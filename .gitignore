@@ -14,7 +14,7 @@ docs/_templates
 .gopath/
 .dotcloud
 *.test
-bundles/
+bundle/
 .hg/
 .git/
 vendor/pkg/
