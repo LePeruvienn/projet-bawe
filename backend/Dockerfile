@@ -1,20 +1,23 @@
-# Use the official Rust image as a base
-FROM rust:1.80
-
-# Set the working directory to /app
+# Stage 1: Build
+FROM rustlang/rust:nightly AS builder
 WORKDIR /app
 
-# Copy the Cargo.toml file into the working directory
-COPY Cargo.toml .
+# Copier les fichiers Cargo et le code source
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
 
-# Build the Rust application
+# Compiler en release
 RUN cargo build --release
 
-# Copy the built application into the working directory
-COPY target/release/* .
+# Stage 2: Runtime léger
+FROM debian:bookworm-slim
+WORKDIR /app
 
-# Expose the port that the application will listen on
+# Copier l'exécutable depuis le stage build
+COPY --from=builder /app/target/release/backend /app/backend
+
+# Exposer le port de l'API
 EXPOSE 8080
 
-# Run the command to start the application when the container is launched
-CMD ["./main"]
+# Commande pour lancer le serveur
+CMD ["./backend"]

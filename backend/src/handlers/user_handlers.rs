@@ -1,36 +1,24 @@
-use axum::{extract::Path, Json};
-
+use axum::{extract::{Path, State}, Json};
+use sqlx::PgPool;
 use crate::models::user::User;
 
 // Handler to greet a user by name from the path
-pub async fn list_all() -> Json<Vec<User>> {
+pub async fn list_all(State(pool): State<PgPool>) -> Json<Vec<User>> {
 
-    let datas = vec![
-        User{ id: 0, name: "Doryan".to_string() },
-        User{ id: 1, name: "Matteo".to_string() },
-        User{ id: 2, name: "FEUR".to_string() },
-        User{ id: 3, name: "Damien".to_string() },
-        User{ id: 4, name: "MOI".to_string() },
-        User{ id: 5, name: "Dimitri".to_string() }
-    ];
+    // Declare the get user query
+    let users = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users")
+        .fetch_all(&pool).await.unwrap();
 
     // Path(name) extracts the parameter named 'name' from the URL
-    Json(datas)
+    Json(users)
 }
 
 // Handler to greet a user by name from the path
-pub async fn get_by_id(Path(id): Path<i32>) -> Json<User> {
+pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Json<User> {
 
-    let datas = vec![
-        User{ id: 0, name: "Doryan".to_string() },
-        User{ id: 1, name: "Matteo".to_string() },
-        User{ id: 2, name: "FEUR".to_string() },
-        User{ id: 3, name: "Damien".to_string() },
-        User{ id: 4, name: "MOI".to_string() },
-        User{ id: 5, name: "Dimitri".to_string() }
-    ];
+    // Declare the get user query
+    let user = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users WHERE id = $1")
+        .bind(id).fetch_one(&pool).await.unwrap();
 
-    let index = id as usize;
-
-    Json(datas[index].clone())
+    Json(user)
 }

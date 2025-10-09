@@ -1,12 +1,11 @@
 use axum::{routing::get, Router};
-
+use sqlx::PgPool;
 use crate::handlers::user_handlers::{
     list_all,
     get_by_id
 };
 
-
-pub fn routes() -> Router {
+pub fn routes() -> Router<PgPool> {
 
     Router::new()
         .route("/", get(list_all))
