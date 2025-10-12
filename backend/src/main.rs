@@ -7,6 +7,7 @@ use std::env;
 pub mod handlers;
 pub mod models;
 pub mod routes;
+pub mod forms;
 
 use crate::routes::user_routes;
 
