@@ -23,7 +23,7 @@ pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Json<
     Json(user)
 }
 
-pub async fn create_user(Form(payload): Form<FormUser>, State(pool): State<PgPool>) -> Json<User> {
+pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> Json<User> {
 
     let query = sqlx::query_as::<_, User>("INSERT INTO users (username, email, password, title)")
         .bind(&payload.username)
@@ -36,14 +36,16 @@ pub async fn create_user(Form(payload): Form<FormUser>, State(pool): State<PgPoo
     Json(user)
 }
 
-/* TODO:
-*
 pub async fn delete_user(Path(id): Path<i32>, State(pool): State<PgPool>) -> StatusCode {
 
-    let query = sqlx::query_as::<_, User>("DELETE FROM users WHERE id = $1;").bind(id);
+    let query = sqlx::query("DELETE FROM users WHERE id = $1;").bind(id);
 
-    let resut = query.execute(&pool).await.unwrap();
+    let result = query.execute(&pool).await;
 
-    StatusCode::NO_CONTENT
+    match result {
+
+        Ok(res) if res.rows_affected() > 0 => StatusCode::NO_CONTENT, // 204
+        Ok(_) => StatusCode::NOT_FOUND, // aucun utilisateur supprimé
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // erreur SQL
+    }
 }
-*/
