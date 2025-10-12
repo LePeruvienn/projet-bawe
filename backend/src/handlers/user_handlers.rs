@@ -33,7 +33,7 @@ pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUse
         .bind(&payload.password)
         .bind(&payload.title);
 
-    let result = query.execute().await;
+    let result = query.execute(&pool).await;
 
     match result {
 
