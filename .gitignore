@@ -20,4 +20,3 @@ bundle/
 vendor/pkg/
 pyenv
 Vagrantfile
-.env/
