@@ -49,3 +49,17 @@ pub async fn delete_user(Path(id): Path<i32>, State(pool): State<PgPool>) -> Sta
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // erreur SQL
     }
 }
+
+pub async fn update_user(Path(id): Path<i32>, State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> Json<User> {
+
+    let query = sqlx::query_as::<_, User>("UPDATE users SET username = $1, email = $2, password = $3, title = $4 WHERE id = $5)")
+        .bind(&payload.username)
+        .bind(&payload.email)
+        .bind(&payload.password)
+        .bind(&payload.title)
+        .bind(id);
+
+    let user = query.fetch_one(&pool).await.unwrap();
+
+    Json(user)
+}
