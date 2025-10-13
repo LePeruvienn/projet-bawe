@@ -12,7 +12,7 @@ services:
       - db
 
   db:
-    image: postgres:15
+    build: ./database
     container_name: postgres_db
     restart: always
     environment:
