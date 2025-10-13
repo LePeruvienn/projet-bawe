@@ -50,3 +50,6 @@ ios/
 linux/
 windows/
 macos/
+
+# I dont think test will be used
+test/
