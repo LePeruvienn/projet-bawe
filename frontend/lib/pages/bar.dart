@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'bar.dart';
+import 'foo.dart';
 
-class FooPage extends StatelessWidget {
+class BarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Foo Page')),
+      appBar: AppBar(title: Text('Bar Page')),
       body: Center(
         child: ElevatedButton(
-          onPressed: () => context.go('/bar'),
-          child: Text('Go to Bar'),
+          onPressed: () => context.go('/foo'),
+          child: Text('Go to Foo'),
         ),
       ),
     );
