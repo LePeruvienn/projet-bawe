@@ -18,7 +18,10 @@ async fn main() {
     dotenv().ok();
 
     // Allow cors
-    let cors = CorsLayer::new().allow_origin(Any);  // Allow all origins (open policy)
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
 
     // Get databas url
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
