@@ -3,6 +3,7 @@ use std::net::SocketAddr;
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use tower_http::cors::{CorsLayer, Any};
 
 pub mod handlers;
 pub mod models;
@@ -16,6 +17,9 @@ async fn main() {
 
     dotenv().ok();
 
+    // Allow cors
+    let cors = CorsLayer::new().allow_origin(Any);  // Allow all origins (open policy)
+
     // Get databas url
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
@@ -28,8 +32,9 @@ async fn main() {
     // Build our application router
     let app = Router::new()
         .nest("/users/", user_routes::routes())
-        .with_state(pool.clone());
-
+        .with_state(pool.clone())
+        .layer(cors);
+    //
     // Define the address to run the server on
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     println!("🚀 Server listening on {}", addr);
