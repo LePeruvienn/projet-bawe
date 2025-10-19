@@ -39,3 +39,28 @@ Future<List<User>> fetchUsers() async {
     throw Exception('Failed to load users');
   }
 }
+
+Future<bool> deleteUser(int id) async {
+
+  try {
+
+    final response = await http.delete(
+      Uri.parse('http://0.0.0.0:8080/users/delete/$id'),
+    );
+
+    // Check for 204 cause API is returning 204 if delete is successfull
+    bool success = response.statusCode == 204;
+
+    if (!success) {
+      print('Failed to delete user: ${response.body}');
+    }
+
+    return success;
+    
+  } catch (error) {
+
+    // Handle any exceptions that occur during the request
+    print('Error occurred while deleting user: $error');
+    return false; // Return false to indicate failure
+  }
+}
