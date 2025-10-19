@@ -4,29 +4,25 @@ import '../models.dart';
 import '../api.dart';
 
 class UsersPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Users'), // Page title
+        title: Text('Users'),
       ),
       body: Column(
         children: [
           Expanded(
             child: UserList(), // Your UserList widget goes here
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Define your button action here
-                print('Button Pressed'); // Example action
-              },
-              child: Text('Take Action'), // Button label
-            ),
-          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Define your button action here
+          print('Button Pressed'); // Example action
+        },
+        child: const Icon(Icons.add), // Button label
       ),
     );
   }
@@ -87,7 +83,7 @@ class UserListItem extends StatelessWidget  {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.deepPurple.shade100,
         child: Text(user.username[0]),
       ),
       title: Text(user.username),

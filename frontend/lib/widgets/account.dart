@@ -39,64 +39,56 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Account',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Account'),
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Account'),
-          centerTitle: true,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Search input and button
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Enter user ID',
-                        border: OutlineInputBorder(),
-                      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Search input and button
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter user ID',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  ElevatedButton.icon(
-                    onPressed: _searchUser,
-                    icon: const Icon(Icons.search),
-                    label: const Text('Search'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // User info (FutureBuilder)
-              Expanded(
-                child: FutureBuilder<User>(
-                  future: futureUser,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData) {
-                      return const Center(child: Text('No user data available'));
-                    }
-
-                    final user = snapshot.data!;
-                    return AccountDetails(user: user);
-                  },
                 ),
+                const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  onPressed: _searchUser,
+                  icon: const Icon(Icons.search),
+                  label: const Text('Search'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // User info (FutureBuilder)
+            Expanded(
+              child: FutureBuilder<User>(
+                future: futureUser,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData) {
+                    return const Center(child: Text('No user data available'));
+                  }
+
+                  final user = snapshot.data!;
+                  return AccountDetails(user: user);
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
