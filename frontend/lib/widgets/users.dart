@@ -106,8 +106,13 @@ class _UserListState extends State<UserList> {
     print("Edit user");
   }
 
-  void _infoUser(int id) {
-    print("Info user");
+  void _infoUser(User user) {
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => UserInfoSheet(user: user),
+    );
   }
 
   @override
@@ -150,7 +155,7 @@ class UserListItem extends StatefulWidget {
   final User user;
   final Function(int) onDelete;
   final Function(int) onEdit;
-  final Function(int) onInfo;
+  final Function(User) onInfo;
 
   UserListItem({
     required this.user,
@@ -190,7 +195,7 @@ class _UserListItemState extends State<UserListItem> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.info),
-                  onPressed: () => widget.onInfo(widget.user.id),
+                  onPressed: () => widget.onInfo(widget.user),
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
@@ -223,6 +228,9 @@ class UserForm extends StatefulWidget {
   State<UserForm> createState() => _UserFormState();
 }
 
+/*
+* State class for UserForm
+*/
 class _UserFormState extends State<UserForm> {
 
   final _formKey = GlobalKey<FormState>();
@@ -370,4 +378,165 @@ class _UserFormState extends State<UserForm> {
       ),
     );
   }
+}
+
+
+/*
+* USER INFO SHEET
+* - Displays detailed info about a user in a bottom popup
+*/
+class UserInfoSheet extends StatelessWidget {
+
+  final User user;
+
+  const UserInfoSheet({super.key, required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _InfoCard(
+            title: user.username,
+            items: [
+              _InfoItem(icon: Icons.badge, label: 'ID', value: user.id.toString()),
+              _InfoItem(icon: Icons.person, label: 'Username', value: user.username),
+              _InfoItem(icon: Icons.email, label: 'Email', value: user.email),
+              _InfoItem(icon: Icons.lock, label: 'Password', value: user.password),
+              _InfoItem(icon: Icons.title, label: 'Title', value: user.title ?? '—'),
+              _InfoItem(
+                icon: Icons.calendar_today,
+                label: 'Created At',
+                value: user.createdAt.toLocal().toString().split('.')[0],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close),
+              label: const Text('Close'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/*
+* User to display users information in the popup
+*/
+class _InfoCard extends StatelessWidget {
+
+  static const double titleFontSize = 24;
+  static const double itemFontSize = 14;
+
+  final String title;
+  final List<_InfoItem> items;
+
+  const _InfoCard({required this.title, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+      Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.deepPurple.shade100,
+            child: Text(
+              title.isNotEmpty ? title[0].toUpperCase() : '?',
+              style: const TextStyle(
+                color: Colors.deepPurple,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: _InfoCard.titleFontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      const Divider(),
+        ...items.map((item) => _InfoRow(item: item)),
+      ],
+    );
+  }
+}
+
+/*
+* Ued to represent each row of the info card
+*/
+class _InfoRow extends StatelessWidget {
+  final _InfoItem item;
+
+  const _InfoRow({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(item.icon, size: 20, color: Colors.deepPurple),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              item.label,
+              style: const TextStyle(
+                fontSize: _InfoCard.itemFontSize,
+                fontWeight: FontWeight.w500
+              ),
+            ),
+          ),
+          Text(
+            item.value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: _InfoCard.itemFontSize,
+              fontWeight: FontWeight.w500
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/*
+* Info model class
+*/
+class _InfoItem {
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoItem({
+
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 }
