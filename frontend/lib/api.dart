@@ -64,3 +64,36 @@ Future<bool> deleteUser(int id) async {
     return false; // Return false to indicate failure
   }
 }
+
+Future<bool> createUser(String username, String email, String password, String title) async {
+
+  try {
+
+    final response = await http.post(
+
+    Uri.parse('http://0.0.0.0:8080/users/create'),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'username': username,
+        'email': email,
+        'password': password,
+      }
+    );
+
+    // Supposons que le backend renvoie 201 pour succès
+    final success = response.statusCode == 201;
+
+    if (!success)
+      print('Failed to create user: ${response.statusCode} - ${response.body}');
+
+    return success;
+
+  } catch (error) {
+
+    print('Error occurred while creating user: $error');
+    return false;
+  }
+}
+
