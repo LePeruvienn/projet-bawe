@@ -27,7 +27,7 @@ pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Resul
 
 pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> StatusCode {
 
-    let query = sqlx::query("INSERT INTO users (username, email, password, title)")
+    let query = sqlx::query("INSERT INTO users (username, email, password, title) VALUES ($1, $2, $3, $4);")
         .bind(&payload.username)
         .bind(&payload.email)
         .bind(&payload.password)
