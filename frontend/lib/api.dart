@@ -65,7 +65,7 @@ Future<bool> deleteUser(int id) async {
   }
 }
 
-Future<bool> createUser(String username, String email, String password, String title) async {
+Future<bool> createUser(String username, String email, String password, String? title) async {
 
   try {
 
@@ -79,6 +79,7 @@ Future<bool> createUser(String username, String email, String password, String t
         'username': username,
         'email': email,
         'password': password,
+        'title': title,
       }
     );
 

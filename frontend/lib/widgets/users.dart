@@ -4,55 +4,104 @@ import '../models.dart';
 import '../api.dart';
 import '../utils.dart';
 
+/************************
+* GLOBALS USERS FUNCTIONS
+*************************/
+
+void handleCreateUser(BuildContext context, String username, String email, String password, String? title) async {
+
+  // Try to create user
+  bool res = await createUser(username, email, password, title);
+
+  // Show message depending of sucess
+  ScaffoldMessenger.of(context).showSnackBar(
+    createSnackbar(
+      dismissText: res ? 'User created successfully' : 'Failed to create user',
+      backgroundColor: res ? Colors.deepPurple : Colors.red,
+      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+    ),
+  );
+}
+
+void handleUpdateUser(User user) async {
+
+  print("Update user");
+}
+
+void handleDeleteUser(BuildContext context, User user) async {
+
+  bool res = await deleteUser(user.id);
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    createSnackbar(
+      dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
+      backgroundColor: res ? Colors.deepPurple : Colors.red,
+      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+    ),
+  );
+}
+
+void handleInfoUser(BuildContext context, User user) {
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => UserInfoSheet(user: user),
+  );
+}
+
+/************************
+* GLOBALS USERS CLASSES
+*************************/
+
 /*
 * BASE USER PAGE
 * - This is the container of the user list page
 */
 class UsersPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Users'),
-      ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  // Define your refresh action here
-                  print('Refresh Pressed'); // Example action
-                },
-              ),
-            ],
-          ),
-          Expanded(
-            child: UserList(), // Your UserList widget goes here
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) => Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: UserForm(onUserCreated: () {
-                // Optionally trigger refresh if needed
-              }),
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Users'),
+    ),
+    body: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                // Define your refresh action here
+                print('Refresh Pressed'); // Example action
+              },
             ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+          ],
+        ),
+        Expanded(
+          child: UserList(), // Your UserList widget goes here
+        ),
+      ],
+    ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: UserForm(title: "Create User"),
+          ),
+        );
+      },
+      child: const Icon(Icons.add),
+    ),
+  );
+}
 }
 
 /*
@@ -60,90 +109,72 @@ class UsersPage extends StatelessWidget {
 * - This widget contains the list of all the Users
 */
 class UserList extends StatefulWidget {
-  const UserList({super.key});
+const UserList({super.key});
 
-  @override
-  State<UserList> createState() => _UserListState();
+@override
+State<UserList> createState() => _UserListState();
 }
 
 /*
 * State class for @UserList
 */
 class _UserListState extends State<UserList> {
-  late Future<List<User>> futureUsers;
+late Future<List<User>> futureUsers;
 
-  @override
-  void initState() {
-    super.initState();
+@override
+void initState() {
+  super.initState();
+  futureUsers = fetchUsers();
+}
+
+// Used to refrech the users after delete / update
+Future<void> _refreshUsers() async {
+  setState(() {
     futureUsers = fetchUsers();
-  }
+  });
+}
 
-  // Used to refrech the users after delete / update
-  Future<void> _refreshUsers() async {
-    setState(() {
-      futureUsers = fetchUsers();
-    });
-  }
+// UserListItem buttons functions :
+void _deleteUser(int id) async {
 
-  // UserListItem buttons functions :
-  void _deleteUser(int id) async {
+  bool res = await deleteUser(id);
 
-    bool res = await deleteUser(id);
+  ScaffoldMessenger.of(context).showSnackBar(
+    createSnackbar(
+      dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
+      backgroundColor: res ? Colors.deepPurple : Colors.red,
+      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+    ),
+  );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      createSnackbar(
-        dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
-        backgroundColor: res ? Colors.deepPurple : Colors.red,
-        icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-      ),
-    );
+  // IDK if let it here
+  // _refreshUsers();
+}
 
-    // IDK if let it here
-    // _refreshUsers();
-  }
+@override
+Widget build(BuildContext context) {
+  return FutureBuilder<List<User>>(
+    future: futureUsers,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
 
-  void _editUser(int id) {
-    print("Edit user");
-  }
+        return Center(child: CircularProgressIndicator());
 
-  void _infoUser(User user) {
+      } else if (snapshot.hasError) {
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => UserInfoSheet(user: user),
-    );
-  }
+        return Center(child: Text('Error: ${snapshot.error}'));
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<User>>(
-      future: futureUsers,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      } else {
 
-          return Center(child: CircularProgressIndicator());
-
-        } else if (snapshot.hasError) {
-
-          return Center(child: Text('Error: ${snapshot.error}'));
-
-        } else {
-
-          return ListView(
-            children: snapshot.data!.map((user) {
-              return UserListItem(
-                user: user,
-                onDelete: _deleteUser,
-                onEdit: _editUser,
-                onInfo: _infoUser,
-              );
-            }).toList(),
-          );
-        }
-      },
-    );
-  }
+        return ListView(
+          children: snapshot.data!.map((user) {
+            return UserListItem(user: user);
+          }).toList(),
+        );
+      }
+    },
+  );
+}
 }
 
 /*
@@ -152,20 +183,12 @@ class _UserListState extends State<UserList> {
 */
 class UserListItem extends StatefulWidget {
 
-  final User user;
-  final Function(int) onDelete;
-  final Function(int) onEdit;
-  final Function(User) onInfo;
+final User user;
 
-  UserListItem({
-    required this.user,
-    required this.onDelete,
-    required this.onEdit,
-    required this.onInfo,
-  }) : super(key: ObjectKey(user));
+UserListItem({ required this.user }) : super(key: ObjectKey(user));
 
-  @override
-  _UserListItemState createState() => _UserListItemState();
+@override
+_UserListItemState createState() => _UserListItemState();
 }
 
 /*
@@ -173,10 +196,10 @@ class UserListItem extends StatefulWidget {
 */
 class _UserListItemState extends State<UserListItem> {
 
-  bool _isHovered = false;
+bool _isHovered = false;
 
-  @override
-  Widget build(BuildContext context) {
+@override
+Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -195,15 +218,15 @@ class _UserListItemState extends State<UserListItem> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.info),
-                  onPressed: () => widget.onInfo(widget.user),
+                  onPressed: () => handleInfoUser(context, widget.user),
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: () => widget.onEdit(widget.user.id),
+                  onPressed: () => handleUpdateUser(widget.user),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () => widget.onDelete(widget.user.id),
+                  onPressed: () => handleDeleteUser(context, widget.user),
                 ),
               ],
             ),
@@ -220,9 +243,18 @@ class _UserListItemState extends State<UserListItem> {
 * - This widget displays the form to create a new user
 */
 class UserForm extends StatefulWidget {
-  final VoidCallback? onUserCreated; // Optional callback to refresh the user list
 
-  const UserForm({super.key, this.onUserCreated});
+  // Title displayed at the top of the popup
+  final String title;
+
+  // User linked to the form (can be null if we are creating an user)
+  final User? user;
+
+  const UserForm({
+    super.key,
+    required this.title,
+    this.user = null
+  });
 
   @override
   State<UserForm> createState() => _UserFormState();
@@ -245,10 +277,29 @@ class _UserFormState extends State<UserForm> {
   // UI vars
   bool _obscurePassword = true;
 
-  Future<void> _submitForm() async {
+  @override
+  void initState() {
+
+    super.initState();
+
+    final user = widget.user;
+
+    if (widget.user != null) {
+
+      _usernameController.text = user!.username;
+      _emailController.text = user!.email;
+      _passwordController.text = user!.password;
+
+      if (user?.title != null)
+        _titleController.text = user!.title!;
+    }
+  }
+
+  void _submitForm() async {
 
     // If form not valid return
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate())
+      return;
 
     // Update state
     setState(() => _isSubmitting = true);
@@ -259,25 +310,34 @@ class _UserFormState extends State<UserForm> {
     final password = _passwordController.text.trim();
     final title = _titleController.text.trim();
 
-    // Try to create user
-    bool res = await createUser(username, email, password, title);
+    // Create user
+    if (widget.user == null) {
 
-    // Show message depending of sucess
-    ScaffoldMessenger.of(context).showSnackBar(
-      createSnackbar(
-        dismissText: res ? 'User created successfully' : 'Failed to create user',
-        backgroundColor: res ? Colors.deepPurple : Colors.red,
-        icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-      ),
-    );
+      handleCreateUser (context, username, email, password, title);
 
-    // Clear all inputs
-    // if (res) {
+    // Update User
+    } else {
+
+      final user = User(
+        id: widget.user!.id,
+        username: username,
+        email: email,
+        password: password,
+        title: title,
+        createdAt: widget.user!.createdAt,
+      );
+
+      handleUpdateUser(user);
+    }
+
+    // Clear inputs fields
     _usernameController.clear();
     _emailController.clear();
-    widget.onUserCreated?.call(); // Notify parent widget if provided
-    Navigator.of(context).pop(); // Close form if in a dialog
-    // }
+    _passwordController.clear();
+    _titleController.clear();
+
+    // Close form if in a dialog
+    Navigator.of(context).pop();
 
     // Update state
     setState(() => _isSubmitting = false);
@@ -293,7 +353,7 @@ class _UserFormState extends State<UserForm> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Create User',
+              widget.title,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -366,7 +426,7 @@ class _UserFormState extends State<UserForm> {
                 : ElevatedButton.icon(
                     onPressed: _submitForm,
                     icon: const Icon(Icons.save),
-                    label: const Text('Create'),
+                    label: const Text('Save'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                       foregroundColor: Colors.white,
