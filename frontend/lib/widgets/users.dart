@@ -23,14 +23,25 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
   );
 }
 
-void handleUpdateUser(User user) async {
+void handleUpdateUser(BuildContext context, User user) async {
 
-  print("Update user");
+  print("HANDLE, UPDATE USER");
+
+  bool res = await updateUser(user);
+
+  // Show message depending of sucess
+  ScaffoldMessenger.of(context).showSnackBar(
+    createSnackbar(
+      dismissText: res ? 'User updated successfully' : 'Failed to update user',
+      backgroundColor: res ? Colors.deepPurple : Colors.red,
+      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+    ),
+  );
 }
 
 void handleDeleteUser(BuildContext context, User user) async {
 
-  bool res = await deleteUser(user.id);
+  bool res = await deleteUser(user);
 
   ScaffoldMessenger.of(context).showSnackBar(
     createSnackbar(
@@ -134,23 +145,6 @@ Future<void> _refreshUsers() async {
   });
 }
 
-// UserListItem buttons functions :
-void _deleteUser(int id) async {
-
-  bool res = await deleteUser(id);
-
-  ScaffoldMessenger.of(context).showSnackBar(
-    createSnackbar(
-      dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
-      backgroundColor: res ? Colors.deepPurple : Colors.red,
-      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-    ),
-  );
-
-  // IDK if let it here
-  // _refreshUsers();
-}
-
 @override
 Widget build(BuildContext context) {
   return FutureBuilder<List<User>>(
@@ -222,7 +216,18 @@ Widget build(BuildContext context) {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: () => handleUpdateUser(widget.user),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: UserForm(title: "Update User", user: widget.user),
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
@@ -327,7 +332,7 @@ class _UserFormState extends State<UserForm> {
         createdAt: widget.user!.createdAt,
       );
 
-      handleUpdateUser(user);
+      handleUpdateUser(context, user);
     }
 
     // Clear inputs fields

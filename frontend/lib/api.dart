@@ -40,7 +40,9 @@ Future<List<User>> fetchUsers() async {
   }
 }
 
-Future<bool> deleteUser(int id) async {
+Future<bool> deleteUser(User user) async {
+
+  final id = user.id;
 
   try {
 
@@ -79,7 +81,7 @@ Future<bool> createUser(String username, String email, String password, String? 
         'username': username,
         'email': email,
         'password': password,
-        'title': title,
+        'title': title ?? 'null',
       }
     );
 
@@ -98,3 +100,40 @@ Future<bool> createUser(String username, String email, String password, String? 
   }
 }
 
+
+Future<bool> updateUser(User user) async {
+
+  final id = user.id;
+
+  try {
+
+    final response = await http.put(
+      Uri.parse('http://0.0.0.0:8080/users/update/$id'),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'username': user.username,
+        'email': user.email,
+        'password': user.password,
+        'title': user.title ?? 'null',
+      }
+    );
+
+    // Check for 202 : OK
+    bool success = response.statusCode == 204;
+
+    if (!success) {
+      print('Failed to update user: ${response.body}');
+    }
+
+    return success;
+    
+  } catch (error) {
+
+    // Handle any exceptions that occur during the request
+    print('Error occurred while updating user: $error');
+
+    return false; // Return false to indicate failure
+  }
+}
