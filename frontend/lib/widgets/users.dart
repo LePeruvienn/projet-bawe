@@ -372,8 +372,6 @@ class _UserFormState extends State<UserForm> {
                       labelText: 'Name',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Username required' : null,
                   ),
                 ),
                 const SizedBox(width: 12), // espace entre les champs
@@ -385,6 +383,8 @@ class _UserFormState extends State<UserForm> {
                       labelText: 'Username',
                       border: OutlineInputBorder(),
                     ),
+                    validator: (value) =>
+                        (value == null || value.isEmpty) ? 'Username required' : null,
                   ),
                 ),
               ],
