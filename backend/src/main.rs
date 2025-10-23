@@ -13,6 +13,7 @@ pub mod routes;
 pub mod forms;
 
 use crate::routes::user_routes;
+use crate::routes::post_routes;
 
 /// Essaie de se connecter à la DB avec des retries
 async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::Pool<sqlx::Postgres> {
@@ -54,6 +55,7 @@ async fn main() {
 
     let app = Router::new()
         .nest("/users/", user_routes::routes())
+        .nest("/posts/", post_routes::routes())
         .with_state(pool.clone())
         .layer(cors);
 
