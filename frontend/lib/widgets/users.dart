@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../models.dart';
-import '../api.dart';
+import '../models/user.dart';
 import '../utils.dart';
+import '../api/users.dart';
 
 /************************
 * GLOBALS USERS FUNCTIONS
@@ -14,12 +14,11 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
   bool res = await createUser(username, email, password, title);
 
   // Show message depending of sucess
-  ScaffoldMessenger.of(context).showSnackBar(
-    createSnackbar(
-      dismissText: res ? 'User created successfully' : 'Failed to create user',
-      backgroundColor: res ? Colors.deepPurple : Colors.red,
-      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-    ),
+  showSnackbar(
+    context: context,
+    dismissText: res ? 'User created successfully' : 'Failed to create user',
+    backgroundColor: res ? Colors.deepPurple : Colors.red,
+    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
 }
 
@@ -30,12 +29,11 @@ void handleUpdateUser(BuildContext context, User user) async {
   bool res = await updateUser(user);
 
   // Show message depending of sucess
-  ScaffoldMessenger.of(context).showSnackBar(
-    createSnackbar(
-      dismissText: res ? 'User updated successfully' : 'Failed to update user',
-      backgroundColor: res ? Colors.deepPurple : Colors.red,
-      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-    ),
+  showSnackbar(
+    context: context,
+    dismissText: res ? 'User updated successfully' : 'Failed to update user',
+    backgroundColor: res ? Colors.deepPurple : Colors.red,
+    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
 }
 
@@ -43,12 +41,11 @@ void handleDeleteUser(BuildContext context, User user) async {
 
   bool res = await deleteUser(user);
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    createSnackbar(
-      dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
-      backgroundColor: res ? Colors.deepPurple : Colors.red,
-      icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-    ),
+  showSnackbar(
+    context: context,
+    dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
+    backgroundColor: res ? Colors.deepPurple : Colors.red,
+    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
 }
 
@@ -71,48 +68,48 @@ void handleInfoUser(BuildContext context, User user) {
 */
 class UsersPage extends StatelessWidget {
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Users'),
-    ),
-    body: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                // Define your refresh action here
-                print('Refresh Pressed'); // Example action
-              },
-            ),
-          ],
-        ),
-        Expanded(
-          child: UserList(), // Your UserList widget goes here
-        ),
-      ],
-    ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (context) => Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: UserForm(title: "Create User"),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Users'),
+      ),
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () {
+                  // Define your refresh action here
+                  print('Refresh Pressed'); // Example action
+                },
+              ),
+            ],
           ),
-        );
-      },
-      child: const Icon(Icons.add),
-    ),
-  );
-}
+          Expanded(
+            child: UserList(), // Your UserList widget goes here
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: UserForm(title: "Create User"),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
 }
 
 /*

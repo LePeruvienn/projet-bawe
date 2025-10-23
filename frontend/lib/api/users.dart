@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 
-import 'models.dart';
+import '../models/user.dart';
 
 Future<User> fetchUser(int id) async {
   final response = await http.get(

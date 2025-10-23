@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models.dart';
-import '../api.dart';
+import '../models/user.dart';
+import '../api/users.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});

@@ -1,9 +1,11 @@
+// Users Table class
 class User {
+
   final int id;
   final String username;
   final String email;
   final String password;
-  final String? title; // nullable
+  final String? title;
   final DateTime createdAt;
 
   const User({
@@ -11,7 +13,7 @@ class User {
     required this.username,
     required this.email,
     required this.password,
-    this.title, // nullable
+    this.title,
     required this.createdAt,
   });
 

@@ -3,6 +3,7 @@ import 'foo.dart';
 import 'bar.dart';
 import 'account.dart';
 import 'users.dart';
+import 'posts.dart';
 
 // The mange page this is gonna contain the page rendererd + navigation bar
 class AppPage extends StatelessWidget {
@@ -81,7 +82,7 @@ class _NavigationState extends State<Navigation> {
   Widget _getPage(int index) {
     // Replace with your actual page widgets
     List<Widget> pages = [
-      FooPage(),
+      PostsPage(),
       BarPage(),
       AccountPage(),
       UsersPage(),
