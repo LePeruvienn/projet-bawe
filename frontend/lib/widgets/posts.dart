@@ -62,7 +62,6 @@ class PostsPage extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () {
-                  // Define your refresh action here
                   print('Refresh Pressed'); // Example action
                 },
               ),
@@ -76,6 +75,79 @@ class PostsPage extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class PostList extends StatefulWidget {
+
+  PostList({super.key});
+  
+  @override
+  State<PostList> createState() => _PostListState();
+}
+
+class _PostListState extends State<PostList> {
+
+  late Future<List<Post>> futurePosts;
+
+  @override
+  void initState() {
+    super.initState();
+    futurePosts = fetchPosts();
+  }
+
+  // Used to refrech the users after delete / update
+  void _refreshPosts() async {
+    setState(() {
+      futurePosts = fetchPosts();
+    });
+  }
+
+  @override Widget build(BuildContext context) {
+
+    return FutureBuilder<List<Post>> (
+      future: futurePosts,
+      builder: (context, snapshot) {
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+
+          return Center(child: CircularProgressIndicator());
+
+        } else if (snapshot.hasError) {
+
+          return Center(child: Text('Error: ${snapshot.error}'));
+
+        } else {
+
+          return ListView(
+            children: snapshot.data!.map((post) {
+              return PostListItem(post: post);
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
+}
+
+class PostListItem extends StatefulWidget {
+
+  final Post post;
+
+  PostListItem({ required this.post }) : super(key: ObjectKey(post));
+
+  @override
+  State<PostListItem> createState() => _PostListItemState();
+}
+
+class _PostListItemState extends State<PostListItem> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Card(
+
     );
   }
 }

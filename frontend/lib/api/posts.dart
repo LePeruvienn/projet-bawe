@@ -13,7 +13,7 @@ Future<Post> fetchPost(int id) async {
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
-    return Post.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    return await Post.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
 
   } else {
     // If the server did not return a 200 OK response,
@@ -31,8 +31,14 @@ Future<List<Post>> fetchPosts() async {
   if (response.statusCode == 200) {
 
     // Parse the response body and map it to a List of Post
-    List<dynamic> jsonResponse = jsonDecode(response.body);
-    return jsonResponse.map<Post>((post) => Post.fromJson(post as Map<String, dynamic>)).toList();
+    List<dynamic> jsonResponse = jsonDecode(response.body) as List;
+
+    //TODO: IMPROVE THIS
+    List<Post> posts = await Future.wait(jsonResponse.map((post) async {
+      return await Post.fromJson(post as Map<String, dynamic>);
+    }).toList());
+
+    return posts;
 
   } else {
 

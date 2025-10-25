@@ -82,7 +82,6 @@ class UsersPage extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () {
-                  // Define your refresh action here
                   print('Refresh Pressed'); // Example action
                 },
               ),
@@ -117,55 +116,57 @@ class UsersPage extends StatelessWidget {
 * - This widget contains the list of all the Users
 */
 class UserList extends StatefulWidget {
-const UserList({super.key});
 
-@override
-State<UserList> createState() => _UserListState();
+  const UserList({super.key});
+
+  @override
+  State<UserList> createState() => _UserListState();
 }
 
 /*
 * State class for @UserList
 */
 class _UserListState extends State<UserList> {
-late Future<List<User>> futureUsers;
 
-@override
-void initState() {
-  super.initState();
-  futureUsers = fetchUsers();
-}
+  late Future<List<User>> futureUsers;
 
-// Used to refrech the users after delete / update
-Future<void> _refreshUsers() async {
-  setState(() {
+  @override
+  void initState() {
+    super.initState();
     futureUsers = fetchUsers();
-  });
-}
+  }
 
-@override
-Widget build(BuildContext context) {
-  return FutureBuilder<List<User>>(
-    future: futureUsers,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
+  // Used to refrech the users after delete / update
+  Future<void> _refreshUsers() async {
+    setState(() {
+      futureUsers = fetchUsers();
+    });
+  }
 
-        return Center(child: CircularProgressIndicator());
+  @override Widget build(BuildContext context) {
 
-      } else if (snapshot.hasError) {
+    return FutureBuilder<List<User>>(
+      future: futureUsers,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
 
-        return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: CircularProgressIndicator());
 
-      } else {
+        } else if (snapshot.hasError) {
 
-        return ListView(
-          children: snapshot.data!.map((user) {
-            return UserListItem(user: user);
-          }).toList(),
-        );
-      }
-    },
-  );
-}
+          return Center(child: Text('Error: ${snapshot.error}'));
+
+        } else {
+
+          return ListView(
+            children: snapshot.data!.map((user) {
+              return UserListItem(user: user);
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
 }
 
 /*
@@ -174,12 +175,12 @@ Widget build(BuildContext context) {
 */
 class UserListItem extends StatefulWidget {
 
-final User user;
+  final User user;
 
-UserListItem({ required this.user }) : super(key: ObjectKey(user));
+  UserListItem({ required this.user }) : super(key: ObjectKey(user));
 
-@override
-_UserListItemState createState() => _UserListItemState();
+  @override
+  State<UserListItem> createState() => _UserListItemState();
 }
 
 /*
@@ -187,10 +188,10 @@ _UserListItemState createState() => _UserListItemState();
 */
 class _UserListItemState extends State<UserListItem> {
 
-bool _isHovered = false;
+  bool _isHovered = false;
 
-@override
-Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
