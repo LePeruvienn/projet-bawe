@@ -1,28 +1,58 @@
 use axum::{extract::{Path, State/*, Form*/}, Json, http::StatusCode};
 use sqlx::PgPool;
-use crate::models::post::Post;
+use crate::models::post::PostWithUserData;
 // use crate::forms::post_forms::Formpost;
 
 // TODO: >>> ALL 
 
-// Handler to greet a post by name from the path
-pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<Post>>, StatusCode> {
+pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<PostWithUserData>>, StatusCode> {
 
-    let query = sqlx::query_as::<_, Post>("SELECT id, user_id, content, created_at, likes_count FROM posts");
+    print!("post_handlers : list_all ...");
 
-    let posts = query.fetch_all(&pool).await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // retourne 500 si erreur SQL
-    //
+    let query = sqlx::query_as::<_, PostWithUserData>("
+        SELECT 
+            p.id,
+            p.content,
+            p.created_at,
+            p.likes_count,
+            u.id as user_id,
+            u.username as user_username,
+            u.title as user_title,
+            u.created_at as user_created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id;
+        ");
+
+    let posts = query.fetch_all(&pool).await.map_err(|e| {
+        eprintln!("Error fetching posts: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
     Ok(Json(posts))
 }
 
 // Handler to greet a post by name from the path
-pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Result<Json<Post>, StatusCode> {
+pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Result<Json<PostWithUserData>, StatusCode> {
 
-    let query = sqlx::query_as::<_, Post>("SELECT id, user_id, content, created_at, likes_count FROM posts WHERE id = $1").bind(id);
+    let query = sqlx::query_as::<_, PostWithUserData>("
+        SELECT 
+            p.id,
+            p.content,
+            p.created_at,
+            p.likes_count,
+            u.id as user_id,
+            u.username as user_username,
+            u.title as user_title,
+            u.created_at as user_created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = $1;
+        ").bind(id);
 
-    let post = query.fetch_one(&pool).await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // retourne 500 si erreur SQL
+    let post = query.fetch_one(&pool).await.map_err(|e| {
+        eprintln!("Error fetching posts: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
     Ok(Json(post))
 }
