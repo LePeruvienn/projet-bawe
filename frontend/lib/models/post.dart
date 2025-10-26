@@ -5,7 +5,7 @@ import '../api/users.dart';
 class Post {
 
   final int id;
-  final User user;
+  final UserBasic user;
   final String content;
   final DateTime createdAt;
   final int likesCount;
@@ -18,12 +18,14 @@ class Post {
     required this.likesCount
   });
 
-  //TODO: IMPROVE THIS
-  static Future<Post> fromJson(Map<String, dynamic> json) async {
-  
-    final userId = json['user_id'] as int;
+  factory Post.fromJson(Map<String, dynamic> json) {
 
-    final user = await fetchUser(userId);
+    final user = UserBasic(
+      id: json['user_id'] as int,
+      username: json['user_username'] as String,
+      title: json['user_title'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
 
     return Post(
       id: json['id'] as int,
