@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'widgets/foo.dart';
 import 'widgets/bar.dart';
-import 'widgets/home.dart';
+import 'widgets/app.dart';
 
 class AppRouter {
 

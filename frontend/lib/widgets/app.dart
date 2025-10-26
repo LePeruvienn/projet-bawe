@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'foo.dart';
-import 'bar.dart';
 import 'account.dart';
 import 'users.dart';
 import 'posts.dart';
+import 'login.dart';
+import 'signin.dart';
 
 // The mange page this is gonna contain the page rendererd + navigation bar
 class AppPage extends StatelessWidget {
@@ -51,7 +51,7 @@ class _NavigationState extends State<Navigation> {
           currentPageIndex = index;
         });
       },
-      indicatorColor: Colors.amber,
+      indicatorColor: Colors.deepPurple.shade100,
       selectedIndex: currentPageIndex,
       destinations: const <Widget>[
           NavigationDestination(
@@ -83,10 +83,10 @@ class _NavigationState extends State<Navigation> {
     // Replace with your actual page widgets
     List<Widget> pages = [
       PostsPage(),
-      BarPage(),
+      LoginPage(),
+      SigninPage(),
       AccountPage(),
       UsersPage(),
-      BarPage(),
     ];
 
     return pages[index];
