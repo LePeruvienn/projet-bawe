@@ -2,10 +2,8 @@ use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey}
 use std::env;
 use crate::models::auth::Claims;
 
-// TODO: IMPROVE THIS : MAKE JWT TOKEN CREATION GOOD
-
 pub fn create_jwt(user_id: &str) -> String {
-    
+
     let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
 
     let expiration = chrono::Utc::now()
@@ -32,6 +30,3 @@ pub fn verify_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
     )?;
     Ok(data.claims)
 }
-
-
-// TODO: Maybe add here verfiy password ? Idk if this is the right file but i dont wanna create too much files
