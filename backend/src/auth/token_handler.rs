@@ -1,14 +1,8 @@
 use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey};
-use serde::{Serialize, Deserialize};
 use std::env;
+use crate::models::auth::Claims;
 
 // TODO: IMPROVE THIS : MAKE JWT TOKEN CREATION GOOD
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Claims {
-    pub sub: String,   // user id
-    pub exp: usize,    // expiration timestamp
-}
 
 pub fn create_jwt(user_id: &str) -> String {
     
@@ -19,12 +13,18 @@ pub fn create_jwt(user_id: &str) -> String {
         .unwrap()
         .timestamp() as usize;
 
-    let claims = Claims { sub: user_id.to_string(), exp: expiration };
+    let claims = Claims{
+        sub: user_id.to_string(),
+        exp: expiration
+    };
+
     encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.as_ref())).unwrap()
 }
 
 pub fn verify_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
+
     let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+
     let data = decode::<Claims>(
         token,
         &DecodingKey::from_secret(secret.as_ref()),
@@ -33,3 +33,5 @@ pub fn verify_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
     Ok(data.claims)
 }
 
+
+// TODO: Maybe add here verfiy password ? Idk if this is the right file but i dont wanna create too much files

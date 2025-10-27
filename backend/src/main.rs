@@ -3,8 +3,8 @@ use std::net::SocketAddr;
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-use std::time::Duration; // <- Correct import
-use tokio::time::sleep;  // <- Correct import
+use std::time::Duration;
+use tokio::time::sleep;
 use tower_http::cors::{CorsLayer, Any};
 
 pub mod handlers;
@@ -15,6 +15,7 @@ pub mod auth;
 
 use crate::routes::user_routes;
 use crate::routes::post_routes;
+use crate::routes:: auth_routes;
 
 /// Essaie de se connecter à la DB avec des retries
 async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::Pool<sqlx::Postgres> {
@@ -26,12 +27,12 @@ async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::
             .await
         {
             Ok(pool) => {
-                println!("✅ Connected to database");
+                println!("Connected to database!");
                 return pool;
             }
             Err(e) => {
                 if attempts == 0 {
-                    panic!("❌ Could not connect to database: {:?}", e);
+                    panic!("Error: Could not connect to database: {:?}", e);
                 }
                 println!("Waiting for database... ({})", e);
                 attempts -= 1;
@@ -57,6 +58,7 @@ async fn main() {
     let app = Router::new()
         .nest("/users/", user_routes::routes())
         .nest("/posts/", post_routes::routes())
+        .nest("/auth/", auth_routes::routes())
         .with_state(pool.clone())
         .layer(cors);
 
