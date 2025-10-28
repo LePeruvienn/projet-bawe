@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 
 import '../models/user.dart';
+import '../auth/tokenHandler.dart';
 
 Future<User> fetchUser(int id) async {
 
@@ -141,18 +142,35 @@ Future<bool> updateUser(User user) async {
 
 Future<User> fetchConnectedUser() async {
 
+  // Get user token
+  final token = TokenHandler().token;
+
+  // If there is no token return error
+  if (token == null)
+    throw Exception('User is not connected.');
+
+  // Try getting connected user data
   final response = await http.get(
     Uri.parse('http://0.0.0.0:8080/users/protected/me'),
+    headers: {
+      'Authorization': 'Bearer $token',  // Include token in the Authorization header
+      'Content-Type': 'application/json',
+    },
   );
 
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  // Handle the response
+  switch (response.statusCode) {
 
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load user');
+    case 200: // Success
+      return User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+
+    case 401: // Unauthorized
+      throw Exception('Unauthorized: Invalid token');
+
+    case 403: // Forbidden
+      throw Exception('Forbidden: You do not have access to this resource');
+
+    default: // Handle other status codes
+      throw Exception('Failed to fetch data: ${response.statusCode} - ${response.body}');
   }
 }

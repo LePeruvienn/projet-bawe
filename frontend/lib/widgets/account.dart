@@ -3,6 +3,7 @@ import '../models/user.dart';
 import '../api/users.dart';
 
 class AccountPage extends StatefulWidget {
+
   const AccountPage({super.key});
 
   @override
@@ -10,31 +11,15 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+
   late Future<User> futureUser;
+
   final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    futureUser = fetchUser(1);
-  }
-
-  void _searchUser() {
-
-    final input = _controller.text.trim();
-    if (input.isEmpty) return;
-
-    final id = int.tryParse(input);
-    if (id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid user ID')),
-      );
-      return;
-    }
-
-    setState(() {
-      futureUser = fetchUser(id);
-    });
+    futureUser = fetchConnectedUser();
   }
 
   @override
@@ -47,43 +32,28 @@ class _AccountPageState extends State<AccountPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Search input and button
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter user ID',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: _searchUser,
-                  icon: const Icon(Icons.search),
-                  label: const Text('Search'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
             // User info (FutureBuilder)
             Expanded(
               child: FutureBuilder<User>(
                 future: futureUser,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData) {
-                    return const Center(child: Text('No user data available'));
-                  }
 
+                  // While we are waiting show progression
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    return const Center(child: CircularProgressIndicator());
+
+                  // When error, show error message at center
+                  else if (snapshot.hasError)
+                    return Center(child: Text('Error: ${snapshot.error}'));
+
+                  // If we have no data return no data error
+                  else if (!snapshot.hasData)
+                    return const Center(child: Text('No user data available'));
+
+                  // Ge fetched user
                   final user = snapshot.data!;
+
+                  // Create AccountDetails component with it
                   return AccountDetails(user: user);
                 },
               ),
@@ -96,6 +66,7 @@ class _AccountPageState extends State<AccountPage> {
 }
 
 class AccountDetails extends StatelessWidget {
+
   final User user;
 
   const AccountDetails({super.key, required this.user});
