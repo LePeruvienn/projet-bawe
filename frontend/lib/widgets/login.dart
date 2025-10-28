@@ -1,4 +1,26 @@
 import 'package:flutter/material.dart';
+import '../utils.dart';
+import '../api/auth.dart';
+
+/************************
+* GLOBALS LOGIN FUNCTIONS
+*************************/
+
+void handleLogin(BuildContext context, String username, String password) async {
+
+  bool res = await login(username, password);
+
+  showSnackbar(
+    context: context,
+    dismissText: res ? 'Sucessfully logged in' : 'Login failed',
+    backgroundColor: res ? Colors.deepPurple : Colors.red,
+    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+  );
+}
+
+/************************
+* GLOBALS LOGIN CLASSES
+*************************/
 
 class LoginPage extends StatefulWidget {
   @override
@@ -6,21 +28,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  String _username = '';
-  String _password = '';
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      // Handle login logic here
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Logging in...'),
-          backgroundColor: Colors.deepPurple,
-        ),
-      );
-      // You can add authentication logic here.
-    }
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _submitForm() {
+
+    if (!_formKey.currentState!.validate())
+      return;
+
+    handleLogin(
+      context,
+      _usernameController.text.trim(), // Username
+      _passwordController.text.trim()  // Password
+    );
   }
 
   @override
@@ -71,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   // Username Text Field
                   TextFormField(
+                    controller: _usernameController,
                     decoration: const InputDecoration(
                       labelText: 'Username',
                       prefixIcon: Icon(Icons.person),
@@ -82,15 +106,11 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       return null;
                     },
-                    onChanged: (value) {
-                      setState(() {
-                        _username = value;
-                      });
-                    },
                   ),
                   const SizedBox(height: 16),
                   // Password Text Field
                   TextFormField(
+                    controller: _passwordController,
                     decoration: const InputDecoration(
                       labelText: 'Password',
                       prefixIcon: Icon(Icons.lock),
@@ -103,16 +123,11 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       return null;
                     },
-                    onChanged: (value) {
-                      setState(() {
-                        _password = value;
-                      });
-                    },
                   ),
                   const SizedBox(height: 20),
                   // Login Button
                   ElevatedButton(
-                    onPressed: _login,
+                    onPressed: _submitForm,
                     child: const Text('Login'),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),

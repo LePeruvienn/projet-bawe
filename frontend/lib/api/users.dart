@@ -6,8 +6,9 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 Future<User> fetchUser(int id) async {
+
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/$id'),
+    Uri.parse('http://0.0.0.0:8080/users/public/$id'),
   );
 
   if (response.statusCode == 200) {
@@ -25,7 +26,7 @@ Future<User> fetchUser(int id) async {
 Future<List<User>> fetchUsers() async {
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/'),
+    Uri.parse('http://0.0.0.0:8080/users/public'),
   );
 
   if (response.statusCode == 200) {
@@ -135,5 +136,23 @@ Future<bool> updateUser(User user) async {
     print('Error occurred while updating user: $error');
 
     return false; // Return false to indicate failure
+  }
+}
+
+Future<User> fetchConnectedUser() async {
+
+  final response = await http.get(
+    Uri.parse('http://0.0.0.0:8080/users/protected/me'),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load user');
   }
 }

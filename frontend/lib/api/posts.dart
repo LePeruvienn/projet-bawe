@@ -26,7 +26,7 @@ Future<Post> fetchPost(int id) async {
 Future<List<Post>> fetchPosts() async {
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/posts/'),
+    Uri.parse('http://0.0.0.0:8080/posts'),
   );
 
   if (response.statusCode == 200) {
