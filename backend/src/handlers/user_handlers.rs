@@ -77,14 +77,20 @@ pub async fn update_user(Path(id): Path<i32>, State(pool): State<PgPool>, Form(p
 
 pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<User>, StatusCode> {
 
+    println!("Trying to get connected user ...");
+
     // If user is not connected we return UNAUTHORIZED
     if !auth_user.is_connected {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
+    let username = auth_user.username;
+    
+    println!("User is connected with {username}");
+
     // Prepare query with auth_user username
     let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users WHERE username = $1")
-        .bind(auth_user.username);
+        .bind(username);
 
     // Run query and map it as User struct
     let user = query.fetch_one(&pool).await

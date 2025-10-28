@@ -7,24 +7,27 @@ use crate::auth::token_handler::create_jwt;
 
 pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>) -> Result<Json<TokenResponse>, StatusCode> {
 
-    print!("Loggin ...");
+    println!("Loggin ...");
 
     let username = payload.username;
     let password = payload.password;
 
-    let query = sqlx::query("SELECT id, password FROM users WHERE username = $1").bind(username);
+    let query = sqlx::query("SELECT username, password FROM users WHERE username = $1").bind(username);
 
     match query.fetch_one(&pool).await {
 
         Ok(row) => {
 
-            let user_id: i32 = row.get("id");
+            // Get DB datas
+            let db_username: String = row.get("username");
             let db_password: String = row.get("password");
 
+            // If password matches, create token and return it
             if password == db_password {
 
-                // Create token if verification is successful
-                let token = create_jwt(&user_id.to_string());
+                println!("Passwords matchs ! Creating Token with {db_username}");
+
+                let token = create_jwt(db_username);
 
                 return Ok(Json(TokenResponse { token }));
             }
