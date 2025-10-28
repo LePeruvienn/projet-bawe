@@ -1,9 +1,10 @@
-use axum::{extract::{Path, State, Form}, Json, http::StatusCode};
+use axum::{extract::{Path, Extension, State, Form}, Json, http::StatusCode};
 use sqlx::PgPool;
 use crate::models::user::User;
 use crate::forms::user_forms::FormUser;
+use crate::models::auth::AuthUser;
 
-// Handler to greet a user by name from the path
+
 pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<User>>, StatusCode> {
 
     let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users");
@@ -14,7 +15,6 @@ pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<User>>, Sta
     Ok(Json(users))
 }
 
-// Handler to greet a user by name from the path
 pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Result<Json<User>, StatusCode> {
 
     let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users WHERE id = $1").bind(id);
@@ -73,4 +73,22 @@ pub async fn update_user(Path(id): Path<i32>, State(pool): State<PgPool>, Form(p
         Ok(_) => StatusCode::NOT_FOUND, // aucun utilisateur mis à jour
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // erreur SQL
     }
+}
+
+pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<User>, StatusCode> {
+
+    // If user is not connected we return UNAUTHORIZED
+    if !auth_user.is_connected {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    // Prepare query with auth_user username
+    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users WHERE username = $1")
+        .bind(auth_user.username);
+
+    // Run query and map it as User struct
+    let user = query.fetch_one(&pool).await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // retourne 500 si erreur SQL
+
+    Ok(Json(user))
 }

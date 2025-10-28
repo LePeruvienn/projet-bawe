@@ -1,5 +1,11 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone)]
+pub struct AuthUser {
+    pub username: String,
+    pub is_connected: bool,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: String,   // user id

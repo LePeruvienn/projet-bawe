@@ -56,9 +56,9 @@ async fn main() {
     let pool = wait_for_db(&database_url, 10, 2).await;
 
     let app = Router::new()
-        .nest("/users/", user_routes::routes())
-        .nest("/posts/", post_routes::routes())
-        .nest("/auth/", auth_routes::routes())
+        .nest("/users", user_routes::routes())
+        .nest("/posts", post_routes::routes())
+        .nest("/auth", auth_routes::routes())
         .with_state(pool.clone())
         .layer(cors);
 
