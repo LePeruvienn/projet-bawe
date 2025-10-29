@@ -1,6 +1,30 @@
 import 'package:flutter/material.dart';
+
 import '../models/user.dart';
 import '../api/users.dart';
+import '../api/auth.dart';
+import '../utils.dart';
+
+/************************
+* GLOBALS ACCOUNT FUNCTIONS
+*************************/
+
+// TODO: Make go back to login page / refresh account page
+void handleLogout(BuildContext context) async {
+
+  // Auth API logout
+  await logout();
+  showSnackbar(
+    context: context,
+    dismissText: 'Sucessfully logged out',
+    backgroundColor: Colors.deepPurple,
+    icon: Icon(Icons.done, color: Colors.white),
+  );
+}
+
+/************************
+* GLOBALS ACCOUNT CLASSES
+*************************/
 
 class AccountPage extends StatefulWidget {
 
@@ -110,6 +134,19 @@ class AccountDetails extends StatelessWidget {
               value: user.createdAt.toLocal().toString().split('.')[0],
             ),
           ],
+        ),
+        // Logout Button
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () => handleLogout(context),
+          child: const Text('Logout'),
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            backgroundColor: Colors.deepPurple.shade100, // Color for the button
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30), // Rounded button
+            ),
+          ),
         ),
       ],
     );

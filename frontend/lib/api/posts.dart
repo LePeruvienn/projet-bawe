@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 
 import '../models/post.dart';
+import '../auth/tokenHandler.dart';
 
 Future<Post> fetchPost(int id) async {
 
@@ -68,7 +69,16 @@ Future<bool> deletePost(Post post) async {
   }
 }
 
-Future<bool> createPost(int userId, String content) async {
+Future<bool> createPost(String content) async {
+
+  // Get user token
+  final token = TokenHandler().token;
+
+  // If there is no token return error
+  if (token == null) {
+    print('CreatePost > NoToken: User must be connected to create a post.');
+    return false;
+  }
 
   try {
 
@@ -76,21 +86,32 @@ Future<bool> createPost(int userId, String content) async {
 
     Uri.parse('http://0.0.0.0:8080/posts/create'),
       headers: {
+        'Authorization': 'Bearer $token',  // Include token in the Authorization header
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: {
-        'user_id': userId,
         'content': content
       }
     );
 
-    // Supposons que le backend renvoie 201 pour succès
-    final success = response.statusCode == 201;
+    // Log status code
+    switch (response.statusCode) {
 
-    if (!success)
-      print('Failed to create post: ${response.statusCode} - ${response.body}');
+      case 201: // Success
+        print('CreatePost > Created: Successfully create a post');
 
-    return success;
+      case 401: // Unauthorized
+        print('CreatePost > Unauthorized: Invalid token');
+
+      case 403: // Forbidden
+        print('CreatePost > Forbidden: You do not have access to this resource');
+
+      default: // Handle other status codes
+        print('CreatePost > Failed to fetch data: ${response.statusCode} - ${response.body}');
+    }
+
+    // Return treu if response was 201 - CREATED
+    return response.statusCode == 201;
 
   } catch (error) {
 

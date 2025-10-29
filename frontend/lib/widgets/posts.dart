@@ -9,8 +9,7 @@ import '../api/posts.dart';
 
 Future<void> handleCreatePost(BuildContext context, String content) async {
 
-  // final res = await createPost(content);
-  final res = true;
+  final res = await createPost(content);
 
   showSnackbar(
     context: context,

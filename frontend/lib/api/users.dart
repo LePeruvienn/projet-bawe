@@ -9,7 +9,7 @@ import '../auth/tokenHandler.dart';
 Future<User> fetchUser(int id) async {
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/public/$id'),
+    Uri.parse('http://0.0.0.0:8080/users/$id'),
   );
 
   if (response.statusCode == 200) {
@@ -27,7 +27,7 @@ Future<User> fetchUser(int id) async {
 Future<List<User>> fetchUsers() async {
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/public'),
+    Uri.parse('http://0.0.0.0:8080/users'),
   );
 
   if (response.statusCode == 200) {
@@ -151,7 +151,7 @@ Future<User> fetchConnectedUser() async {
 
   // Try getting connected user data
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/protected/me'),
+    Uri.parse('http://0.0.0.0:8080/users/me'),
     headers: {
       'Authorization': 'Bearer $token',  // Include token in the Authorization header
       'Content-Type': 'application/json',
