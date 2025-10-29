@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use chrono::NaiveDateTime;
 
 #[derive(sqlx::FromRow, Serialize, Debug)]
@@ -22,4 +22,9 @@ pub struct PostWithUserData {
     pub user_username: String,
     pub user_title: Option<String>,
     pub user_created_at: Option<NaiveDateTime>,
+}
+
+#[derive(Deserialize)]
+pub struct FormPost {
+    pub content: String,
 }

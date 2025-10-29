@@ -2,7 +2,7 @@ use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey}
 use std::env;
 use crate::models::auth::Claims;
 
-pub fn create_jwt(username: String) -> String {
+pub fn create_jwt(user_id: i32, username: String) -> String {
 
     let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
 
@@ -12,7 +12,8 @@ pub fn create_jwt(username: String) -> String {
         .timestamp() as usize;
 
     let claims = Claims{
-        sub: username,
+        username: username,
+        sub: user_id,
         exp: expiration
     };
 

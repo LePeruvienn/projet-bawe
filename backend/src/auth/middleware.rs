@@ -20,12 +20,14 @@ pub async fn get_auth_user(mut req: Request<Body>, next: Next) -> Result<Respons
 
                 // If token is valide, return auth user
                 Ok(claims) => AuthUser {
-                    username: claims.sub,
+                    user_id: claims.sub,
+                    username: claims.username,
                     is_connected: true,
                 },
 
                 // If token is not valid return no user
                 Err(_) => AuthUser {
+                    user_id: -1,
                     username: "".to_string(),
                     is_connected: false,
                 },
@@ -34,6 +36,7 @@ pub async fn get_auth_user(mut req: Request<Body>, next: Next) -> Result<Respons
 
         // If there is no token, return AuthUser Not connected
         None => AuthUser {
+            user_id: -1,
             username: "".to_string(),
             is_connected: false,
         },

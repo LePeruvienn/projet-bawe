@@ -10,7 +10,6 @@ use tower_http::cors::{CorsLayer, Any};
 pub mod handlers;
 pub mod models;
 pub mod routes;
-pub mod forms;
 pub mod auth;
 
 use crate::routes::user_routes;

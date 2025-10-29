@@ -33,8 +33,7 @@ fn protected_routes() -> Router<PgPool> {
 
 pub fn routes() -> Router<PgPool> {
 
-    Router::new()
-        .nest("/public", public_routes())
-        .nest("/protected", protected_routes())
+    // Merge boths routes
+    public_routes().merge(protected_routes())
 }
 

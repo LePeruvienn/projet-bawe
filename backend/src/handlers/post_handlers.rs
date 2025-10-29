@@ -1,7 +1,7 @@
-use axum::{extract::{Path, State/*, Form*/}, Json, http::StatusCode};
+use axum::{extract::{Path, State, Form, Extension}, Json, http::StatusCode};
 use sqlx::PgPool;
-use crate::models::post::PostWithUserData;
-// use crate::forms::post_forms::Formpost;
+use crate::models::post::{PostWithUserData, FormPost};
+use crate::models::auth::AuthUser;
 
 // TODO: >>> ALL 
 
@@ -57,26 +57,6 @@ pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Resul
     Ok(Json(post))
 }
 
-/* TODO:
-* 
-pub async fn create_post(State(pool): State<PgPool>, Form(payload): Form<Formpost>) -> StatusCode {
-
-    let query = sqlx::query("INSERT INTO posts (postname, email, password, title) VALUES ($1, $2, $3, $4);")
-        .bind(&payload.postname)
-        .bind(&payload.email)
-        .bind(&payload.password)
-        .bind(&payload.title);
-
-    let result = query.execute(&pool).await;
-
-    match result {
-
-        Ok(_) => StatusCode::CREATED, // 201
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR // erreur SQL
-    }
-}
-*/
-
 pub async fn delete_post(Path(id): Path<i32>, State(pool): State<PgPool>) -> StatusCode {
 
     let query = sqlx::query("DELETE FROM posts WHERE id = $1;").bind(id);
@@ -88,5 +68,36 @@ pub async fn delete_post(Path(id): Path<i32>, State(pool): State<PgPool>) -> Sta
         Ok(res) if res.rows_affected() > 0 => StatusCode::NO_CONTENT, // 204
         Ok(_) => StatusCode::NOT_FOUND, // aucun utilisateur supprimé
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // erreur SQL
+    }
+}
+
+pub async fn create_post(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormPost>) -> StatusCode {
+
+    println!("CREATE_POST: Trying to get connected user ...");
+
+    // If user is not connected we return UNAUTHORIZED
+    if !auth_user.is_connected {
+        return StatusCode::UNAUTHORIZED;
+    }
+
+    // Get query data
+    let username = auth_user.username;
+    let user_id = auth_user.user_id;
+    let content = payload.content;
+
+    println!("CREATE POST: User is connected with @{username}");
+
+    let query = sqlx::query("INSERT INTO posts (user_id, content) VALUES ($1, $2);")
+        .bind(user_id)
+        .bind(content);
+
+    let result = query.execute(&pool).await;
+
+    println!("CREATE POST: Executed SQL query");
+
+    match result {
+
+        Ok(_) => StatusCode::CREATED, // 201
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR // erreur SQL
     }
 }

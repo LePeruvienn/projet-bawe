@@ -12,13 +12,14 @@ pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>
     let username = payload.username;
     let password = payload.password;
 
-    let query = sqlx::query("SELECT username, password FROM users WHERE username = $1").bind(username);
+    let query = sqlx::query("SELECT id, username, password FROM users WHERE username = $1").bind(username);
 
     match query.fetch_one(&pool).await {
 
         Ok(row) => {
 
             // Get DB datas
+            let db_id: i32 = row.get("id");
             let db_username: String = row.get("username");
             let db_password: String = row.get("password");
 
@@ -27,7 +28,7 @@ pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>
 
                 println!("Passwords matchs ! Creating Token with {db_username}");
 
-                let token = create_jwt(db_username);
+                let token = create_jwt(db_id, db_username);
 
                 return Ok(Json(TokenResponse { token }));
             }

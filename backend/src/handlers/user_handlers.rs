@@ -1,7 +1,6 @@
 use axum::{extract::{Path, Extension, State, Form}, Json, http::StatusCode};
 use sqlx::PgPool;
-use crate::models::user::User;
-use crate::forms::user_forms::FormUser;
+use crate::models::user::{User, FormUser};
 use crate::models::auth::AuthUser;
 
 
@@ -85,7 +84,7 @@ pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool
     }
 
     let username = auth_user.username;
-    
+
     println!("User is connected with {username}");
 
     // Prepare query with auth_user username
