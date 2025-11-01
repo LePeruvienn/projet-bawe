@@ -16,12 +16,14 @@ class TokenHandler {
 
   Future<void> init() async {
 
-    if (_initialized) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString(_key);
+    if (_initialized)
+      return;
 
     _initialized = true;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    _token = prefs.getString(_key);
 
     print("TokenHandler Intialized.");
   }
