@@ -1,10 +1,16 @@
 import 'package:flutter/foundation.dart';
-import 'token_handler.dart';
+import 'tokenHandler.dart';
 
 import '../models/user.dart';
 import '../api/users.dart';
 
 class AuthProvider extends ChangeNotifier {
+
+  static final AuthProvider _instance = AuthProvider._internal();
+
+  factory AuthProvider() => _instance;
+
+  AuthProvider._internal();
 
   User? _user;
 

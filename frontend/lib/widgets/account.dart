@@ -4,6 +4,7 @@ import '../models/user.dart';
 import '../api/users.dart';
 import '../api/auth.dart';
 import '../utils.dart';
+import '../auth/authProvider.dart';
 
 /************************
 * GLOBALS ACCOUNT FUNCTIONS
@@ -12,8 +13,8 @@ import '../utils.dart';
 // TODO: Make go back to login page / refresh account page
 void handleLogout(BuildContext context) async {
 
-  // Auth API logout
-  await logout();
+  await AuthProvider().logout();
+
   showSnackbar(
     context: context,
     dismissText: 'Sucessfully logged out',
@@ -46,44 +47,40 @@ class _AccountPageState extends State<AccountPage> {
     futureUser = fetchConnectedUser();
   }
 
+  // TODO: Make the user data come from AuthProvider
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Account'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // User info (FutureBuilder)
-            Expanded(
-              child: FutureBuilder<User>(
-                future: futureUser,
-                builder: (context, snapshot) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // User info (FutureBuilder)
+          Expanded(
+            child: FutureBuilder<User>(
+              future: futureUser,
+              builder: (context, snapshot) {
 
-                  // While we are waiting show progression
-                  if (snapshot.connectionState == ConnectionState.waiting)
-                    return const Center(child: CircularProgressIndicator());
+                // While we are waiting show progression
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  return const Center(child: CircularProgressIndicator());
 
-                  // When error, show error message at center
-                  else if (snapshot.hasError)
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                // When error, show error message at center
+                else if (snapshot.hasError)
+                  return Center(child: Text('Error: ${snapshot.error}'));
 
-                  // If we have no data return no data error
-                  else if (!snapshot.hasData)
-                    return const Center(child: Text('No user data available'));
+                // If we have no data return no data error
+                else if (!snapshot.hasData)
+                  return const Center(child: Text('No user data available'));
 
-                  // Ge fetched user
-                  final user = snapshot.data!;
+                // Ge fetched user
+                final user = snapshot.data!;
 
-                  // Create AccountDetails component with it
-                  return AccountDetails(user: user);
-                },
-              ),
+                // Create AccountDetails component with it
+                return AccountDetails(user: user);
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

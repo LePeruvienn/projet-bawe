@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import '../auth/tokenHandler.dart';
+import '../auth/authProvider.dart';
 
 //TODO: Improve the return logic of the function to have differents messages
 Future<bool> login(String username, String password) async {
@@ -24,7 +24,13 @@ Future<bool> login(String username, String password) async {
 
       case 200: // OK -> Add token to shared_preferences and return true
         final tokenResponse = jsonDecode(response.body);
-        await TokenHandler().setToken(tokenResponse['token']);
+        final token = tokenResponse['token'];
+        if (token == null) {
+
+          print("No field 'Token' in response body");
+          return false;
+        }
+        await AuthProvider().login(token);
         print(tokenResponse);
         return true;
 
@@ -51,6 +57,6 @@ Future<bool> login(String username, String password) async {
 Future<void> logout() async {
 
   // Clear token from client side to logout
-  await TokenHandler().clear();
+  await AuthProvider().logout();
 }
 

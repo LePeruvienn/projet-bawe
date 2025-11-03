@@ -63,19 +63,6 @@ class _PostsPageState extends State<PostsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text(
-          "FeurX",
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-            color: Colors.deepPurple,
-          ),
-        )),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0.4,
-      ),
       body: RefreshIndicator(
         onRefresh: () async => _refreshPosts(),
         child: FutureBuilder<List<Post>>(

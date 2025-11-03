@@ -24,6 +24,9 @@ class _NavigationShellState extends State<NavigationShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('FeurX'),
+      ),
       body: widget.child, // Contenu de la page changée
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
