@@ -36,3 +36,10 @@ chmod +x build.sh
 ```bash
 docker compose up --build
 ```
+
+
+---
+
+```
+docker exec -it postgres_db psql -U postgres -d appdb
+```

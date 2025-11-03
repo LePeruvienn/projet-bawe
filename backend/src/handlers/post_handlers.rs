@@ -101,3 +101,46 @@ pub async fn create_post(Extension(auth_user): Extension<AuthUser>, State(pool):
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR // erreur SQL
     }
 }
+
+pub async fn like_post(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
+
+    // Ensure the user is connected
+    if !auth_user.is_connected {
+        return StatusCode::UNAUTHORIZED;
+    }
+
+    // Check if the post exists
+    let post_exists = sqlx::query("SELECT 1 FROM posts WHERE id = $1")
+        .bind(id)
+        .fetch_optional(&pool)
+        .await;
+
+    // If post dont exist return 404 not found
+    if post_exists.is_err() || post_exists.unwrap().is_none() {
+        return StatusCode::NOT_FOUND;
+    }
+
+    // Check if the user already likes the post
+    let like_exists = sqlx::query("SELECT 1 FROM user_likes WHERE user_id = $1 AND post_id = $2")
+        .bind(auth_user.user_id)
+        .bind(id)
+        .fetch_optional(&pool)
+        .await;
+
+    if like_exists.is_ok() && like_exists.unwrap().is_some() {
+        return StatusCode::CONFLICT; // 409: User has already liked this post
+    }
+
+    // Attempt to insert a like
+    let result = sqlx::query("INSERT INTO user_likes (user_id, post_id) VALUES ($1, $2);")
+        .bind(auth_user.user_id)
+        .bind(id)
+        .execute(&pool)
+        .await;
+
+    match result {
+        Ok(_) => StatusCode::CREATED, // 201: Like was added
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // SQL error
+    }
+}
+
