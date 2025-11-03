@@ -13,10 +13,9 @@ CREATE TABLE posts (
 	content TEXT NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 	likes_count INTEGER NOT NULL DEFAULT 0
+	is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-/* TODO: Make an user can like only 1 time a post
-*
 CREATE TABLE user_likes (
 	id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -24,4 +23,3 @@ CREATE TABLE user_likes (
 	liked_at TIMESTAMP DEFAULT NOW(),
 	UNIQUE (user_id, post_id)
 );
-*/
