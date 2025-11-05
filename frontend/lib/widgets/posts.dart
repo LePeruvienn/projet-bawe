@@ -34,6 +34,44 @@ void handleDeletePost(BuildContext context, Post post, VoidCallback onDeleted) a
     onDeleted();
 }
 
+void handleLikePost(BuildContext context, Post post) async {
+
+  final id = post.id;
+
+  bool isLiked = await likePost(id);
+
+  if (!isLiked) {
+
+    // TODO: Make the frontend remove the like if it dont work
+
+    showSnackbar(
+      context: context,
+      dismissText: 'Failed to like post',
+      backgroundColor: Colors.red,
+      icon: Icon(Icons.close, color: Colors.white),
+    );
+  }
+}
+
+void handleUnlikePost(BuildContext context, Post post) async {
+
+  final id = post.id;
+
+  bool isUnliked = await unlikePost(id);
+
+  if (!isUnliked) {
+
+    // TODO: Make the frontend readd the like if it dont work
+
+    showSnackbar(
+      context: context,
+      dismissText: 'Failed to unlike post',
+      backgroundColor: Colors.red,
+      icon: Icon(Icons.close, color: Colors.white),
+    );
+  }
+}
+
 /************************
 * POSTS PAGE
 *************************/
@@ -127,21 +165,30 @@ class _PostListItemState extends State<PostListItem> {
     likes = widget.post.likesCount;
   }
 
-  void toggleLike() {
+  void toggleLike(BuildContext context, Post post) {
+
+    // Send like/unlike request to API
+    if (isLiked)
+      handleUnlikePost(context, post);
+    else
+      handleLikePost(context, post);
+
+    // Update current frontend item state
     setState(() {
-      if (isLiked) {
+
+      if (isLiked)
         likes -= 1;
-      } else {
+
+      else
         likes += 1;
-      }
+
       isLiked = !isLiked;
     });
-    // TODO: send like/unlike to backend
-    // likePost(widget.post.id, isLiked);
   }
 
   @override
   Widget build(BuildContext context) {
+
     final post = widget.post;
 
     return Container(
@@ -216,7 +263,7 @@ class _PostListItemState extends State<PostListItem> {
                         isLiked ? Icons.favorite : Icons.favorite_border,
                         color: isLiked ? Colors.red : Colors.grey[600],
                       ),
-                      onPressed: toggleLike,
+                      onPressed: () => toggleLike(context, post),
                     ),
                     Text('$likes', style: TextStyle(color: Colors.grey[700])),
                     const Spacer(),
