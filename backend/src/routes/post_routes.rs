@@ -8,7 +8,8 @@ use crate::handlers::post_handlers::{
     get_by_id,
     create_post,
     delete_post,
-    like_post
+    like_post,
+    unlike_post
 };
 
 pub fn public_routes() -> Router<PgPool> {
@@ -24,7 +25,8 @@ fn protected_routes() -> Router<PgPool> {
 
     Router::new()
         .route("/create", post(create_post))
-        .route("/like/{id}", post(like_post))
+        .route("/like/{id}", get(like_post))
+        .route("/unlike/{id}", get(unlike_post))
         .route_layer(middleware::from_fn(get_auth_user))
 }
 pub fn routes() -> Router<PgPool> {
