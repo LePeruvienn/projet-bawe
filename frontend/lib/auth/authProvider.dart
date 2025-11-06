@@ -16,9 +16,11 @@ class AuthProvider extends ChangeNotifier {
 
   bool _initialized = false;
 
+  User? get user => _user;
+
   bool get isLoggedIn => _user != null;
 
-  User? get user => _user;
+  bool get isAdmin => _user != null && _user.isAdmin;
 
   // Initialisation depuis le token
   Future<void> init() async {

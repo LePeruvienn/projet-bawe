@@ -8,6 +8,7 @@ class User {
   final String password;
   final String? title;
   final DateTime createdAt;
+  final bool isAdmin = false;
 
   const User({
     required this.id,
@@ -16,6 +17,7 @@ class User {
     required this.password,
     this.title,
     required this.createdAt,
+    this.isAdmin,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class User {
       password: json['password'] as String,
       title: json['title'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      isAdmin: json['is_admin'] as bool,
     );
   }
 }
@@ -37,12 +40,14 @@ class UserBasic {
   final String username;
   final String? title;
   final DateTime createdAt;
+  final bool isAdmin;
 
   const UserBasic({
     required this.id,
     required this.username,
     this.title,
     required this.createdAt,
+    required this.isAdmin,
   });
 
   factory UserBasic.fromJson(Map<String, dynamic> json) {
@@ -51,6 +56,7 @@ class UserBasic {
       username: json['username'] as String,
       title: json['title'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      isAdmin: json['is_admin'] as bool,
     );
   }
 }

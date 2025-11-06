@@ -69,7 +69,13 @@ Future<bool> deleteUser(User user) async {
   }
 }
 
-Future<bool> createUser(String username, String email, String password, String? title) async {
+Future<bool> createUser(String username, String email, String password, String? title, bool isAdmin = false) async {
+
+
+  // If we try to create a new admin we must also check if current client is admin
+  if (isAdmin) {
+
+  }
 
   try {
 
@@ -84,6 +90,7 @@ Future<bool> createUser(String username, String email, String password, String? 
         'email': email,
         'password': password,
         'title': title ?? 'null',
+        'isAdmin': isAdmin,
       }
     );
 
