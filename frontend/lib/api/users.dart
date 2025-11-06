@@ -124,6 +124,7 @@ Future<bool> updateUser(User user) async {
         'email': user.email,
         'password': user.password,
         'title': user.title ?? 'null',
+        'is_admin': user.isAdmin ? 'true' : 'false'
       }
     );
 
