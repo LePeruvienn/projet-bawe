@@ -1,5 +1,30 @@
 import 'package:flutter/material.dart';
 
+import '../api/users.dart';
+import '../utils.dart';
+
+/************************
+* GLOBALS SIGNIN FUNCTIONS
+*************************/
+
+void handleCreateUser(BuildContext context, String username, String email, String password, String? title) async {
+
+  // Try to create user
+  bool res = await createUser(username, email, password, title);
+
+  // Show message depending of sucess
+  showSnackbar(
+    context: context,
+    dismissText: res ? 'User created successfully' : 'Failed to create user',
+    backgroundColor: res ? Colors.deepPurple : Colors.red,
+    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+  );
+}
+
+/************************
+* GLOBALS SIGNIN CLASSES
+*************************/
+
 class SigninPage extends StatefulWidget {
   @override
   _SigninPageState createState() => _SigninPageState();
@@ -16,17 +41,20 @@ class _SigninPageState extends State<SigninPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatedPasswordController = TextEditingController();
 
-  void _signin() {
-    if (_formKey.currentState!.validate()) {
-      // Handle signin logic here
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Signing in...'),
-          backgroundColor: Colors.deepPurple,
-        ),
-      );
-      // You can add authentication logic here.
-    }
+  void _signin(BuildContext context) {
+
+    // if form not valid return
+    if (!_formKey.currentState!.validate())
+      return;
+
+    // Create user
+    handleCreateUser(
+      context,
+      _usernameController.text.trim(),
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+      _titleController.text.trim()
+    );
   }
 
   @override
@@ -144,7 +172,7 @@ class _SigninPageState extends State<SigninPage> {
                 const SizedBox(height: 20),
                 // Signin Button
                 ElevatedButton(
-                  onPressed: _signin,
+                  onPressed: () => _signin(context),
                   child: const Text('Signin'),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),

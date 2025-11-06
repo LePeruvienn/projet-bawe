@@ -69,13 +69,11 @@ Future<bool> deleteUser(User user) async {
   }
 }
 
-Future<bool> createUser(String username, String email, String password, String? title, bool isAdmin = false) async {
+Future<bool> createUser(String username, String email, String password, String? title, [bool? isAdmin]) async {
 
-
-  // If we try to create a new admin we must also check if current client is admin
-  if (isAdmin) {
-
-  }
+  // if isAdmin var is not set, set it to false
+  if (isAdmin == null)
+    isAdmin = false;
 
   try {
 
@@ -90,7 +88,7 @@ Future<bool> createUser(String username, String email, String password, String? 
         'email': email,
         'password': password,
         'title': title ?? 'null',
-        'isAdmin': isAdmin,
+        'is_admin': isAdmin ? 'true' : 'false',
       }
     );
 
@@ -151,6 +149,10 @@ Future<User> fetchConnectedUser() async {
 
   // Get user token
   final token = TokenHandler().token;
+
+  print(">>>>>");
+  print(token);
+  print(">>>>>");
 
   // If there is no token return error
   if (token == null)

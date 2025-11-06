@@ -26,8 +26,15 @@ Future<Post> fetchPost(int id) async {
 
 Future<List<Post>> fetchPosts() async {
 
+  // Get user token
+  final token = TokenHandler().token;
+
   final response = await http.get(
     Uri.parse('http://0.0.0.0:8080/posts'),
+    headers: {
+      'Authorization': 'Bearer $token',  // Include token in the Authorization header
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
   );
 
   if (response.statusCode == 200) {

@@ -89,7 +89,7 @@ pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool
     println!("User is connected with {username}");
 
     // Prepare query with auth_user username
-    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users WHERE username = $1")
+    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at, is_admin FROM users WHERE username = $1")
         .bind(username);
 
     // Run query and map it as User struct

@@ -8,7 +8,7 @@ class User {
   final String password;
   final String? title;
   final DateTime createdAt;
-  final bool isAdmin = false;
+  final bool isAdmin;
 
   const User({
     required this.id,
@@ -17,7 +17,7 @@ class User {
     required this.password,
     this.title,
     required this.createdAt,
-    this.isAdmin,
+    this.isAdmin = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -47,7 +47,7 @@ class UserBasic {
     required this.username,
     this.title,
     required this.createdAt,
-    required this.isAdmin,
+    this.isAdmin = false,
   });
 
   factory UserBasic.fromJson(Map<String, dynamic> json) {

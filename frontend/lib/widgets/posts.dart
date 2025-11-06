@@ -161,8 +161,11 @@ class _PostListItemState extends State<PostListItem> {
 
   @override
   void initState() {
+
     super.initState();
     likes = widget.post.likesCount;
+    print('>>> IS LIKED' + widget.post.authIsLiked.toString());
+    isLiked = widget.post.authIsLiked;
   }
 
   void toggleLike(BuildContext context, Post post) {

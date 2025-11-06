@@ -15,7 +15,6 @@ use crate::handlers::post_handlers::{
 pub fn public_routes() -> Router<PgPool> {
 
     Router::new()
-        .route("/", get(list_all))
         .route("/{id}", get(get_by_id))
         .route("/delete/{id}", delete(delete_post))
 }
@@ -24,6 +23,7 @@ pub fn public_routes() -> Router<PgPool> {
 fn protected_routes() -> Router<PgPool> {
 
     Router::new()
+        .route("/", get(list_all))
         .route("/create", post(create_post))
         .route("/like/{id}", get(like_post))
         .route("/unlike/{id}", get(unlike_post))

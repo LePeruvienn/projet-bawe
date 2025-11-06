@@ -20,7 +20,7 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _user != null;
 
-  bool get isAdmin => _user != null && _user.isAdmin;
+  bool get isAdmin => _user?.isAdmin ?? false;
 
   // Initialisation depuis le token
   Future<void> init() async {
@@ -44,7 +44,14 @@ class AuthProvider extends ChangeNotifier {
 
         TokenHandler().clear();
       }
+
+    } else {
+
+        print("AuthProvider->Init() : User not connected.");
     }
+    
+    if (_user != null)
+        print("AuthProvider->Init() : User sucessfully connected !");
 
     notifyListeners();
   }

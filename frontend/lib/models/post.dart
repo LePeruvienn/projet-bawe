@@ -9,13 +9,15 @@ class Post {
   final String content;
   final DateTime createdAt;
   final int likesCount;
+  final bool authIsLiked;
 
   const Post({
     required this.id,
     required this.user,
     required this.content,
     required this.createdAt,
-    required this.likesCount
+    required this.likesCount,
+    required this.authIsLiked
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class Post {
       content: json['content'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       likesCount: json['likes_count'] as int,
+      authIsLiked: json['auth_is_liked'] as bool,
     );
   }
 }

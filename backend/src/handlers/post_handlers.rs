@@ -3,9 +3,12 @@ use sqlx::PgPool;
 use crate::models::post::{PostWithUserData, FormPost};
 use crate::models::auth::AuthUser;
 
-// TODO: >>> ALL 
 
-pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<PostWithUserData>>, StatusCode> {
+pub async fn list_all(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<Vec<PostWithUserData>>, StatusCode> {
+
+    // The goal is if the user is connected, return his likes, otherwise set all likes to false wit
+    // user -1.
+    let user_id = if auth_user.is_connected { auth_user.user_id } else { -1 };
 
     print!("post_handlers : list_all ...");
 
@@ -18,10 +21,16 @@ pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<PostWithUse
             u.id as user_id,
             u.username as user_username,
             u.title as user_title,
-            u.created_at as user_created_at
+            u.created_at as user_created_at,
+            EXISTS (
+                SELECT 1
+                FROM user_likes ul 
+                WHERE ul.user_id = $1 AND ul.post_id = p.id
+            ) AS auth_is_liked
         FROM posts p
         JOIN users u ON p.user_id = u.id;
-        ");
+    ")
+    .bind(user_id);
 
     let posts = query.fetch_all(&pool).await.map_err(|e| {
         eprintln!("Error fetching posts: {:?}", e);
