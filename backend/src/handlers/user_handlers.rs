@@ -6,7 +6,7 @@ use crate::models::auth::AuthUser;
 
 pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<User>>, StatusCode> {
 
-    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users");
+    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at, is_admin FROM users");
 
     let users = query.fetch_all(&pool).await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // retourne 500 si erreur SQL
@@ -16,7 +16,7 @@ pub async fn list_all(State(pool): State<PgPool>) -> Result<Json<Vec<User>>, Sta
 
 pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Result<Json<User>, StatusCode> {
 
-    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at FROM users WHERE id = $1").bind(id);
+    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at, is_admin FROM users WHERE id = $1").bind(id);
 
     let user = query.fetch_one(&pool).await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // retourne 500 si erreur SQL
@@ -26,11 +26,12 @@ pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Resul
 
 pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> StatusCode {
 
-    let query = sqlx::query("INSERT INTO users (username, email, password, title) VALUES ($1, $2, $3, $4);")
+    let query = sqlx::query("INSERT INTO users (username, email, password, title, is_admin) VALUES ($1, $2, $3, $4, $5);")
         .bind(&payload.username)
         .bind(&payload.email)
         .bind(&payload.password)
-        .bind(&payload.title);
+        .bind(&payload.title)
+        .bind(&payload.is_admin);
 
     let result = query.execute(&pool).await;
 

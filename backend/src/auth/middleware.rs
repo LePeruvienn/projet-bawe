@@ -22,6 +22,7 @@ pub async fn get_auth_user(mut req: Request<Body>, next: Next) -> Result<Respons
                 Ok(claims) => AuthUser {
                     user_id: claims.sub,
                     username: claims.username,
+                    is_admin: claims.is_admin,
                     is_connected: true,
                 },
 
@@ -29,6 +30,7 @@ pub async fn get_auth_user(mut req: Request<Body>, next: Next) -> Result<Respons
                 Err(_) => AuthUser {
                     user_id: -1,
                     username: "".to_string(),
+                    is_admin: false,
                     is_connected: false,
                 },
             }
@@ -38,6 +40,7 @@ pub async fn get_auth_user(mut req: Request<Body>, next: Next) -> Result<Respons
         None => AuthUser {
             user_id: -1,
             username: "".to_string(),
+            is_admin: false,
             is_connected: false,
         },
     };
@@ -45,6 +48,7 @@ pub async fn get_auth_user(mut req: Request<Body>, next: Next) -> Result<Respons
     // Save the user in the extension
     req.extensions_mut().insert(auth_user);
 
+    // Go to next request (handler)
     Ok(next.run(req).await)
 }
 
