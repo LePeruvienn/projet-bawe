@@ -4,6 +4,10 @@ use crate::models::post::{PostWithUserData, FormPost};
 use crate::models::auth::AuthUser;
 
 
+/*
+ * List all posts from the database
+ * @auth {None} - no authorization needed
+ */
 pub async fn list_all(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<Vec<PostWithUserData>>, StatusCode> {
 
     // The goal is if the user is connected, return his likes, otherwise set all likes to false wit
@@ -34,13 +38,17 @@ pub async fn list_all(Extension(auth_user): Extension<AuthUser>, State(pool): St
 
     let posts = query.fetch_all(&pool).await.map_err(|e| {
         eprintln!("Error fetching posts: {:?}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
+        StatusCode::INTERNAL_SERVER_ERROR // Return 500 if SQL error
     })?;
 
     Ok(Json(posts))
 }
 
-// Handler to greet a post by name from the path
+/*
+ * Get data from a specific post
+ * @auth {None} - no authorization needed
+ * @param {id} - post's id
+ */
 pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Result<Json<PostWithUserData>, StatusCode> {
 
     let query = sqlx::query_as::<_, PostWithUserData>("
@@ -60,13 +68,23 @@ pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Resul
 
     let post = query.fetch_one(&pool).await.map_err(|e| {
         eprintln!("Error fetching posts: {:?}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
+        StatusCode::INTERNAL_SERVER_ERROR // Return 500 if SQL error
     })?;
 
     Ok(Json(post))
 }
 
-pub async fn delete_post(Path(id): Path<i32>, State(pool): State<PgPool>) -> StatusCode {
+/*
+ * Delete a post
+ * @auth {Admin} - only for admin users
+ * @param {id} - post's id
+ */
+pub async fn delete_post(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
+
+    // If user is not admin return 401
+    if !auth_user.is_admin {
+        return StatusCode::UNAUTHORIZED;
+    }
 
     let query = sqlx::query("DELETE FROM posts WHERE id = $1;").bind(id);
 
@@ -74,17 +92,22 @@ pub async fn delete_post(Path(id): Path<i32>, State(pool): State<PgPool>) -> Sta
 
     match result {
 
-        Ok(res) if res.rows_affected() > 0 => StatusCode::NO_CONTENT, // 204
-        Ok(_) => StatusCode::NOT_FOUND, // aucun utilisateur supprimé
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // erreur SQL
+        Ok(res) if res.rows_affected() > 0 => StatusCode::NO_CONTENT, // Return 204 if success
+        Ok(_) => StatusCode::NOT_FOUND, // Return 404 if no user found
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // Return 500 if SQL error
     }
 }
 
+/*
+ * Create a post
+ * @auth {Conneceted} - only for conneceted users
+ * @param {FormPost} - form input data
+ */
 pub async fn create_post(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormPost>) -> StatusCode {
 
     println!("CREATE_POST: Trying to get connected user ...");
 
-    // If user is not connected we return UNAUTHORIZED
+    // If user is not connected we return 500
     if !auth_user.is_connected {
         return StatusCode::UNAUTHORIZED;
     }
@@ -106,14 +129,19 @@ pub async fn create_post(Extension(auth_user): Extension<AuthUser>, State(pool):
 
     match result {
 
-        Ok(_) => StatusCode::CREATED, // 201
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR // erreur SQL
+        Ok(_) => StatusCode::CREATED, // Return 201 if success
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR // Return 500 if SQL error
     }
 }
 
+/*
+ * Like a post
+ * @auth {Conneceted} - only for conneceted users
+ * @param {id} - post's id you want to like
+ */
 pub async fn like_post(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
 
-    // Ensure the user is connected
+    // If user is not connected return 401
     if !auth_user.is_connected {
         return StatusCode::UNAUTHORIZED;
     }
@@ -137,7 +165,7 @@ pub async fn like_post(Path(id): Path<i32>, Extension(auth_user): Extension<Auth
         .await;
 
     if like_exists.is_ok() && like_exists.unwrap().is_some() {
-        return StatusCode::CONFLICT; // 409: User has already liked this post
+        return StatusCode::CONFLICT; // Return 409 if user already liked the post
     }
 
     // Attempt to insert a like
@@ -148,14 +176,19 @@ pub async fn like_post(Path(id): Path<i32>, Extension(auth_user): Extension<Auth
         .await;
 
     match result {
-        Ok(_) => StatusCode::CREATED, // 201: Like was added
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // SQL error
+        Ok(_) => StatusCode::CREATED, // Return 201 if success
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // Return 500 if SQL error
     }
 }
 
+/*
+ * Unlike a post
+ * @auth {Conneceted} - only for conneceted users
+ * @param {id} - post's id you want to unlike
+ */
 pub async fn unlike_post(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
 
-    // Ensure user in connected
+    // Return 401 if user not connected
     if !auth_user.is_connected {
         return StatusCode::UNAUTHORIZED;
     }
@@ -166,9 +199,9 @@ pub async fn unlike_post(Path(id): Path<i32>, Extension(auth_user): Extension<Au
         .fetch_optional(&pool)
         .await;
 
-    // If post dont exist return
+    // If post dont exist return 404
     if post_exists.is_err() || post_exists.unwrap().is_none() {
-        return StatusCode::NOT_FOUND; // 404
+        return StatusCode::NOT_FOUND;
     }
 
     // Check if user have liked the post
@@ -178,9 +211,9 @@ pub async fn unlike_post(Path(id): Path<i32>, Extension(auth_user): Extension<Au
         .fetch_optional(&pool)
         .await;
 
-    // If not return NOT FOUND
+    // If user hasnt like the post we return 404
     if like_exists.is_err() || like_exists.unwrap().is_none() {
-        return StatusCode::NOT_FOUND; // 404
+        return StatusCode::NOT_FOUND;
     }
 
     // Unlike the post
@@ -191,7 +224,7 @@ pub async fn unlike_post(Path(id): Path<i32>, Extension(auth_user): Extension<Au
         .await;
 
     match result {
-        Ok(_) => StatusCode::OK, // 200 
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // 500
+        Ok(_) => StatusCode::OK, // Return 200 if success
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // Return 500 if SQL error
     }
 }

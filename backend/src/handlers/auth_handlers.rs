@@ -5,6 +5,10 @@ use axum::http::StatusCode;
 use crate::models::auth::{LoginRequest, TokenResponse};
 use crate::auth::token_handler::create_jwt;
 
+/*
+ * Try to log user with username and password
+ * @auth {None} - no authorization needed
+ */
 pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>) -> Result<Json<TokenResponse>, StatusCode> {
 
     println!("Loggin ...");

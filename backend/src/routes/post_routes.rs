@@ -15,8 +15,7 @@ use crate::handlers::post_handlers::{
 pub fn public_routes() -> Router<PgPool> {
 
     Router::new()
-        .route("/{id}", get(get_by_id))
-        .route("/delete/{id}", delete(delete_post))
+        .route("/{id}", get(get_by_id)) // Unused routes, still here but must update ()
 }
 
 
@@ -25,6 +24,7 @@ fn protected_routes() -> Router<PgPool> {
     Router::new()
         .route("/", get(list_all))
         .route("/create", post(create_post))
+        .route("/delete/{id}", delete(delete_post))
         .route("/like/{id}", get(like_post))
         .route("/unlike/{id}", get(unlike_post))
         .route_layer(middleware::from_fn(get_auth_user))

@@ -16,18 +16,18 @@ use crate::handlers::user_handlers::{
 fn public_routes() -> Router<PgPool> {
 
     Router::new()
-        .route("/", get(list_all))
-        .route("/{id}", get(get_by_id))
         .route("/create", post(create_user))
-        .route("/delete/{id}", delete(delete_user))
-        .route("/update/{id}", put(update_user))
 }
 
 // All routes that NEED you to be auth
 fn protected_routes() -> Router<PgPool> {
 
     Router::new()
+        .route("/", get(list_all))
+        .route("/{id}", get(get_by_id))
         .route("/me", get(get_connected))
+        .route("/delete/{id}", delete(delete_user))
+        .route("/update/{id}", put(update_user))
         .route_layer(middleware::from_fn(get_auth_user))
 }
 
