@@ -42,3 +42,15 @@ String formatTimeAgo(DateTime date) {
   return '${date.year}-${date.month}-${date.day}';
 }
 
+
+class NavigationDestinationWithPath extends NavigationDestination {
+
+  final String path;
+
+  const NavigationDestinationWithPath({
+    required Icon selectedIcon,
+    required Icon icon,
+    required String label,
+    required this.path,
+  }) : super(selectedIcon: selectedIcon, icon: icon, label: label);
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
+import 'package:provider/provider.dart';
 
 import 'auth/tokenHandler.dart';
 import 'auth/authProvider.dart';
@@ -16,8 +17,15 @@ void main() async {
 
   // Initialze TokenHandler singleton
   await TokenHandler().init();
-  await AuthProvider().init();
 
-  // Run main app
-  runApp(const AppRouter());
+  // Get AuthProvider instance & init it
+  final authProvider = AuthProvider();
+  await authProvider.init();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => authProvider,
+      child: const AppRouter()
+    ),
+  );
 }
