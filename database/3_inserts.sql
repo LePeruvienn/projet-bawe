@@ -1,10 +1,11 @@
 /**************************
 * USERS TEST DATA INSERTION
 ***************************/
-INSERT INTO users (username, email, password) VALUES (
+INSERT INTO users (username, email, password, is_admin) VALUES (
 	'FEUR',
 	'feur@free.fr',
-	'123'
+	'123',
+  TRUE
 );
 INSERT INTO users (username, email, password) VALUES (
 	'Milou',
