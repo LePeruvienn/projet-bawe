@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../auth/authProvider.dart';
 import '../models/user.dart';
 import '../api/users.dart';
 import '../api/auth.dart';
 import '../utils.dart';
-import '../auth/authProvider.dart';
+import 'users.dart';
 
 /************************
 * GLOBALS ACCOUNT FUNCTIONS
 *************************/
 
-// TODO: Make go back to login page / refresh account page
 void handleLogout(BuildContext context) async {
 
   await AuthProvider().logout();
@@ -47,7 +47,12 @@ class _AccountPageState extends State<AccountPage> {
     futureUser = fetchConnectedUser();
   }
 
-  // TODO: Make the user data come from AuthProvider
+  void refreshUser() {
+    setState(() {
+      futureUser = fetchConnectedUser();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -76,7 +81,7 @@ class _AccountPageState extends State<AccountPage> {
                 final user = snapshot.data!;
 
                 // Create AccountDetails component with it
-                return AccountDetails(user: user);
+                return AccountDetails(user: user, onUserUpdate: refreshUser);
               },
             ),
           ),
@@ -89,8 +94,13 @@ class _AccountPageState extends State<AccountPage> {
 class AccountDetails extends StatelessWidget {
 
   final User user;
+  final VoidCallback onUserUpdate;
 
-  const AccountDetails({super.key, required this.user});
+  const AccountDetails({
+    super.key,
+    required this.user,
+    required this.onUserUpdate
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +129,7 @@ class AccountDetails extends StatelessWidget {
 
         _InfoCard(
           title: 'User Information',
+          user: user,
           items: [
             _InfoItem(icon: Icons.badge, label: 'ID', value: user.id.toString()),
             _InfoItem(icon: Icons.person, label: 'Username', value: user.username),
@@ -131,6 +142,7 @@ class AccountDetails extends StatelessWidget {
               value: user.createdAt.toLocal().toString().split('.')[0],
             ),
           ],
+          onUserUpdate: onUserUpdate
         ),
         // Logout Button
         const SizedBox(height: 20),
@@ -151,10 +163,19 @@ class AccountDetails extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
+  
   final String title;
+  final User user;
   final List<_InfoItem> items;
 
-  const _InfoCard({required this.title, required this.items});
+  final VoidCallback onUserUpdate;
+
+  const _InfoCard({
+    required this.title,
+    required this.user,
+    required this.items,
+    required this.onUserUpdate
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +187,30 @@ class _InfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit), // Use an appropriate icon
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: UserForm(title: "Edit User", user: user, callback: onUserUpdate),
+                      ),
+                    );
+                  },
+                )
+              ]
+            ),
             const Divider(),
             ...items.map((item) => _InfoRow(item: item)),
           ],

@@ -22,7 +22,7 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
   );
 }
 
-void handleUpdateUser(BuildContext context, User user) async {
+Future<void> handleUpdateUser(BuildContext context, User user) async {
 
   print("HANDLE, UPDATE USER");
 
@@ -250,10 +250,14 @@ class UserForm extends StatefulWidget {
   // User linked to the form (can be null if we are creating an user)
   final User? user;
 
+  // Callback (optional)
+  final VoidCallback? callback;
+
   const UserForm({
     super.key,
     required this.title,
-    this.user = null
+    this.user = null,
+    this.callback = null
   });
 
   @override
@@ -327,7 +331,7 @@ class _UserFormState extends State<UserForm> {
         createdAt: widget.user!.createdAt,
       );
 
-      handleUpdateUser(context, user);
+      await handleUpdateUser(context, user);
     }
 
     // Clear inputs fields
@@ -338,6 +342,10 @@ class _UserFormState extends State<UserForm> {
 
     // Close form if in a dialog
     Navigator.of(context).pop();
+
+    // Call callback
+    if (widget.callback != null)
+      widget.callback?.call();
 
     // Update state
     setState(() => _isSubmitting = false);

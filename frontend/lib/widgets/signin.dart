@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../api/users.dart';
+import '../routes.dart';
 import '../utils.dart';
+
 
 /************************
 * GLOBALS SIGNIN FUNCTIONS
@@ -19,6 +22,10 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
+
+  // User created successfully, redirect to /login
+  if (res)
+    context.go(LOGIN_PATH);
 }
 
 /************************
@@ -185,11 +192,9 @@ class _SigninPageState extends State<SigninPage> {
                 const SizedBox(height: 16),
                 // Optional: Add a link to create an account
                 TextButton(
-                  onPressed: () {
-                    // Navigate to signup page
-                  },
+                  onPressed: () => context.go(LOGIN_PATH),
                   child: const Text(
-                    'Already have an account ? signin',
+                    'Already have an account ? Login',
                     style: TextStyle(color: Colors.deepPurple),
                   ),
                 ),

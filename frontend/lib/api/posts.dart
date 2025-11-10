@@ -53,10 +53,17 @@ Future<bool> deletePost(Post post) async {
 
   final id = post.id;
 
+  // Get user token
+  final token = TokenHandler().token;
+
   try {
 
     final response = await http.delete(
       Uri.parse('http://0.0.0.0:8080/posts/delete/$id'),
+      headers: {
+        'Authorization': 'Bearer $token',  // Include token in the Authorization header
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }
     );
 
     // Check for 204 cause API is returning 204 if delete is successfull

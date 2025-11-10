@@ -8,8 +8,15 @@ import '../auth/tokenHandler.dart';
 
 Future<User> fetchUser(int id) async {
 
+  // Get user token
+  final token = TokenHandler().token;
+
   final response = await http.get(
     Uri.parse('http://0.0.0.0:8080/users/$id'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
   );
 
   if (response.statusCode == 200) {
@@ -26,8 +33,15 @@ Future<User> fetchUser(int id) async {
 
 Future<List<User>> fetchUsers() async {
 
+  // Get user token
+  final token = TokenHandler().token;
+
   final response = await http.get(
     Uri.parse('http://0.0.0.0:8080/users'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
   );
 
   if (response.statusCode == 200) {
@@ -46,10 +60,17 @@ Future<bool> deleteUser(User user) async {
 
   final id = user.id;
 
+  // Get user token
+  final token = TokenHandler().token;
+
   try {
 
     final response = await http.delete(
       Uri.parse('http://0.0.0.0:8080/users/delete/$id'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }
     );
 
     // Check for 204 cause API is returning 204 if delete is successfull
@@ -112,11 +133,15 @@ Future<bool> updateUser(User user) async {
 
   final id = user.id;
 
+  // Get user token
+  final token = TokenHandler().token;
+
   try {
 
     final response = await http.put(
       Uri.parse('http://0.0.0.0:8080/users/update/$id'),
       headers: {
+        'Authorization': 'Bearer $token',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: {

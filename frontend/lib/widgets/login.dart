@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import '../utils.dart';
+import 'package:go_router/go_router.dart';
+
 import '../api/auth.dart';
+import '../routes.dart';
+import '../utils.dart';
 
 /************************
 * GLOBALS LOGIN FUNCTIONS
@@ -124,11 +127,9 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16),
                 // Optional: Add a link to create an account
                 TextButton(
-                  onPressed: () {
-                    // Navigate to signup page
-                  },
+                  onPressed: () => context.go(SIGNIN_PATH),
                   child: const Text(
-                    'Don’t have an account? Sign up',
+                    'Don’t have an account? Create one !',
                     style: TextStyle(color: Colors.deepPurple),
                   ),
                 ),
