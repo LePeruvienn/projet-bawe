@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import '../models/post.dart';
 import '../utils.dart';
 import '../api/posts.dart';
+import '../auth/authProvider.dart';
+import '../routes.dart';
+
+/************************
+* GLOBAL POSTS FINALS
+*************************/
+
+// Get Singleton Instance once
+final authProvider = AuthProvider();
+
 
 /************************
 * GLOBAL POSTS FUNCTIONS
@@ -34,7 +46,7 @@ void handleDeletePost(BuildContext context, Post post, VoidCallback onDeleted) a
     onDeleted();
 }
 
-void handleLikePost(BuildContext context, Post post) async {
+Future<bool> handleLikePost(BuildContext context, Post post) async {
 
   final id = post.id;
 
@@ -51,9 +63,11 @@ void handleLikePost(BuildContext context, Post post) async {
       icon: Icon(Icons.close, color: Colors.white),
     );
   }
+
+  return isLiked;
 }
 
-void handleUnlikePost(BuildContext context, Post post) async {
+Future<bool> handleUnlikePost(BuildContext context, Post post) async {
 
   final id = post.id;
 
@@ -70,6 +84,8 @@ void handleUnlikePost(BuildContext context, Post post) async {
       icon: Icon(Icons.close, color: Colors.white),
     );
   }
+
+  return isUnliked;
 }
 
 /************************
@@ -127,10 +143,11 @@ class _PostsPageState extends State<PostsPage> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => openPostForm(context, _refreshPosts),
-        child: const Icon(Icons.create),
-      ),
+      floatingActionButton: (authProvider.isLoggedIn) ?
+        FloatingActionButton(
+          onPressed: () => openPostForm(context, _refreshPosts),
+          child: const Icon(Icons.create),
+        ) : null,
     );
   }
 }
@@ -156,25 +173,47 @@ class PostListItem extends StatefulWidget {
 
 class _PostListItemState extends State<PostListItem> {
   
-  late int likes;
+  int likes = 0;
   bool isLiked = false;
+
+  bool isHandlingLike = false;
 
   @override
   void initState() {
 
     super.initState();
     likes = widget.post.likesCount;
-    print('>>> IS LIKED' + widget.post.authIsLiked.toString());
     isLiked = widget.post.authIsLiked;
   }
 
-  void toggleLike(BuildContext context, Post post) {
+  void toggleLike(BuildContext context, Post post) async {
+
+    // Is we are actually handling a like do not process other instructions
+    if (isHandlingLike)
+      return;
+
+    // Set post item handling like status to true
+    isHandlingLike = true;
+
+    // If user tries to like but is not logged in
+    if (!authProvider.isLoggedIn) {
+
+      // Redirect to login page & stop here
+      context.go(LOGIN_PATH);
+      isHandlingLike = false;
+      return;
+    }
 
     // Send like/unlike request to API
-    if (isLiked)
-      handleUnlikePost(context, post);
-    else
-      handleLikePost(context, post);
+    bool success = isLiked ?
+      await handleUnlikePost(context, post) : 
+      await handleLikePost(context, post);
+
+    // if it failed stop here
+    if (!success) {
+      isHandlingLike = false;
+      return;
+    }
 
     // Update current frontend item state
     setState(() {
@@ -187,6 +226,9 @@ class _PostListItemState extends State<PostListItem> {
 
       isLiked = !isLiked;
     });
+
+    // Remove handling like state
+    isHandlingLike = false;
   }
 
   @override
@@ -242,11 +284,13 @@ class _PostListItemState extends State<PostListItem> {
                         ],
                       ],
                     ),
-                    IconButton(
-                      iconSize: 20,
-                      icon: Icon(Icons.delete),
-                      onPressed: () => handleDeletePost(context, post, widget.onDelete),
-                    ),
+                    // Only show if user is admin
+                    if (authProvider.isAdmin)
+                      IconButton(
+                        iconSize: 20,
+                        icon: Icon(Icons.delete),
+                        onPressed: () => handleDeletePost(context, post, widget.onDelete),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 4),
