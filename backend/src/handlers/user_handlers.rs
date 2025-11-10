@@ -97,9 +97,11 @@ pub async fn delete_user(Path(id): Path<i32>, Extension(auth_user): Extension<Au
  */
 pub async fn update_user(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> StatusCode {
 
+    let is_authorized = (auth_user.is_connected && auth_user.user_id == id) || auth_user.is_admin;
+
     // If user is not connected or tries to modify an other account than his own, or is not admin,
     // Return 401
-    if !(auth_user.is_connected && auth_user.user_id == id) || !auth_user.is_admin {
+    if !is_authorized {
         return StatusCode::UNAUTHORIZED;
     }
 
