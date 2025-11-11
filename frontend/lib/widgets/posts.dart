@@ -54,8 +54,6 @@ Future<bool> handleLikePost(BuildContext context, Post post) async {
 
   if (!isLiked) {
 
-    // TODO: Make the frontend remove the like if it dont work
-
     showSnackbar(
       context: context,
       dismissText: 'Failed to like post',
@@ -75,8 +73,6 @@ Future<bool> handleUnlikePost(BuildContext context, Post post) async {
 
   if (!isUnliked) {
 
-    // TODO: Make the frontend readd the like if it dont work
-
     showSnackbar(
       context: context,
       dismissText: 'Failed to unlike post',
@@ -88,18 +84,227 @@ Future<bool> handleUnlikePost(BuildContext context, Post post) async {
   return isUnliked;
 }
 
+
+void openPostForm(BuildContext context, VoidCallback onPostCreated) {
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (context) => Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: _PostForm(onPostCreated: onPostCreated),
+    ),
+  );
+}
+
+/*****************
+* POSTS COMPONENTS
+******************/
+
+class _PostForm extends StatefulWidget {
+
+  final VoidCallback onPostCreated;
+  const _PostForm({required this.onPostCreated});
+
+  @override
+  State<_PostForm> createState() => _PostFormState();
+}
+
+class _PostFormState extends State<_PostForm> {
+
+  final TextEditingController _controller = TextEditingController();
+
+  bool isPosting = false;
+  static const int maxLength = 280;
+
+  Future<void> _createPost(BuildContext context) async {
+
+    setState(() => isPosting = true);
+    await handleCreatePost(context, _controller.text.trim());
+    Navigator.pop(context);
+    widget.onPostCreated();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final remaining = maxLength - _controller.text.length;
+    final disabled = _controller.text.trim().isEmpty || _controller.text.length > maxLength;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(
+                backgroundColor: Colors.deepPurple,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  maxLines: null,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: "What's happening?",
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$remaining',
+                style: TextStyle(
+                  color: remaining < 0 ? Colors.red : Colors.grey[600],
+                  fontSize: 13,
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: disabled ? Colors.grey[400] : Colors.deepPurple,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                ),
+                onPressed: disabled || isPosting ? null : () => _createPost(context),
+                child: isPosting ?
+                  const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Text('Post', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PostFormDesktop extends StatefulWidget {
+
+  final VoidCallback onPostCreated;
+  const _PostFormDesktop({required this.onPostCreated});
+
+  @override
+  State<_PostFormDesktop> createState() => _PostFormDesktopState();
+}
+
+class _PostFormDesktopState extends State<_PostFormDesktop> {
+
+  final TextEditingController _controller = TextEditingController();
+
+  bool isPosting = false;
+  static const int maxLength = 280;
+
+  Future<void> _createPost() async {
+
+    final content = _controller.text.trim();
+    if (content.isEmpty || content.length > maxLength) return;
+
+    setState(() => isPosting = true);
+    await handleCreatePost(context, content);
+    _controller.clear();
+    setState(() => isPosting = false);
+    widget.onPostCreated();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final disabled = _controller.text.trim().isEmpty || _controller.text.length > maxLength;
+
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              maxLines: null,
+              decoration: const InputDecoration(
+                hintText: "What's happening?",
+                border: InputBorder.none,
+              ),
+              style: const TextStyle(fontSize: 16),
+              onChanged: (_) {
+                setState(() {}); // triggers rebuild to update remaining
+              },
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  '${maxLength - _controller.text.length}',
+                  style: TextStyle(
+                    color: _controller.text.length > maxLength
+                        ? Colors.red
+                        : Colors.grey[600],
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: disabled ? Colors.grey[400] : Colors.deepPurple,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                ),
+                onPressed: disabled || isPosting ? null : _createPost,
+                child: isPosting ?
+                  const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Text('Post', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /************************
 * POSTS PAGE
 *************************/
 
 class PostsPage extends StatefulWidget {
+
   const PostsPage({super.key});
 
   @override
   State<PostsPage> createState() => _PostsPageState();
 }
 
+
 class _PostsPageState extends State<PostsPage> {
+
   late Future<List<Post>> futurePosts;
 
   @override
@@ -114,6 +319,8 @@ class _PostsPageState extends State<PostsPage> {
     });
   }
 
+  bool get _isDesktop => MediaQuery.of(context).size.width >= 800;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,32 +329,45 @@ class _PostsPageState extends State<PostsPage> {
         child: FutureBuilder<List<Post>>(
           future: futurePosts,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+
+            // Loading widget ...
+            if (snapshot.connectionState == ConnectionState.waiting)
               return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
+
+            // Showing error if there are one
+            else if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            else if (!snapshot.hasData || snapshot.data!.isEmpty)
               return const Center(child: Text('No posts available.'));
-            } else {
-              final posts = snapshot.data!;
-              return ListView.builder(
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  return PostListItem(
-                    post: posts[index],
-                    onDelete: _refreshPosts,
-                  );
-                },
-              );
-            }
+
+            // Get fetched data
+            final posts = snapshot.data!;
+
+            // Widget :
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+
+                // And Post Input if we are in Desktop mode and we 
+                if (_isDesktop && authProvider.isLoggedIn)
+                  _PostFormDesktop(onPostCreated: _refreshPosts),
+
+                // Post items
+                ...posts.map((post) => PostListItem(
+                      post: post,
+                      onDelete: _refreshPosts,
+                    )),
+              ],
+            );
           },
         ),
       ),
-      floatingActionButton: (authProvider.isLoggedIn) ?
-        FloatingActionButton(
-          onPressed: () => openPostForm(context, _refreshPosts),
-          child: const Icon(Icons.create),
-        ) : null,
+      floatingActionButton: (!_isDesktop && authProvider.isLoggedIn)
+          ? FloatingActionButton(
+              onPressed: () => openPostForm(context, _refreshPosts),
+              child: const Icon(Icons.create),
+            )
+          : null,
     );
   }
 }
@@ -322,110 +542,6 @@ class _PostListItemState extends State<PostListItem> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-void openPostForm(BuildContext context, VoidCallback onPostCreated) {
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    ),
-    builder: (context) => Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: _PostForm(onPostCreated: onPostCreated),
-    ),
-  );
-}
-
-class _PostForm extends StatefulWidget {
-  final VoidCallback onPostCreated;
-  const _PostForm({required this.onPostCreated});
-
-  @override
-  State<_PostForm> createState() => _PostFormState();
-}
-
-class _PostFormState extends State<_PostForm> {
-  final TextEditingController _controller = TextEditingController();
-  bool isPosting = false;
-  static const int maxLength = 280;
-
-  @override
-  Widget build(BuildContext context) {
-    final remaining = maxLength - _controller.text.length;
-    final disabled = _controller.text.trim().isEmpty || _controller.text.length > maxLength;
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  maxLines: null,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: "What's happening?",
-                    border: InputBorder.none,
-                  ),
-                  onChanged: (_) => setState(() {}),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$remaining',
-                style: TextStyle(
-                  color: remaining < 0 ? Colors.red : Colors.grey[600],
-                  fontSize: 13,
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: disabled ? Colors.grey[400] : Colors.deepPurple,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                ),
-                onPressed: disabled || isPosting
-                    ? null
-                    : () async {
-                        setState(() => isPosting = true);
-                        await handleCreatePost(context, _controller.text.trim());
-                        Navigator.pop(context);
-                        widget.onPostCreated();
-                      },
-                child: isPosting
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Text('Post', style: TextStyle(color: Colors.white)),
-              ),
-            ],
           ),
         ],
       ),

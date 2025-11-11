@@ -21,16 +21,19 @@ void handleLogin(BuildContext context, String username, String password) async {
   );
 }
 
-/************************
-* GLOBALS LOGIN CLASSES
-*************************/
+/***********************
+* LOGIN PAGE COMPONENTS
+***********************/
 
-class LoginPage extends StatefulWidget {
+class _LoginForm extends StatefulWidget {
+
+  const _LoginForm({Key? key}) : super(key: key);
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<_LoginForm> createState() => _LoginFormState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginFormState extends State<_LoginForm> {
 
   final _formKey = GlobalKey<FormState>();
 
@@ -51,94 +54,184 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Title and Subtitle
-          const Text(
-            'Welcome Back!',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
-            ),
-          ),
-          const SizedBox(height: 8),  // Spacing between title and subtitle
-          const Text(
-            'Ready to FEUR ?',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.deepPurple,
-            ),
-          ),
-          const SizedBox(height: 40),  // Spacing before the form
 
-          Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Username Text Field
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                // Password Text Field
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Login Button
-                ElevatedButton(
-                  onPressed: _submitForm,
-                  child: const Text('Login'),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    backgroundColor: Colors.deepPurple.shade100, // Color for the button
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // Rounded button
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Optional: Add a link to create an account
-                TextButton(
-                  onPressed: () => context.go(SIGNIN_PATH),
-                  child: const Text(
-                    'Don’t have an account? Create one !',
-                    style: TextStyle(color: Colors.deepPurple),
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Welcome Back!',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.deepPurple,
           ),
-        ],
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Ready to FEUR?',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.deepPurple,
+          ),
+        ),
+        const SizedBox(height: 40),
+        Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Username Text Field
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your username';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              // Password Text Field
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock),
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              // Login Button
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: const Text('Login'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  backgroundColor: Colors.deepPurple.shade100, // Color for the button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded button
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Optional: Add a link to create an account
+              TextButton(
+                onPressed: () => context.go(SIGNIN_PATH),
+                child: const Text(
+                  'Don’t have an account? Create one !',
+                  style: TextStyle(color: Colors.deepPurple),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+class _InfoBox extends StatelessWidget {
+
+  const _InfoBox({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple, Colors.deepPurpleAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(48.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: const [
+              Text(
+                'Hello 👋',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 24),
+              Text(
+                'Are you ready to create a new FEUR?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
+/************
+* LOGIN PAGE
+*************/
+
+class LoginPage extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+
+        final bool isDesktop = constraints.maxWidth > 800;
+
+        // >>> Desktop View
+        if (isDesktop) {
+
+          return Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: const _InfoBox()
+              ),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(64.0),
+                  child: const _LoginForm(),
+                ),
+              ),
+            ]
+          );
+
+        // >>> Mobile View
+        } else {
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: const _LoginForm(),
+          );
+        }
+      },
+    );
+  }
+}

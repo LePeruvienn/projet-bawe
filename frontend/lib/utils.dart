@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/*
+ * Function used to display message on a SnackBar easly
+ */
 void showSnackbar({
   required BuildContext context,
   required String dismissText,
@@ -29,6 +32,9 @@ void showSnackbar({
   );
 }
 
+/*
+ * Function used to get a text from how many time the date was
+ */
 String formatTimeAgo(DateTime date) {
 
   final now = DateTime.now();
@@ -42,15 +48,37 @@ String formatTimeAgo(DateTime date) {
   return '${date.year}-${date.month}-${date.day}';
 }
 
+/*
+ * Functions used to know in wich type of screen we are
+ */
+bool isMobile(BuildContext context) {
 
-class NavigationDestinationWithPath extends NavigationDestination {
+  return MediaQuery.of(context).size.width < 600;
+}
+bool isTablet(BuildContext context) {
 
+    final width = MediaQuery.of(context).size.width;
+    return width >= 600 && width < 1024;
+}
+bool isDesktop(BuildContext context) {
+
+  return MediaQuery.of(context).size.width >= 1024;
+}
+
+/*
+ * Used to store destination data
+ */
+class DestinationData {
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String text;
   final String path;
 
-  const NavigationDestinationWithPath({
-    required Icon selectedIcon,
-    required Icon icon,
-    required String label,
-    required this.path,
-  }) : super(selectedIcon: selectedIcon, icon: icon, label: label);
+  const DestinationData({
+    required this.icon,
+    required this.selectedIcon,
+    required this.text,
+    required this.path
+  });
 }
