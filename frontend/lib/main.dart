@@ -25,7 +25,24 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => authProvider,
-      child: const AppRouter()
+      child: const AppPage()
     ),
   );
+}
+
+class AppPage extends StatelessWidget {
+
+  const AppPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'ComicSansMS', 
+        useMaterial3: true,
+      ),
+      routerConfig: router,
+    );
+  }
 }

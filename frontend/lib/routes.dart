@@ -72,20 +72,3 @@ final GoRouter router = GoRouter(
     return null;
   }
 );
-
-/************************
-* GLOBAL ROUTES CLASSES
-*************************/
-
-class AppRouter extends StatelessWidget {
-
-  const AppRouter({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
-    );
-  }
-}
