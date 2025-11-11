@@ -49,23 +49,6 @@ String formatTimeAgo(DateTime date) {
 }
 
 /*
- * Functions used to know in wich type of screen we are
- */
-bool isMobile(BuildContext context) {
-
-  return MediaQuery.of(context).size.width < 600;
-}
-bool isTablet(BuildContext context) {
-
-    final width = MediaQuery.of(context).size.width;
-    return width >= 600 && width < 1024;
-}
-bool isDesktop(BuildContext context) {
-
-  return MediaQuery.of(context).size.width >= 1024;
-}
-
-/*
  * Used to store destination data
  */
 class DestinationData {

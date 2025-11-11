@@ -36,13 +36,33 @@ class AppPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'ComicSansMS', 
-        useMaterial3: true,
+
+    final width = MediaQuery.of(context).size.width;
+    
+    final bool isTablet = width >= 600 && width < 1024;
+    final bool isDesktop = width >= 1024;
+
+    double textScale = 1.0;
+
+    if (isTablet) textScale = 1.10;
+    if (isDesktop) textScale = 1.25;
+    
+    final originalMediaQueryData = MediaQuery.of(context);
+
+    final scaledMediaQueryData = originalMediaQueryData.copyWith(
+      textScaler: TextScaler.linear(textScale), 
+    );
+
+    return MediaQuery(
+      data: scaledMediaQueryData,
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'ComicSansMS',
+          useMaterial3: true,
+        ),
+        routerConfig: router,
       ),
-      routerConfig: router,
     );
   }
 }
