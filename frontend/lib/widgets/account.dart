@@ -55,37 +55,42 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // User info (FutureBuilder)
-          Expanded(
-            child: FutureBuilder<User>(
-              future: futureUser,
-              builder: (context, snapshot) {
 
-                // While we are waiting show progression
-                if (snapshot.connectionState == ConnectionState.waiting)
-                  return const Center(child: CircularProgressIndicator());
+    return Center(
+      child: SizedBox(
+        width: 800, 
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: FutureBuilder<User>(
+                  future: futureUser,
+                  builder: (context, snapshot) {
 
-                // When error, show error message at center
-                else if (snapshot.hasError)
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                    // While we are waiting show progression
+                    if (snapshot.connectionState == ConnectionState.waiting)
+                      return const Center(child: CircularProgressIndicator());
 
-                // If we have no data return no data error
-                else if (!snapshot.hasData)
-                  return const Center(child: Text('No user data available'));
+                    // When error, show error message at center
+                    else if (snapshot.hasError)
+                      return Center(child: Text('Error: ${snapshot.error}'));
 
-                // Ge fetched user
-                final user = snapshot.data!;
+                    // If we have no data return no data error
+                    else if (!snapshot.hasData)
+                      return const Center(child: Text('No user data available'));
 
-                // Create AccountDetails component with it
-                return AccountDetails(user: user, onUserUpdate: refreshUser);
-              },
-            ),
+                    // Ge fetched user
+                    final user = snapshot.data!;
+
+                    // Create AccountDetails component with it
+                    return AccountDetails(user: user, onUserUpdate: refreshUser);
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
