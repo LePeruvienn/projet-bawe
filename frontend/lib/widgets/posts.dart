@@ -191,7 +191,7 @@ class _PostFormState extends State<_PostForm> {
                     width: 18,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
-                : const Text('Post', style: TextStyle(color: Colors.white)),
+                : Text(context.loc.createPost, style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -457,11 +457,18 @@ class _PostListItemState extends State<PostListItem> {
   @override
   Widget build(BuildContext context) {
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final post = widget.post;
 
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12)),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.onSurface.withOpacity(0.12), // subtle line based on text color
+          ),
+        ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
       child: Row(

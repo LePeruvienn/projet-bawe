@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_strategy/url_strategy.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -17,7 +17,7 @@ const DESKTOP_TEXT_SCALE = 1.25;
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-  setPathUrlStrategy();
+  setUrlStrategy(PathUrlStrategy());
 
   await TokenHandler().init();
 
@@ -56,7 +56,6 @@ class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en');
 
   void setLocale(Locale locale) {
-
     setState(() {
       _locale = locale;
     });
@@ -65,47 +64,52 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
 
-    double textScale = DEFAULT_TEXT_SCALE;
+    return AdaptiveTheme(
+      light: ThemeData(
+        brightness: Brightness.light,
+        useMaterial3: true,
+        fontFamily: 'ComicSansMS',
+      ),
+      dark: ThemeData(
+        brightness: Brightness.dark,
+        useMaterial3: true,
+        fontFamily: 'ComicSansMS',
+      ),
+      initial: widget.savedThemeMode ?? AdaptiveThemeMode.system,
 
-    final width = MediaQuery.of(context).size.width;
+      builder: (theme, darkTheme) => MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        theme: theme,
+        darkTheme: darkTheme,
+        locale: _locale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('fr'),
+        ],
+        routerConfig: router,
 
-    if (width >= 600 && width < 1024) textScale = TABLET_TEXT_SCALE;
-    if (width >= 1024) textScale = DESKTOP_TEXT_SCALE;
+        builder: (context, child) { 
 
-    final originalMediaQuery = MediaQuery.of(context);
-    final scaledMediaQuery = originalMediaQuery.copyWith(textScaleFactor: textScale);
+          double textScale = DEFAULT_TEXT_SCALE;
+          final width = MediaQuery.of(context).size.width;
 
-    return MediaQuery(
-      data: scaledMediaQuery,
-      child: AdaptiveTheme(
-        light: ThemeData(
-          brightness: Brightness.light,
-          useMaterial3: true,
-          fontFamily: 'ComicSansMS',
-        ),
-        dark: ThemeData(
-          brightness: Brightness.dark,
-          useMaterial3: true,
-          fontFamily: 'ComicSansMS',
-        ),
-        initial: widget.savedThemeMode ?? AdaptiveThemeMode.system,
-        builder: (theme, darkTheme) => MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          theme: theme,
-          darkTheme: darkTheme,
-          locale: _locale,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('fr'),
-          ],
-          routerConfig: router,
-        )
+          if (width >= 600 && width < 1024) textScale = TABLET_TEXT_SCALE;
+          if (width >= 1024) textScale = DESKTOP_TEXT_SCALE;
+
+          final originalMediaQuery = MediaQuery.of(context);
+          final scaledMediaQuery = originalMediaQuery.copyWith(textScaleFactor: textScale);
+
+          return MediaQuery(
+            data: scaledMediaQuery,
+            child: child!, 
+          );
+        }
       )
     );
   }

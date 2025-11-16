@@ -129,7 +129,7 @@ String getDestinationLabel(BuildContext context, DestinationData destination) {
 
 class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
 
-  const FeurAppBar({super.key});
+  FeurAppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -212,7 +212,7 @@ class _DesktopShell extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: const FeurAppBar(),
+      appBar: FeurAppBar(),
       body: Row(
         children: [
           // Sidebar
@@ -275,11 +275,23 @@ class _DesktopShell extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   alignment: Alignment.center,
-                  child: Text(
-                    "Made with ❤️",
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        context.loc.madeWithLove,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        context.loc.footer,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -319,7 +331,7 @@ class _MobileShell extends StatelessWidget {
       .toList();
 
     return Scaffold(
-      appBar: const FeurAppBar(),
+      appBar: FeurAppBar(),
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,

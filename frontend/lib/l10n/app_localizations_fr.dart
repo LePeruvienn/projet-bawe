@@ -127,7 +127,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unlikePostFailed => 'Échec du unlike de la publication';
 
   @override
-  String get createPost => 'Post';
+  String get createPost => 'Publier';
 
   @override
   String get loading => 'Loading ...';
@@ -154,6 +154,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get madeWithLove => 'Fait avec ❤️';
+
+  @override
+  String get footer => 'Arthur Pinel 2025';
 
   @override
   String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas';

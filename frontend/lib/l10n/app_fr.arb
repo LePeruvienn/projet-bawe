@@ -48,7 +48,7 @@
   "likePostFailed": "Échec du like de la publication",
   "unlikePostFailed": "Échec du unlike de la publication",
 
-  "createPost": "Post",
+  "createPost": "Publier",
 
   "loadingFeur": "Chargement de FEUR...",
   "readyToStart": "Prêt à commencer ?",
@@ -60,6 +60,7 @@
   "areYouReady": "Êtes-vous prêt à créer un nouveau FEUR ?",
 
   "madeWithLove": "Fait avec ❤️",
+  "footer": "Arthur Pinel 2025",
 
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
   "invalidEmail": "Email invalide",

@@ -154,6 +154,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get madeWithLove => 'Made with ❤️';
 
   @override
+  String get footer => 'Arthur Pinel 2025';
+
+  @override
   String get passwordsDoNotMatch => 'Passwords do not match';
 
   @override
