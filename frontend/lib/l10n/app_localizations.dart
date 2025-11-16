@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'Arthur Pinel 2025'**
   String get footer;
 
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
   /// No description provided for @passwordsDoNotMatch.
   ///
   /// In en, this message translates to:

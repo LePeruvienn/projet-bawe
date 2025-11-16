@@ -27,12 +27,14 @@ void showSnackbar({
         ],
       ),
       backgroundColor: backgroundColor,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
+      /*
       action: SnackBarAction(
-        label: 'Dismiss',
+        label: context.loc.dismiss,
         textColor: Colors.white,
         onPressed: () {},
-      ),
+      )
+      */
     )
   );
 }

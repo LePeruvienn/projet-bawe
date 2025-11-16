@@ -6,8 +6,7 @@
   "admin": "Admin",
 
   "welcomeBack": "Bienvenue !",
-  "readyToFeur": "Prêt à FEUR ?",
-  "dontHaveAccount": "Vous n'avez pas de compte ? Créez-en un !",
+  "readyToFeur": "Prêt à FEUR ?", "dontHaveAccount": "Vous n'avez pas de compte ? Créez-en un !",
   "alreadyHaveAccount": "Vous avez déjà un compte ? Connectez-vous !",
 
   "username": "Nom d'utilisateur",
@@ -61,6 +60,8 @@
 
   "madeWithLove": "Fait avec ❤️",
   "footer": "Arthur Pinel 2025",
+
+  "dismiss": "Masquer",
 
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
   "invalidEmail": "Email invalide",

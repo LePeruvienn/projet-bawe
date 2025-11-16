@@ -159,6 +159,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get footer => 'Arthur Pinel 2025';
 
   @override
+  String get dismiss => 'Masquer';
+
+  @override
   String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas';
 
   @override
