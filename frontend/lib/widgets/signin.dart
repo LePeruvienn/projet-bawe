@@ -13,9 +13,11 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
 
   bool res = await createUser(username, email, password, title);
 
+  final loc = context.loc;
+
   showSnackbar(
     context: context,
-    dismissText: res ? 'User created successfully' : 'Failed to create user',
+    dismissText: res ? loc.userCreated : loc.userCreationFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -68,7 +70,7 @@ class _SigninFormState extends State<_SigninForm> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Ready to start?',
+          context.loc.readyToStart,
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -77,7 +79,7 @@ class _SigninFormState extends State<_SigninForm> {
         ),
         const SizedBox(height: 8),
         Text(
-          'This is the place to be.',
+          context.loc.thisIsThePlace,
           style: TextStyle(
             fontSize: 16,
             color: colorScheme.primary,
@@ -96,7 +98,7 @@ class _SigninFormState extends State<_SigninForm> {
                       controller: _titleController,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.person, color: colorScheme.primary),
-                        labelText: 'Name',
+                        labelText: context.loc.name,
                         border: const OutlineInputBorder(),
                       ),
                     ),
@@ -107,11 +109,11 @@ class _SigninFormState extends State<_SigninForm> {
                       controller: _usernameController,
                       decoration: InputDecoration(
                         prefix: Text('@', style: TextStyle(color: colorScheme.onSurface)),
-                        labelText: 'Username',
+                        labelText: context.loc.username,
                         border: const OutlineInputBorder(),
                       ),
                       validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Username required' : null,
+                          (value == null || value.isEmpty) ? context.loc.usernameRequired : null,
                     ),
                   ),
                 ],
@@ -122,13 +124,13 @@ class _SigninFormState extends State<_SigninForm> {
                 controller: _emailController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.mail, color: colorScheme.primary),
-                  labelText: 'Email',
+                  labelText: context.loc.email,
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Email required';
+                  if (value == null || value.isEmpty) return context.loc.emailRequired;
                   final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                  return emailRegex.hasMatch(value) ? null : 'Invalid email';
+                  return emailRegex.hasMatch(value) ? null : context.loc.invalidEmail;
                 },
               ),
               const SizedBox(height: 16),
@@ -136,26 +138,26 @@ class _SigninFormState extends State<_SigninForm> {
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password',
+                  labelText: context.loc.password,
                   prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
                   border: const OutlineInputBorder(),
                 ),
                 obscureText: true,
-                validator: (value) => (value == null || value.isEmpty) ? 'Please enter your password' : null,
+                validator: (value) => (value == null || value.isEmpty) ? context.loc.passwordRequired : null,
               ),
               const SizedBox(height: 16),
               // Repeat Password
               TextFormField(
                 controller: _repeatedPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Repeat your password',
+                decoration: InputDecoration(
+                  labelText: context.loc.repeatPassword,
                   border: OutlineInputBorder(),
                 ),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Please repeat your password';
+                  if (value == null || value.isEmpty) return context.loc.repeatPasswordRequired;
                   if (_passwordController.text.trim() != _repeatedPasswordController.text.trim()) {
-                    return 'Passwords do not match.';
+                    return context.loc.passwordsDoNotMatch;
                   }
                   return null;
                 },
@@ -171,13 +173,13 @@ class _SigninFormState extends State<_SigninForm> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Signin'),
+                child: Text(context.loc.signin),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.go(LOGIN_PATH),
                 child: Text(
-                  'Already have an account? Login',
+                  context.loc.alreadyHaveAccount,
                   style: TextStyle(color: colorScheme.primary),
                 ),
               ),
@@ -216,7 +218,7 @@ class _InfoBox extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'FEUR 💜',
+                context.loc.signinHeader,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 48,
@@ -226,7 +228,7 @@ class _InfoBox extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                'Create your account and start sharing your thoughts with the world.',
+                contex.loc.createAccountMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,

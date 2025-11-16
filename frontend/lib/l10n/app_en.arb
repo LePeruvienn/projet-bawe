@@ -1,7 +1,70 @@
 {
   "home": "Home",
   "login": "Login",
-  "signin": "Signin",
-  "account": "Account",
-  "admin": "Admin"
+  "signin": "Sign Up",
+  "account": "My Account",
+  "admin": "Admin",
+
+  "welcomeBack": "Welcome Back!",
+  "readyToFeur": "Ready to FEUR?",
+  "dontHaveAccount": "Don't have an account? Create one!",
+  "alreadyHaveAccount": "Already have an account? Login!",
+
+  "username": "Username",
+  "password": "Password",
+  "repeatPassword": "Repeat Password",
+  "email": "Email",
+  "name": "Name",
+  "title": "Title",
+
+  "createAccount": "Create Account",
+  "logout": "Logout",
+
+  "userInformation": "User Information",
+  "id": "ID",
+  "createdAt": "Created At",
+
+  "editUser": "Edit User",
+  "createUser": "Create User",
+  "save": "Save",
+
+  "loginSuccess": "Successfully logged in",
+  "loginFailed": "Login failed",
+  "userCreated": "User created successfully",
+  "userCreationFailed": "Failed to create user",
+  "logoutSuccess": "Successfully logged out",
+  "updateSuccess": "Update successful",
+  "updateFailed": "Failed to update user",
+  "deleteSuccess": "Delete successful",
+  "deleteFailed": "Failed to delete user",
+
+  "postCreatedSuccess": "Post created successfully",
+  "postCreationFailed": "Failed to create post",
+  "postDeletedSuccess": "Post successfully deleted",
+  "postDeletedFailed": "Failed to delete post",
+
+  "postHint": "What's happening?",
+
+  "likePostFailed": "Failed to like post",
+  "unlikePostFailed": "Failed to unlike post",
+
+  "createPost": "Post",
+
+  "loading": "Loading ...",
+  "readyToStart": "Ready to start?",
+  "thisIsThePlace": "This is the place to share your thoughts.",
+  "signinHeader": "FEUR 💜",
+  "createAccountMessage": "Create your account and start sharing your thoughts with the world.",
+
+  "hello": "Hello 👋",
+  "areYouReady": "Are you ready to create a new FEUR?",
+
+  "madeWithLove": "Made with ❤️",
+
+  "passwordsDoNotMatch": "Passwords do not match",
+  "invalidEmail": "Invalid email",
+  "usernameRequired": "Username required",
+  "emailRequired": "Email required",
+  "passwordRequired": "Please enter your password",
+  "repeatPasswordRequired": "Please repeat your password"
 }

@@ -23,9 +23,11 @@ Future<void> handleCreatePost(BuildContext context, String content) async {
 
   final res = await createPost(content);
 
+  final loc = context.loc;
+
   showSnackbar(
     context: context,
-    dismissText: res ? 'Post created successfully' : 'Failed to create post',
+    dismissText: res ? loc.postCreatedSuccess : loc.postCreationFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -35,9 +37,11 @@ void handleDeletePost(BuildContext context, Post post, VoidCallback onDeleted) a
 
   final res = await deletePost(post);
 
+  final loc = context.loc;
+
   showSnackbar(
     context: context,
-    dismissText: res ? 'Post successfully deleted' : 'Failed to delete post',
+    dismissText: res ? loc.postDeletedSuccess : loc.postDeletedFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -56,7 +60,7 @@ Future<bool> handleLikePost(BuildContext context, Post post) async {
 
     showSnackbar(
       context: context,
-      dismissText: 'Failed to like post',
+      dismissText: context.loc.likePostFailed,
       backgroundColor: Colors.red,
       icon: Icon(Icons.close, color: Colors.white),
     );
@@ -75,7 +79,7 @@ Future<bool> handleUnlikePost(BuildContext context, Post post) async {
 
     showSnackbar(
       context: context,
-      dismissText: 'Failed to unlike post',
+      dismissText: context.loc.unlikePostFailed,
       backgroundColor: Colors.red,
       icon: Icon(Icons.close, color: Colors.white),
     );
@@ -154,8 +158,8 @@ class _PostFormState extends State<_PostForm> {
                   controller: _controller,
                   maxLines: null,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: "What's happening?",
+                  decoration: InputDecoration(
+                    hintText: context.loc.postHint,
                     border: InputBorder.none,
                   ),
                   onChanged: (_) => setState(() {}),
@@ -242,8 +246,8 @@ class _PostFormDesktopState extends State<_PostFormDesktop> {
             TextField(
               controller: _controller,
               maxLines: null,
-              decoration: const InputDecoration(
-                hintText: "What's happening?",
+              decoration: InputDecoration(
+                hintText: context.loc.postHint,
                 border: InputBorder.none,
               ),
               style: const TextStyle(fontSize: 16),
@@ -278,7 +282,7 @@ class _PostFormDesktopState extends State<_PostFormDesktop> {
                     width: 18,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
-                : const Text('Post', style: TextStyle(color: Colors.white)),
+                : Text(context.loc.createPost, style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

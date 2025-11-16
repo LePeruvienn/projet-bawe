@@ -113,13 +113,13 @@ abstract class AppLocalizations {
   /// No description provided for @signin.
   ///
   /// In en, this message translates to:
-  /// **'Signin'**
+  /// **'Sign Up'**
   String get signin;
 
   /// No description provided for @account.
   ///
   /// In en, this message translates to:
-  /// **'Account'**
+  /// **'My Account'**
   String get account;
 
   /// No description provided for @admin.
@@ -127,6 +127,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Admin'**
   String get admin;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back!'**
+  String get welcomeBack;
+
+  /// No description provided for @readyToFeur.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to FEUR?'**
+  String get readyToFeur;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Create one!'**
+  String get dontHaveAccount;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Login!'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @repeatPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Password'**
+  String get repeatPassword;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @userInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'User Information'**
+  String get userInformation;
+
+  /// No description provided for @id.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get id;
+
+  /// No description provided for @createdAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created At'**
+  String get createdAt;
+
+  /// No description provided for @editUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit User'**
+  String get editUser;
+
+  /// No description provided for @createUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Create User'**
+  String get createUser;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @loginSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully logged in'**
+  String get loginSuccess;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed'**
+  String get loginFailed;
+
+  /// No description provided for @userCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'User created successfully'**
+  String get userCreated;
+
+  /// No description provided for @userCreationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create user'**
+  String get userCreationFailed;
+
+  /// No description provided for @logoutSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully logged out'**
+  String get logoutSuccess;
+
+  /// No description provided for @updateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Update successful'**
+  String get updateSuccess;
+
+  /// No description provided for @updateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update user'**
+  String get updateFailed;
+
+  /// No description provided for @deleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete successful'**
+  String get deleteSuccess;
+
+  /// No description provided for @deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete user'**
+  String get deleteFailed;
+
+  /// No description provided for @postCreatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Post created successfully'**
+  String get postCreatedSuccess;
+
+  /// No description provided for @postCreationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create post'**
+  String get postCreationFailed;
+
+  /// No description provided for @postDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Post successfully deleted'**
+  String get postDeletedSuccess;
+
+  /// No description provided for @postDeletedFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete post'**
+  String get postDeletedFailed;
+
+  /// No description provided for @postHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s happening?'**
+  String get postHint;
+
+  /// No description provided for @likePostFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to like post'**
+  String get likePostFailed;
+
+  /// No description provided for @unlikePostFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unlike post'**
+  String get unlikePostFailed;
+
+  /// No description provided for @createPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get createPost;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading ...'**
+  String get loading;
+
+  /// No description provided for @readyToStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to start?'**
+  String get readyToStart;
+
+  /// No description provided for @thisIsThePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the place to share your thoughts.'**
+  String get thisIsThePlace;
+
+  /// No description provided for @hello.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello 👋'**
+  String get hello;
+
+  /// No description provided for @areYouReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you ready to create a new FEUR?'**
+  String get areYouReady;
+
+  /// No description provided for @madeWithLove.
+  ///
+  /// In en, this message translates to:
+  /// **'Made with ❤️'**
+  String get madeWithLove;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email'**
+  String get invalidEmail;
+
+  /// No description provided for @usernameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Username required'**
+  String get usernameRequired;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email required'**
+  String get emailRequired;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get passwordRequired;
+
+  /// No description provided for @repeatPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please repeat your password'**
+  String get repeatPasswordRequired;
 }
 
 class _AppLocalizationsDelegate

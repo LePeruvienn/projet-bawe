@@ -17,7 +17,7 @@ void handleLogout(BuildContext context) async {
 
   showSnackbar(
     context: context,
-    dismissText: 'Sucessfully logged out',
+    dismissText: context.loc.logoutSuccess,
     backgroundColor: Colors.deepPurple,
     icon: Icon(Icons.done, color: Colors.white),
   );
@@ -139,17 +139,17 @@ class AccountDetails extends StatelessWidget {
         const SizedBox(height: 30),
 
         _InfoCard(
-          title: 'User Information',
+          title: context.loc.userInformation,
           user: user,
           items: [
-            _InfoItem(icon: Icons.badge, label: 'ID', value: user.id.toString()),
-            _InfoItem(icon: Icons.person, label: 'Username', value: user.username),
-            _InfoItem(icon: Icons.email, label: 'Email', value: user.email),
-            _InfoItem(icon: Icons.lock, label: 'Password', value: user.password),
-            _InfoItem(icon: Icons.title, label: 'Title', value: user.title ?? '—'),
+            _InfoItem(icon: Icons.badge, label: context.loc.id, value: user.id.toString()),
+            _InfoItem(icon: Icons.person, label: context.loc.username, value: user.username),
+            _InfoItem(icon: Icons.email, label: context.loc.email, value: user.email),
+            _InfoItem(icon: Icons.lock, label: context.loc.password, value: user.password),
+            _InfoItem(icon: Icons.title, label: context.loc.title, value: user.title ?? '—'),
             _InfoItem(
               icon: Icons.calendar_today,
-              label: 'Created At',
+              label: context.loc.createdAt,
               value: user.createdAt.toLocal().toString().split('.')[0],
             ),
           ],
@@ -159,7 +159,7 @@ class AccountDetails extends StatelessWidget {
         const SizedBox(height: 20),
         ElevatedButton(
           onPressed: () => handleLogout(context),
-          child: const Text('Logout'),
+          child: Text(context.loc.logout),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             backgroundColor: colorScheme.primaryContainer,
@@ -214,7 +214,7 @@ class _InfoCard extends StatelessWidget {
                         padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).viewInsets.bottom,
                         ),
-                        child: UserForm(title: "Edit User", user: user, callback: onUserUpdate),
+                        child: UserForm(title: context.loc.editUser, user: user, callback: onUserUpdate),
                       ),
                     );
                   },

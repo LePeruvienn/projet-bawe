@@ -13,10 +13,12 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
   // Try to create user
   bool res = await createUser(username, email, password, title);
 
+  final loc = context.loc;
+
   // Show message depending of sucess
   showSnackbar(
     context: context,
-    dismissText: res ? 'User created successfully' : 'Failed to create user',
+    dismissText: res ? loc.userCreated : loc.userCreationFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -24,14 +26,15 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
 
 Future<void> handleUpdateUser(BuildContext context, User user) async {
 
-  print("HANDLE, UPDATE USER");
-
+  // Try update user
   bool res = await updateUser(user);
+
+  final loc = context.loc;
 
   // Show message depending of sucess
   showSnackbar(
     context: context,
-    dismissText: res ? 'User updated successfully' : 'Failed to update user',
+    dismissText: res ? loc.updateSuccess : loc.updateFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -41,9 +44,11 @@ void handleDeleteUser(BuildContext context, User user) async {
 
   bool res = await deleteUser(user);
 
+  final loc = context.loc;
+
   showSnackbar(
     context: context,
-    dismissText: res ? 'User successfully deleted' : 'Failed to delete user',
+    dismissText: res ? loc.deleteSuccess : loc.deleteFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -98,7 +103,7 @@ class UsersPage extends StatelessWidget {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: UserForm(title: "Create User"),
+              child: UserForm(title: context.loc.createUser),
             ),
           );
         },
@@ -218,7 +223,7 @@ class _UserListItemState extends State<UserListItem> {
                         padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).viewInsets.bottom,
                         ),
-                        child: UserForm(title: "Update User", user: widget.user),
+                        child: UserForm(title: context.loc.editUser, user: widget.user),
                       ),
                     );
                   },
@@ -373,9 +378,9 @@ class _UserFormState extends State<UserForm> {
                 Expanded(
                   child: TextFormField(
                     controller: _titleController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       icon: Icon(Icons.person),
-                      labelText: 'Name',
+                      labelText: context.loc.name,
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -384,13 +389,13 @@ class _UserFormState extends State<UserForm> {
                 Expanded(
                   child: TextFormField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       prefix: Text('@'),
-                      labelText: 'Username',
+                      labelText: context.loc.username,
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Username required' : null,
+                        (value == null || value.isEmpty) ? context.loc.usernameRequired : null,
                   ),
                 ),
               ],
@@ -398,15 +403,15 @@ class _UserFormState extends State<UserForm> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 icon: Icon(Icons.mail),
-                labelText: 'Email',
+                labelText: context.loc.email,
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) return 'Email required';
+                if (value == null || value.isEmpty) return context.loc.emailRequired;
                 final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                return emailRegex.hasMatch(value) ? null : 'Invalid email';
+                return emailRegex.hasMatch(value) ? null : context.loc.invalidEmail;
               },
             ),
             const SizedBox(height: 12),
@@ -415,7 +420,7 @@ class _UserFormState extends State<UserForm> {
               obscureText: _obscurePassword,
               decoration: InputDecoration(
                 icon: const Icon(Icons.lock),
-                labelText: 'Password',
+                labelText: context.loc.password,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -429,7 +434,7 @@ class _UserFormState extends State<UserForm> {
                 ),
               ),
               validator: (value) =>
-                  (value == null || value.isEmpty) ? 'Password required' : null,
+                  (value == null || value.isEmpty) ? context.loc.passwordRequired : null,
             ),
             const SizedBox(height: 20),
             _isSubmitting
@@ -437,7 +442,7 @@ class _UserFormState extends State<UserForm> {
                 : ElevatedButton.icon(
                     onPressed: _submitForm,
                     icon: const Icon(Icons.save),
-                    label: const Text('Save'),
+                    label: Text(context.loc.save),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primaryContainer,
                       foregroundColor: colorScheme.onPrimaryContainer,
@@ -478,14 +483,14 @@ class UserInfoSheet extends StatelessWidget {
           _InfoCard(
             title: user.username,
             items: [
-              _InfoItem(icon: Icons.badge, label: 'ID', value: user.id.toString()),
-              _InfoItem(icon: Icons.person, label: 'Username', value: user.username),
-              _InfoItem(icon: Icons.email, label: 'Email', value: user.email),
-              _InfoItem(icon: Icons.lock, label: 'Password', value: user.password),
-              _InfoItem(icon: Icons.title, label: 'Title', value: user.title ?? '—'),
+              _InfoItem(icon: Icons.badge, label: context.loc.id, value: user.id.toString()),
+              _InfoItem(icon: Icons.person, label: context.loc.username, value: user.username),
+              _InfoItem(icon: Icons.email, label: context.loc.email, value: user.email),
+              _InfoItem(icon: Icons.lock, label: context.loc.password, value: user.password),
+              _InfoItem(icon: Icons.title, label: context.loc.title, value: user.title ?? '—'),
               _InfoItem(
                 icon: Icons.calendar_today,
-                label: 'Created At',
+                label: context.loc.createdAt,
                 value: user.createdAt.toLocal().toString().split('.')[0],
               ),
             ],

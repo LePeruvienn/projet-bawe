@@ -13,9 +13,11 @@ void handleLogin(BuildContext context, String username, String password) async {
 
   bool res = await login(username, password);
 
+  final loc = context.loc;
+
   showSnackbar(
     context: context,
-    dismissText: res ? 'Successfully logged in' : 'Login failed',
+    dismissText: res ? loc.loginSuccess : loc.loginFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -56,7 +58,7 @@ class _LoginFormState extends State<_LoginForm> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Welcome Back !',
+          context.loc.welcomeBack,
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -65,7 +67,7 @@ class _LoginFormState extends State<_LoginForm> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Ready to FEUR?',
+          context.loc.readyToFeur,
           style: TextStyle(
             fontSize: 16,
             color: colorScheme.primary,
@@ -80,25 +82,25 @@ class _LoginFormState extends State<_LoginForm> {
               TextFormField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Username',
+                  labelText: context.loc.username,
                   prefixIcon: Icon(Icons.person, color: colorScheme.primary),
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Please enter your username' : null,
+                    (value == null || value.isEmpty) ? context.loc.usernameRequired : null,
               ),
               const SizedBox(height: 16),
               // Password
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password',
+                  labelText: context.loc.password,
                   prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
                   border: const OutlineInputBorder(),
                 ),
                 obscureText: true,
                 validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Please enter your password' : null,
+                    (value == null || value.isEmpty) ? context.loc.passwordRequired : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -111,13 +113,13 @@ class _LoginFormState extends State<_LoginForm> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Login'),
+                child: Text(context.loc.login),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.go(SIGNIN_PATH),
                 child: Text(
-                  'Don’t have an account? Create one !',
+                  context.loc.dontHaveAccount,
                   style: TextStyle(color: colorScheme.primary),
                 ),
               ),
@@ -155,7 +157,7 @@ class _InfoBox extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Hello 👋',
+                context.loc.hello,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 48,
@@ -165,7 +167,7 @@ class _InfoBox extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Are you ready to create a new FEUR?',
+                context.loc.areYouReady,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,

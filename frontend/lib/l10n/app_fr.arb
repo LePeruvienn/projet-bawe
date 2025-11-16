@@ -1,7 +1,70 @@
 {
-  "home": "Acceuil",
+  "home": "Accueil",
   "login": "Se connecter",
   "signin": "S'inscrire",
-  "account": "Mon Compte",
-  "admin": "Admin"
+  "account": "Mon compte",
+  "admin": "Admin",
+
+  "welcomeBack": "Bienvenue !",
+  "readyToFeur": "Prêt à FEUR ?",
+  "dontHaveAccount": "Vous n'avez pas de compte ? Créez-en un !",
+  "alreadyHaveAccount": "Vous avez déjà un compte ? Connectez-vous !",
+
+  "username": "Nom d'utilisateur",
+  "password": "Mot de passe",
+  "repeatPassword": "Répétez le mot de passe",
+  "email": "Email",
+  "name": "Nom",
+  "title": "Titre",
+
+  "createAccount": "Créer un compte",
+  "logout": "Se déconnecter",
+
+  "userInformation": "Informations utilisateur",
+  "id": "ID",
+  "createdAt": "Créé le",
+
+  "editUser": "Modifier l'utilisateur",
+  "createUser": "Nouvel utilisateur",
+  "save": "Enregistrer",
+
+  "loginSuccess": "Connexion réussie",
+  "loginFailed": "Échec de la connexion",
+  "userCreated": "Utilisateur créé avec succès",
+  "userCreationFailed": "Échec de la création de l'utilisateur",
+  "logoutSuccess": "Déconnexion réussie",
+  "updateSuccess": "Mise à jour réussie",
+  "updateFailed": "Échec de la mise à jour",
+  "deleteSuccess": "Suppression réussie",
+  "deleteFailed": "Échec de la suppression de l'utilisateur",
+
+  "postCreatedSuccess": "Publication créée avec succès",
+  "postCreationFailed": "Échec de la création de la publication",
+  "postDeletedSuccess": "Publication supprimée avec succès",
+  "postDeletedFailed": "Échec de la suppression de la publication",
+
+  "postHint": "Quoi de neuf ?",
+
+  "likePostFailed": "Échec du like de la publication",
+  "unlikePostFailed": "Échec du unlike de la publication",
+
+  "createPost": "Post",
+
+  "loadingFeur": "Chargement de FEUR...",
+  "readyToStart": "Prêt à commencer ?",
+  "thisIsThePlace": "C'est l'endroit idéal pour partager vos pensées.",
+  "signinHeader": "FEUR 💜",
+  "createAccountMessage": "Créez votre compte et commencez à partager vos pensées avec le monde.",
+
+  "hello": "Bonjour 👋",
+  "areYouReady": "Êtes-vous prêt à créer un nouveau FEUR ?",
+
+  "madeWithLove": "Fait avec ❤️",
+
+  "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+  "invalidEmail": "Email invalide",
+  "usernameRequired": "Nom d'utilisateur requis",
+  "emailRequired": "Email requis",
+  "passwordRequired": "Veuillez entrer votre mot de passe",
+  "repeatPasswordRequired": "Veuillez répéter votre mot de passe"
 }
