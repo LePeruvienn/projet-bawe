@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'l10n/app_localizations.dart';
 
 /*
  * Function used to display message on a SnackBar easly
@@ -64,4 +66,14 @@ class DestinationData {
     required this.text,
     required this.path
   });
+}
+
+
+/*
+ * Make the use of locationsation text easier !
+ * - This add a `.loc` properties in all BuildContext objects
+ */
+extension LocalizationExt on BuildContext {
+
+  AppLocalizations get loc => AppLocalizations.of(this)!;
 }

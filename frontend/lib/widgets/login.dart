@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../api/auth.dart';
 import '../routes.dart';
@@ -58,8 +59,8 @@ class _LoginFormState extends State<_LoginForm> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Welcome Back!',
+        Text(
+          'Welcome Back !',
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
