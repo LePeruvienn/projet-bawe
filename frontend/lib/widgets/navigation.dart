@@ -136,11 +136,15 @@ class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return AppBar(
       title: Text(
         'FEUR',
         style: TextStyle(
-          color: Colors.deepPurple,
+            color: colorScheme.primary,
           fontWeight: FontWeight.bold,
           fontSize: 24,
         ),
@@ -203,6 +207,7 @@ class _DesktopShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../api/auth.dart';
 import '../routes.dart';
@@ -16,18 +15,17 @@ void handleLogin(BuildContext context, String username, String password) async {
 
   showSnackbar(
     context: context,
-    dismissText: res ? 'Sucessfully logged in' : 'Login failed',
+    dismissText: res ? 'Successfully logged in' : 'Login failed',
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
 }
 
 /***********************
-* LOGIN PAGE COMPONENTS
+* LOGIN FORM COMPONENTS
 ***********************/
 
 class _LoginForm extends StatefulWidget {
-
   const _LoginForm({Key? key}) : super(key: key);
 
   @override
@@ -35,26 +33,24 @@ class _LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<_LoginForm> {
-
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   void _submitForm() {
-
-    if (!_formKey.currentState!.validate())
-      return;
+    if (!_formKey.currentState!.validate()) return;
 
     handleLogin(
       context,
-      _usernameController.text.trim(), // Username
-      _passwordController.text.trim()  // Password
+      _usernameController.text.trim(),
+      _passwordController.text.trim(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -64,15 +60,15 @@ class _LoginFormState extends State<_LoginForm> {
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            color: Colors.deepPurple,
+            color: colorScheme.primary,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Ready to FEUR?',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.deepPurple,
+            color: colorScheme.primary,
           ),
         ),
         const SizedBox(height: 40),
@@ -80,58 +76,49 @@ class _LoginFormState extends State<_LoginForm> {
           key: _formKey,
           child: Column(
             children: [
-              // Username Text Field
+              // Username
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Username',
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person, color: colorScheme.primary),
+                  border: const OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your username';
-                  }
-                  return null;
-                },
+                validator: (value) =>
+                    (value == null || value.isEmpty) ? 'Please enter your username' : null,
               ),
               const SizedBox(height: 16),
-              // Password Text Field
+              // Password
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
+                  border: const OutlineInputBorder(),
                 ),
                 obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
+                validator: (value) =>
+                    (value == null || value.isEmpty) ? 'Please enter your password' : null,
               ),
               const SizedBox(height: 20),
-              // Login Button
               ElevatedButton(
                 onPressed: _submitForm,
-                child: const Text('Login'),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  backgroundColor: Colors.deepPurple.shade100, // Color for the button
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded button
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
+                child: const Text('Login'),
               ),
               const SizedBox(height: 16),
-              // Optional: Add a link to create an account
               TextButton(
                 onPressed: () => context.go(SIGNIN_PATH),
-                child: const Text(
+                child: Text(
                   'Don’t have an account? Create one !',
-                  style: TextStyle(color: Colors.deepPurple),
+                  style: TextStyle(color: colorScheme.primary),
                 ),
               ),
             ],
@@ -142,18 +129,21 @@ class _LoginFormState extends State<_LoginForm> {
   }
 }
 
+/***********************
+* INFO BOX COMPONENT
+***********************/
 
 class _InfoBox extends StatelessWidget {
-
   const _InfoBox({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.deepPurple, Colors.deepPurpleAccent],
+          colors: [colorScheme.primary, colorScheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -163,24 +153,23 @@ class _InfoBox extends StatelessWidget {
           padding: const EdgeInsets.all(48.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
+            children: [
               Text(
                 'Hello 👋',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Text(
                 'Are you ready to create a new FEUR?',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
-                  color: Colors.white70,
+                  color: colorScheme.onPrimary.withOpacity(0.7),
                 ),
               ),
             ],
@@ -191,45 +180,36 @@ class _InfoBox extends StatelessWidget {
   }
 }
 
-/************
+/***********************
 * LOGIN PAGE
-*************/
+***********************/
 
 class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return LayoutBuilder(
       builder: (context, constraints) {
-
         final bool isDesktop = constraints.maxWidth > 800;
 
-        // >>> Desktop View
         if (isDesktop) {
-
           return Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: const _InfoBox()
-              ),
+            children: const [
+              Expanded(flex: 1, child: _InfoBox()),
               Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: const EdgeInsets.all(64.0),
-                  child: const _LoginForm(),
+                  padding: EdgeInsets.all(64.0),
+                  child: _LoginForm(),
                 ),
               ),
-            ]
+            ],
           );
-
-        // >>> Mobile View
         } else {
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: const _LoginForm(),
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: _LoginForm(),
           );
         }
       },

@@ -43,3 +43,7 @@ docker compose up --build
 ```
 docker exec -it postgres_db psql -U postgres -d appdb
 ```
+
+```
+vimgrep /Colors/ frontend/lib/widgets/**/*.dart   
+```

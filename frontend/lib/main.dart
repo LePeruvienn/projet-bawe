@@ -65,35 +65,48 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
 
-    return AdaptiveTheme(
-      light: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: true,
-        fontFamily: 'ComicSansMS',
-      ),
-      dark: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        fontFamily: 'ComicSansMS',
-      ),
-      initial: widget.savedThemeMode ?? AdaptiveThemeMode.system,
-      builder: (theme, darkTheme) => MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        theme: theme,
-        darkTheme: darkTheme,
-        locale: _locale,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('fr'),
-        ],
-        routerConfig: router,
-      ),
+    double textScale = DEFAULT_TEXT_SCALE;
+
+    final width = MediaQuery.of(context).size.width;
+
+    if (width >= 600 && width < 1024) textScale = TABLET_TEXT_SCALE;
+    if (width >= 1024) textScale = DESKTOP_TEXT_SCALE;
+
+    final originalMediaQuery = MediaQuery.of(context);
+    final scaledMediaQuery = originalMediaQuery.copyWith(textScaleFactor: textScale);
+
+    return MediaQuery(
+      data: scaledMediaQuery,
+      child: AdaptiveTheme(
+        light: ThemeData(
+          brightness: Brightness.light,
+          useMaterial3: true,
+          fontFamily: 'ComicSansMS',
+        ),
+        dark: ThemeData(
+          brightness: Brightness.dark,
+          useMaterial3: true,
+          fontFamily: 'ComicSansMS',
+        ),
+        initial: widget.savedThemeMode ?? AdaptiveThemeMode.system,
+        builder: (theme, darkTheme) => MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: theme,
+          darkTheme: darkTheme,
+          locale: _locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('fr'),
+          ],
+          routerConfig: router,
+        )
+      )
     );
   }
 }

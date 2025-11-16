@@ -196,7 +196,6 @@ class _UserListItemState extends State<UserListItem> {
         color: _isHovered ? Colors.black.withOpacity(0.1) : Colors.transparent,
         child: ListTile(
           leading: CircleAvatar(
-            backgroundColor: Colors.deepPurple.shade100,
             child: Text(widget.user.username[0]),
           ),
           title: Text(widget.user.username),
@@ -353,6 +352,10 @@ class _UserFormState extends State<UserForm> {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
@@ -436,8 +439,8 @@ class _UserFormState extends State<UserForm> {
                     icon: const Icon(Icons.save),
                     label: const Text('Save'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
+                      backgroundColor: colorScheme.primaryContainer,
+                      foregroundColor: colorScheme.onPrimaryContainer,
                       minimumSize: const Size(double.infinity, 48),
                     ),
                   ),
@@ -508,17 +511,21 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
       Row(
         children: [
           CircleAvatar(
-            backgroundColor: Colors.deepPurple.shade100,
+            backgroundColor: colorScheme.primaryContainer,
             child: Text(
               title.isNotEmpty ? title[0].toUpperCase() : '?',
-              style: const TextStyle(
-                color: Colors.deepPurple,
+              style: TextStyle(
+                color: colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -550,11 +557,15 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(item.icon, size: 20, color: Colors.deepPurple),
+          Icon(item.icon, size: 20, color: colorScheme.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

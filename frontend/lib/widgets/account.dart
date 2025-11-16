@@ -109,16 +109,24 @@ class AccountDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return ListView(
       children: [
         Column(
           children: [
             CircleAvatar(
               radius: 45,
-              backgroundColor: Colors.deepPurple.shade100,
+              backgroundColor: colorScheme.primaryContainer,
               child: Text(
                 user.username[0].toUpperCase(),
-                style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onPrimaryContainer,
+                ),
               ),
             ),
             const SizedBox(height: 15),
@@ -126,8 +134,6 @@ class AccountDetails extends StatelessWidget {
               user.title ?? user.username,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 10),
-            Text(user.email, style: TextStyle(color: Colors.grey.shade600)),
           ],
         ),
         const SizedBox(height: 30),
@@ -155,11 +161,10 @@ class AccountDetails extends StatelessWidget {
           onPressed: () => handleLogout(context),
           child: const Text('Logout'),
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            backgroundColor: Colors.deepPurple.shade100, // Color for the button
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30), // Rounded button
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            backgroundColor: colorScheme.primaryContainer,
+            foregroundColor: colorScheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           ),
         ),
       ],
@@ -232,11 +237,15 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(item.icon, size: 20, color: Colors.deepPurple),
+          Icon(item.icon, size: 20, color: colorScheme.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

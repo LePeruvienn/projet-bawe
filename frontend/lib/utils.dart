@@ -17,18 +17,21 @@ void showSnackbar({
       content: Row(
         children: [
           icon,
-          const SizedBox(width: 8), // Add some spacing
+          const SizedBox(width: 8),
           Expanded(
-            child: Text(dismissText),
+            child: Text(
+              dismissText,
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
       backgroundColor: backgroundColor,
-      duration: const Duration(seconds: 2), // Duration for the Snackbar
+      duration: const Duration(seconds: 2),
       action: SnackBarAction(
         label: 'Dismiss',
         textColor: Colors.white,
-        onPressed: () { /*Optionally, handle dismiss action*/ },
+        onPressed: () {},
       ),
     )
   );
