@@ -127,7 +127,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unlikePostFailed => 'Échec du unlike de la publication';
 
   @override
-  String get createPost => 'Publier';
+  String get createPost => 'Post';
 
   @override
   String get loading => 'Loading ...';
@@ -138,6 +138,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get thisIsThePlace =>
       'C\'est l\'endroit idéal pour partager vos pensées.';
+
+  @override
+  String get signinHeader => 'FEUR 💜';
+
+  @override
+  String get createAccountMessage =>
+      'Créez votre compte et commencez à partager vos pensées avec le monde.';
 
   @override
   String get hello => 'Bonjour 👋';

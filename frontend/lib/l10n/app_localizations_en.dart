@@ -138,6 +138,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thisIsThePlace => 'This is the place to share your thoughts.';
 
   @override
+  String get signinHeader => 'FEUR 💜';
+
+  @override
+  String get createAccountMessage =>
+      'Create your account and start sharing your thoughts with the world.';
+
+  @override
   String get hello => 'Hello 👋';
 
   @override

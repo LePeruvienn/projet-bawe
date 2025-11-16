@@ -228,7 +228,7 @@ class _InfoBox extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                contex.loc.createAccountMessage,
+                context.loc.createAccountMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,

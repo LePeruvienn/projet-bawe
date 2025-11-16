@@ -356,6 +356,18 @@ abstract class AppLocalizations {
   /// **'This is the place to share your thoughts.'**
   String get thisIsThePlace;
 
+  /// No description provided for @signinHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'FEUR 💜'**
+  String get signinHeader;
+
+  /// No description provided for @createAccountMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account and start sharing your thoughts with the world.'**
+  String get createAccountMessage;
+
   /// No description provided for @hello.
   ///
   /// In en, this message translates to:
