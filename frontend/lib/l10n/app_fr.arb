@@ -1,3 +1,7 @@
 {
-  "helloWorld": "Hello World!"
+  "home": "Acceuil",
+  "login": "Se connecter",
+  "signin": "S'inscrire",
+  "account": "Mon Compte",
+  "admin": "Admin"
 }

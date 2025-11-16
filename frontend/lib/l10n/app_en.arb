@@ -1,3 +1,7 @@
 {
-  "helloWorld": "Hola mundo!"
+  "home": "Home",
+  "login": "Login",
+  "signin": "Signin",
+  "account": "Account",
+  "admin": "Admin"
 }

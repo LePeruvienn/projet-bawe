@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 
+import '../l10n/app_localizations.dart';
 import '../auth/authProvider.dart';
 import '../routes.dart';
 import '../utils.dart';
+import '../main.dart';
 
 /****************************
 * GLOBAL NAVIGATION CONSTANTS
@@ -17,14 +20,12 @@ import '../utils.dart';
 const HOME_DESTINSATION = DestinationData(
                             selectedIcon: Icons.home,
                             icon: Icons.home_outlined,
-                            text: 'Home',
                             path: HOME_PATH
                           );
 
 const LOGIN_DESTINATION = DestinationData(
                             selectedIcon: Icons.person,
                             icon: Icons.person_outlined,
-                            text: 'Login',
                             path: LOGIN_PATH
                           );
 
@@ -32,20 +33,17 @@ const LOGIN_DESTINATION = DestinationData(
 const SIGNIN_DESTINATION = DestinationData(
                             selectedIcon: Icons.person_add,
                             icon: Icons.person_add_outlined,
-                            text: 'Signin',
                             path: SIGNIN_PATH
                           );
 
 const ACCOUNT_DESTINATION = DestinationData(
                               selectedIcon: Icons.person,
                               icon: Icons.person_outlined,
-                              text: 'Acccount',
                               path: ACCOUNT_PATH
                             );
 const ADMIN_DESTINATION = DestinationData(
                             selectedIcon: Icons.shield,
                             icon: Icons.shield_outlined,
-                            text: 'Admin',
                             path: ADMIN_PATH
                           );
 
@@ -91,9 +89,43 @@ List<DestinationData> getDestinations(AuthProvider auth) {
   return CONNECTED_ADMIN_DESTINATIONS;
 }
 
+/*
+ * Used to get the linked label to the destination path
+ */
+String getDestinationLabel(BuildContext context, DestinationData destination) {
+
+  String label = "Unknown";
+
+  switch (destination.path) {
+
+    case HOME_PATH:
+      label = context.loc.home;
+      break;
+
+    case LOGIN_PATH:
+      label = context.loc.login;
+      break;
+
+    case SIGNIN_PATH:
+      label = context.loc.signin;
+      break;
+
+    case ACCOUNT_PATH:
+      label = context.loc.account;
+      break;
+
+    case ADMIN_PATH:
+      label = context.loc.admin;
+      break;
+  }
+  
+  return label;
+}
+
 /******************
 * NAVIGATION LAYOUT
 *******************/
+
 
 class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
 
@@ -105,7 +137,7 @@ class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text(
+      title: Text(
         'FEUR',
         style: TextStyle(
           color: Colors.deepPurple,
@@ -114,7 +146,6 @@ class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       centerTitle: true,
-      elevation: 0, // remove default shadow if you want
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(1),
         child: Divider(
@@ -122,6 +153,37 @@ class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
           thickness: 1,
         ),
       ),
+      actions: [
+        // 🌍 Language button
+        PopupMenuButton<Locale>(
+          icon: const Icon(Icons.language),
+          onSelected: (Locale locale) {
+            MyApp.of(context).setLocale(locale);
+          },
+          itemBuilder: (context) => const [
+            PopupMenuItem(
+              value: Locale('en'),
+              child: Text('English'),
+            ),
+            PopupMenuItem(
+              value: Locale('fr'),
+              child: Text('Français'),
+            ),
+          ],
+        ),
+
+        // 🌙 Light/Dark theme button
+        IconButton(
+          icon: Icon(
+            AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
+                ? Icons.dark_mode
+                : Icons.light_mode,
+          ),
+          onPressed: () {
+            AdaptiveTheme.of(context).toggleThemeMode();
+          },
+        ),
+      ],
     );
   }
 }
@@ -186,7 +248,7 @@ class _DesktopShell extends StatelessWidget {
                               ),
                               const SizedBox(width: 16),
                               Text(
-                                d.text,
+                                getDestinationLabel(context, d),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: isSelected
                                       ? FontWeight.bold
@@ -247,7 +309,7 @@ class _MobileShell extends StatelessWidget {
       destinations.map((d) => NavigationDestination(
         icon: Icon(d.icon),
         selectedIcon: Icon(d.selectedIcon),
-        label: d.text,
+        label: getDestinationLabel(context, d),
       ))
       .toList();
 
