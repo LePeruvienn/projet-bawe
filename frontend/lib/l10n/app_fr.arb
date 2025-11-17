@@ -49,16 +49,16 @@
 
   "createPost": "Publier",
 
-  "loadingFeur": "Chargement de FEUR...",
+  "loading": "Chargement...",
   "readyToStart": "Prêt à commencer ?",
   "thisIsThePlace": "C'est l'endroit idéal pour partager vos pensées.",
-  "signinHeader": "FEUR 💜",
+  "signinHeader": "FEUR",
   "createAccountMessage": "Créez votre compte et commencez à partager vos pensées avec le monde.",
 
-  "hello": "Bonjour 👋",
+  "hello": "Bonjour",
   "areYouReady": "Êtes-vous prêt à créer un nouveau FEUR ?",
 
-  "madeWithLove": "Fait avec ❤️",
+  "madeWithLove": "Fait avec",
   "footer": "Arthur Pinel 2025",
 
   "dismiss": "Masquer",

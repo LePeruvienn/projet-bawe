@@ -42,8 +42,8 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key, this.savedThemeMode});
 
   static _MyAppState of(BuildContext context) {
-    // This looks up the tree for the nearest State object of type _MyAppState
-    // and returns it.
+
+    // This looks up the tree for the nearest State object of type _MyAppState and returns it.
     return context.findAncestorStateOfType<_MyAppState>()!;
   }
 

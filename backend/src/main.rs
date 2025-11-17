@@ -16,9 +16,16 @@ use crate::routes::user_routes;
 use crate::routes::post_routes;
 use crate::routes:: auth_routes;
 
-/// Essaie de se connecter à la DB avec des retries
+/*
+ * Try to connect to the database with multiplie tries
+ * @param {String} database_url - the database url we want to connect
+ * @param {uint8}  retries - how many times we want to try connect before giving up
+ * @param {uint64} delay - how many time to wait between each try
+ */
 async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::Pool<sqlx::Postgres> {
+
     let mut attempts = retries;
+
     loop {
         match PgPoolOptions::new()
             .max_connections(5)
@@ -41,19 +48,29 @@ async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::
     }
 }
 
+/********************
+ *      MAIN        *
+ ********************/
+
 #[tokio::main]
 async fn main() {
+
+    // Ensure env variable are accessible
     dotenv().ok();
 
+    // Configure CORS layer
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
+    // Get database_url from env variable
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+    // Try getting DB connnection
     let pool = wait_for_db(&database_url, 10, 2).await;
 
+    // Create http router with all paths and routes
     let app = Router::new()
         .nest("/users", user_routes::routes())
         .nest("/posts", post_routes::routes())
@@ -61,9 +78,14 @@ async fn main() {
         .with_state(pool.clone())
         .layer(cors);
 
+    // Create new adress where the API is gonna listen
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+
     println!("🚀 Server listening on {}", addr);
 
+    // Create a new listener for this adress
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+
+    // Run the API
     axum::serve(listener, app).await.unwrap();
 }

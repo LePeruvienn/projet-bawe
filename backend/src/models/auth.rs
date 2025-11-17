@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+// This is data we get from middleware of the user try to do a request
 #[derive(Clone)]
 pub struct AuthUser {
     pub user_id: i32,

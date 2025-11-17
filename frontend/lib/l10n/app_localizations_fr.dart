@@ -130,7 +130,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get createPost => 'Publier';
 
   @override
-  String get loading => 'Loading ...';
+  String get loading => 'Chargement...';
 
   @override
   String get readyToStart => 'Prêt à commencer ?';
@@ -140,20 +140,20 @@ class AppLocalizationsFr extends AppLocalizations {
       'C\'est l\'endroit idéal pour partager vos pensées.';
 
   @override
-  String get signinHeader => 'FEUR 💜';
+  String get signinHeader => 'FEUR';
 
   @override
   String get createAccountMessage =>
       'Créez votre compte et commencez à partager vos pensées avec le monde.';
 
   @override
-  String get hello => 'Bonjour 👋';
+  String get hello => 'Bonjour';
 
   @override
   String get areYouReady => 'Êtes-vous prêt à créer un nouveau FEUR ?';
 
   @override
-  String get madeWithLove => 'Fait avec ❤️';
+  String get madeWithLove => 'Fait avec';
 
   @override
   String get footer => 'Arthur Pinel 2025';

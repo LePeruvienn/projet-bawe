@@ -12,6 +12,9 @@ use crate::handlers::post_handlers::{
     unlike_post
 };
 
+/*
+ * All routes that DOESNT need you to be auth
+ */
 pub fn public_routes() -> Router<PgPool> {
 
     Router::new()
@@ -19,6 +22,10 @@ pub fn public_routes() -> Router<PgPool> {
 }
 
 
+/*
+ * All routes that NEED you to be auth
+ * - Each request is gonna get trought a middleware to ensure the user authentification
+ */
 fn protected_routes() -> Router<PgPool> {
 
     Router::new()
@@ -29,6 +36,10 @@ fn protected_routes() -> Router<PgPool> {
         .route("/unlike/{id}", get(unlike_post))
         .route_layer(middleware::from_fn(get_auth_user))
 }
+
+/*
+ * Public function to expose routes for main.rs
+ */
 pub fn routes() -> Router<PgPool> {
 
     // Merge both public & protected routes

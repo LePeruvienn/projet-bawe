@@ -359,7 +359,7 @@ abstract class AppLocalizations {
   /// No description provided for @signinHeader.
   ///
   /// In en, this message translates to:
-  /// **'FEUR 💜'**
+  /// **'FEUR'**
   String get signinHeader;
 
   /// No description provided for @createAccountMessage.
@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @hello.
   ///
   /// In en, this message translates to:
-  /// **'Hello 👋'**
+  /// **'Hello'**
   String get hello;
 
   /// No description provided for @areYouReady.
@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @madeWithLove.
   ///
   /// In en, this message translates to:
-  /// **'Made with ❤️'**
+  /// **'Made with'**
   String get madeWithLove;
 
   /// No description provided for @footer.

@@ -12,14 +12,19 @@ use crate::handlers::user_handlers::{
     get_connected
 };
 
-// All routes DOESNT NEED you to be auth
+/*
+ * All routes that DOESNT need you to be auth
+ */
 fn public_routes() -> Router<PgPool> {
 
     Router::new()
         .route("/create", post(create_user))
 }
 
-// All routes that NEED you to be auth
+/*
+ * All routes that NEED you to be auth
+ * - Each request is gonna get trought a middleware to ensure the user authentification
+ */
 fn protected_routes() -> Router<PgPool> {
 
     Router::new()
@@ -31,6 +36,9 @@ fn protected_routes() -> Router<PgPool> {
         .route_layer(middleware::from_fn(get_auth_user))
 }
 
+/*
+ * Public function to expose routes for main.rs
+ */
 pub fn routes() -> Router<PgPool> {
 
     // Merge boths routes
