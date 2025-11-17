@@ -152,11 +152,16 @@ class _PostFormMobileState extends State<_PostFormMobile> {
 
   Future<void> _createPost(BuildContext context) async {
 
+    // Get content
+    final content = _controller.text.trim();
+
     // Set state to posting
     setState(() => isPosting = true);
 
     // Try to create post
-    final newPost = await handleCreatePost(context, _controller.text.trim());
+    final newPost = await handleCreatePost(context, content);
+
+    _controller.clear();
 
     // Remove form
     Navigator.pop(context);
@@ -352,7 +357,6 @@ class PostsPage extends StatefulWidget {
   State<PostsPage> createState() => _PostsPageState();
 }
 
-// TODO: CLEAR
 class _PostsPageState extends State<PostsPage> {
 
   final ScrollController _scrollController = ScrollController();
@@ -364,7 +368,7 @@ class _PostsPageState extends State<PostsPage> {
   bool _hasMore = true;
 
   List<Post> _posts = [];
-  
+
   // Future that represents the initial/refresh load
   Future<void>? _initialLoadFuture; 
 
@@ -372,13 +376,13 @@ class _PostsPageState extends State<PostsPage> {
   void initState() {
 
     super.initState();
-    // ⭐️ Conditional initial load logic (to prevent full refresh on pop) is missing here, but keeping loadPosts(initial: true) for now
     _initialLoadFuture = _loadPosts(initial: true); 
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+
     _scrollController.dispose();
     super.dispose();
   }
@@ -388,17 +392,19 @@ class _PostsPageState extends State<PostsPage> {
     final pos = _scrollController.position.pixels;
     final treshold = _scrollController.position.maxScrollExtent - REFRESH_WHEN_CLOSE_TO;
 
-    // If the scroll is near the bottom (within 300 pixels) AND we are not currently loading AND there are potentially more posts, load more.
+    // If we scrolled out of the treshold and we are loading and there is more to load
+    // => Load more :O
     if (pos >= treshold && !_isLoading && _hasMore)
       _loadPosts();
   }
 
-  // --- Post Loading Logic ---
   Future<void> _loadPosts({bool initial = false}) async {
-    // ... (rest of _loadPosts remains the same, used for initial load and infinite scroll) ...
+
+    // If we are already loading do not load more
     if (_isLoading)
       return;
 
+    // Update State to loading
     setState(() {
       _isLoading = true;
     });
@@ -409,60 +415,74 @@ class _PostsPageState extends State<PostsPage> {
       _offset = 0;
       _hasMore = true;
     }
-    
+
+    // NOW TRYING TO LOAD MORE POSTS :
     try {
+
+      // Do the API call
       final newPosts = await fetchPosts(limit: _limit, offset: _offset);
 
-      if (mounted) {
-        setState(() {
-          _posts.addAll(newPosts);
-          _offset += newPosts.length;
-          // If the number of posts returned is less than the limit, assume it's the last page.
-          _hasMore = newPosts.length == _limit; 
-          _isLoading = false;
-        });
-      }
+      // Use `mounted` to ensure that we still on this page !!!
+      if (!mounted)
+        return;
+
+      setState(() {
+        // Add new posts to posts list
+        _posts.addAll(newPosts);
+        // Move offset cursor
+        _offset += newPosts.length;
+        // Check if we right the limit
+        _hasMore = newPosts.length == _limit; 
+        // Update loading state
+        _isLoading = false;
+      });
+
+    // IF WE CATCH A ERROR WHILE LOADING POSTS :
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        showSnackbar(
-          context: context, 
-          dismissText: 'context.loc.postsLoadFailed',
-          backgroundColor: Colors.red,
-          icon: const Icon(Icons.close, color: Colors.white),
-        );
-      }
+
+      // Use `mounted` to ensure that we still on this page !!!
+      if (mounted)
+        return;
+
+      // Update loading state to false
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Show error to snackbar
+      showSnackbar(
+        context: context, 
+        dismissText: 'context.loc.postsLoadFailed',
+        backgroundColor: Colors.red,
+        icon: const Icon(Icons.close, color: Colors.white),
+      );
     }
   }
 
-  // ⭐️ ADDED: Local deletion handler (removes post instantly)
   void _removePostLocally(Post post) {
+
     setState(() {
-
+      // Remove post from list and update offset
       _posts.removeWhere((p) => p.id == post.id);
-
-      // ⭐️ Correctly decrement offset since the list size decreased by 1
       if (_offset > 0)
         _offset--;
     });
   }
 
-  // ⭐️ ADDED: Local post creation handler (inserts post instantly at the top)
   void _addPostLocally(Post newPost) {
+
+    // Add the new post at the top of the page and update offset
     setState(() {
       _posts.insert(0, newPost);
-      _offset++; // Increment offset as the list size grew
-      // _scrollController.jumpTo(0.0); // Optional: scroll to the new post
+      _offset++;
     });
   }
 
-  // Helper getter from the original code
-  bool get _isDesktop => MediaQuery.of(context).size.width >= 800;
-
   @override
   Widget build(BuildContext context) {
+
+    // Check for responsive
+    final _isDesktop = MediaQuery.of(context).size.width >= 800;
 
     return Scaffold(
       body: RefreshIndicator(
@@ -482,15 +502,27 @@ class _PostsPageState extends State<PostsPage> {
               return const Center(child: Text('No posts available.'));
             }
 
+            // Ok this is weird but let me expalin,
+            // We must manage the ListItem length depeding of :
+            // - If we are loading the page (cause it adds +1 to list cause the loading Circle count as an item)
+            // - If we are in desktop (cause it adds +1 to list cause the _PostFormDesktop count as an item)
+            //
+            // We also need so to dynamicly change the post indexs depending if we have added the DesktopForm at the top
+            //
+            // So we must to compute this dynamicly it's weid and can make some pretty bad bugs
+
+            final bool _showDesktopForm = _isDesktop && authProvider.isLoggedIn;
+            final int _totalItems = _posts.length + (_isLoading ? 1 : 0) + (_showDesktopForm ? 1 : 0);
+
             // Main List View
             return ListView.builder(
               controller: _scrollController, 
               padding: const EdgeInsets.all(16),
-              itemCount: _posts.length + (_isLoading ? 1 : 0), 
+              itemCount: _totalItems, 
               itemBuilder: (context, index) {
 
                 // Last item is the loading indicator
-                if (index == _posts.length) {
+                if (_isLoading && index == _posts.length) {
                   return _hasMore ? const Center(child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: CircularProgressIndicator(),
@@ -501,12 +533,14 @@ class _PostsPageState extends State<PostsPage> {
                 if (index == 0 && _isDesktop && authProvider.isLoggedIn)
                   return _PostFormDesktop(onPostCreated: _addPostLocally);
 
+                // BE CAREFUL : You must do the index - 1 otherwise all post will bot be shown in showDesktopForm (as i say before)
+                final postIndex = _showDesktopForm ? index - 1 : index;
+                final post = _posts[postIndex];
+
                 // Standard post item
-                final post = _posts[index];
                 return PostListItem(
                   key: ValueKey(post.id),
                   post: post,
-                  // ⭐️ UPDATED: Use local handler _removePostLocally
                   onDelete: () => _removePostLocally(post),
                 );
               },
@@ -517,7 +551,6 @@ class _PostsPageState extends State<PostsPage> {
       // Mobile FAB
       floatingActionButton: (!_isDesktop && authProvider.isLoggedIn)
           ? FloatingActionButton(
-              // ⭐️ UPDATED: Use local handler _addPostLocally
               onPressed: () => openMobilePostForm(context, _addPostLocally), 
               child: const Icon(Icons.create),
             )
@@ -561,23 +594,31 @@ class _PostListItemState extends State<PostListItem> {
 
   void toggleLike(BuildContext context, Post post) async {
 
+    // If we are already handling the like return
     if (isHandlingLike)
       return;
 
-    isHandlingLike = true;
+    // If we are not logged in go to login page and return
     if (!authProvider.isLoggedIn) {
       context.go(LOGIN_PATH);
-      isHandlingLike = false;
       return;
     }
+
+    // Update like status
+    isHandlingLike = true;
+
+    // Try to like/unlike post
     bool success = isLiked ?
       await handleUnlikePost(context, post) : 
       await handleLikePost(context, post);
 
+    // if we failed stop here and update handling status
     if (!success) {
       isHandlingLike = false;
       return;
     }
+
+    // If sucess Update like data
     setState(() {
       if (isLiked)
         likes -= 1;
@@ -585,6 +626,8 @@ class _PostListItemState extends State<PostListItem> {
         likes += 1;
       isLiked = !isLiked;
     });
+
+    // Not handling like anymore
     isHandlingLike = false;
   }
 
@@ -651,7 +694,6 @@ class _PostListItemState extends State<PostListItem> {
                       IconButton(
                         iconSize: 20,
                         icon: Icon(Icons.delete),
-                        // ⭐️ UNCHANGED: This correctly calls the global handler, which triggers widget.onDelete (which is _removePostLocally)
                         onPressed: () => handleDeletePost(context, post, widget.onDelete),
                       ),
                   ],
