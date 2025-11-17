@@ -8,6 +8,13 @@ import '../auth/authProvider.dart';
 import '../routes.dart';
 
 /************************
+* GLOBAL POSTS CONSTANTS
+*************************/
+
+const POST_LIMIT = 20;
+const REFRESH_WHEN_CLOSE_TO = 300;
+
+/************************
 * GLOBAL POSTS FINALS
 *************************/
 
@@ -305,76 +312,170 @@ class PostsPage extends StatefulWidget {
   State<PostsPage> createState() => _PostsPageState();
 }
 
-
+// TODO: CLEAR
 class _PostsPageState extends State<PostsPage> {
 
-  late Future<List<Post>> futurePosts;
+  final ScrollController _scrollController = ScrollController();
+
+  final int _limit = POST_LIMIT;
+  int _offset = 0;
+
+  bool _isLoading = false;
+  bool _hasMore = true;
+
+  List<Post> _posts = [];
+  
+  // Future that represents the initial/refresh load
+  Future<void>? _initialLoadFuture; 
 
   @override
   void initState() {
+
     super.initState();
-    futurePosts = fetchPosts();
+    _initialLoadFuture = _loadPosts(initial: true); 
+    _scrollController.addListener(_onScroll);
   }
 
-  void _refreshPosts() {
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+
+    final pos = _scrollController.position.pixels;
+    final treshold = _scrollController.position.maxScrollExtent - REFRESH_WHEN_CLOSE_TO;
+
+    // If the scroll is near the bottom (within 300 pixels) AND we are not currently loading AND there are potentially more posts, load more.
+    if (pos >= treshold && !_isLoading && _hasMore)
+      _loadPosts();
+  }
+
+  // --- Post Loading Logic ---
+  Future<void> _loadPosts({bool initial = false}) async {
+
+    if (_isLoading)
+      return;
+
     setState(() {
-      futurePosts = fetchPosts();
+      _isLoading = true;
     });
+
+    if (initial) {
+      // Reset for a full refresh
+      _posts.clear();
+      _offset = 0;
+      _hasMore = true;
+    }
+    
+    try {
+      // Assuming fetchPosts now takes limit and offset
+      // You must update your actual API call to use these parameters.
+      final newPosts = await fetchPosts(limit: _limit, offset: _offset);
+
+      if (mounted) {
+        setState(() {
+          _posts.addAll(newPosts);
+          _offset += newPosts.length;
+          // If the number of posts returned is less than the limit, assume it's the last page.
+          _hasMore = newPosts.length == _limit; 
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      // Handle error, maybe show a snackbar or log it
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        showSnackbar(
+          context: context, 
+          dismissText: 'context.loc.postsLoadFailed',
+          backgroundColor: Colors.red,
+          icon: const Icon(Icons.close, color: Colors.white),
+        );
+      }
+    }
   }
 
+  // Helper getter from the original code
   bool get _isDesktop => MediaQuery.of(context).size.width >= 800;
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () async => _refreshPosts(),
-        child: FutureBuilder<List<Post>>(
-          future: futurePosts,
+        onRefresh: () => _loadPosts(initial: true), // Trigger a full refresh
+        child: FutureBuilder<void>(
+          // Use FutureBuilder on the initial load future
+          future: _initialLoadFuture, 
           builder: (context, snapshot) {
 
-            // Loading widget ...
-            if (snapshot.connectionState == ConnectionState.waiting)
+            // Initial full-screen loading state (only for the very first load)
+            if (snapshot.connectionState == ConnectionState.waiting && _posts.isEmpty) {
               return const Center(child: CircularProgressIndicator());
+            }
 
-            // Showing error if there are one
-            else if (snapshot.hasError)
+            // Error state for initial load
+            if (snapshot.hasError && _posts.isEmpty) {
               return Center(child: Text('Error: ${snapshot.error}'));
-            else if (!snapshot.hasData || snapshot.data!.isEmpty)
+            }
+
+            // No data state
+            if (_posts.isEmpty && !_isLoading && !_hasMore) {
               return const Center(child: Text('No posts available.'));
+            }
 
-            // Get fetched data
-            final posts = snapshot.data!;
-
-            // Widget :
-            return ListView(
+            // Main List View
+            return ListView.builder(
+              controller: _scrollController, // Attach the controller
               padding: const EdgeInsets.all(16),
-              children: [
+              itemCount: _posts.length + (_isLoading ? 1 : 0), // Add 1 for loading indicator
+              itemBuilder: (context, index) {
+                // Last item is the loading indicator
+                if (index == _posts.length) {
+                  // Only show the indicator if we are loading AND expect more data
+                  return _hasMore ? const Center(child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  )) : const SizedBox.shrink(); 
+                }
 
-                // And Post Input if we are in Desktop mode and we 
-                if (_isDesktop && authProvider.isLoggedIn)
-                  _PostFormDesktop(onPostCreated: _refreshPosts),
+                // First item is the desktop post form
+                if (index == 0 && _isDesktop && authProvider.isLoggedIn) {
+                  return Column(
+                    children: [
+                      _PostFormDesktop(onPostCreated: () => _loadPosts(initial: true)),
+                      PostListItem(
+                        post: _posts[index],
+                        onDelete: () => _loadPosts(initial: true),
+                      ),
+                    ],
+                  );
+                }
 
-                // Post items
-                ...posts.map((post) => PostListItem(
-                      post: post,
-                      onDelete: _refreshPosts,
-                    )),
-              ],
+                // Standard post item
+                final post = _posts[index];
+                return PostListItem(
+                  post: post,
+                  onDelete: () => _loadPosts(initial: true), // Refresh on delete
+                );
+              },
             );
           },
         ),
       ),
       floatingActionButton: (!_isDesktop && authProvider.isLoggedIn)
           ? FloatingActionButton(
-              onPressed: () => openPostForm(context, _refreshPosts),
+              onPressed: () => openPostForm(context, () => _loadPosts(initial: true)), // Refresh on post creation
               child: const Icon(Icons.create),
             )
           : null,
     );
   }
 }
-
 /************************
 * POST LIST ITEM
 *************************/

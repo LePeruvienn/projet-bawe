@@ -1,0 +1,95 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- PAQUETS ESSENTIELS ---
+\usepackage[utf8]{inputenc} % Encodage
+\usepackage[T1]{fontenc}    % Encodage de la police
+\usepackage[french]{babel}  % Support de la langue française
+\usepackage{hyperref}       % Liens cliquables
+\usepackage{graphicx}       % Pour insérer les images (captures d'écran)
+\usepackage{enumitem}       % Pour personnaliser les listes
+\usepackage{parskip}        % Pour sauter des lignes entre les paragraphes au lieu de les indenter
+
+% --- GESTION DES MARGES (Ajustez si nécessaire pour tenir sur 2 pages) ---
+\usepackage[margin=2.5cm]{geometry} % Marge standard : 2.5cm
+
+% --- TITRE ET INFORMATIONS ---
+\title{\textbf{Rapport de Projet : FEUR (Bases du Web)}}
+\author{Votre Nom et Prénom \\ ENSIIE FISA FC 2025-2026}
+\date{Novembre 2025} % Mettez la date de rendu
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty} % Supprime le numéro de page sur la page de titre (si vous en faites une)
+
+% -------------------------------------------------------------------------
+% SECTION 2 : TECHNOLOGIES ET ARCHITECTURE (CONTENU ÉVALUÉ)
+% -------------------------------------------------------------------------
+\section*{1. Technologies Utilisées et Architecture}
+
+\subsection*{1.1. Architecture Technique}
+Le projet FEUR, inspiré de Twitter, est implémenté avec une architecture client-serveur moderne :
+\begin{itemize}
+    \item \textbf{Client (Frontend)} : \textbf{Flutter} (Dart), choisi pour sa flexibilité multiplateforme (Web/Mobile).
+    \item \textbf{Serveur (Backend)} : \textbf{Rust Axum}, utilisé pour sa performance et sa gestion des traitements asynchrones.
+    \item \textbf{Base de Données} : \textbf{PostgreSQL}, une base de données relationnelle robuste.
+\end{itemize}
+
+\subsection*{1.2. Conformité aux Contraintes et Justification du Dépassement}
+Les contraintes du sujet ont été respectées sur la partie serveur (10 fichiers) et la base de données (3 tables).
+\begin{itemize}
+    \item \textbf{Base de données} : \textbf{3 tables} SQL (\texttt{users}, \texttt{posts}, \texttt{user\_likes}).
+    \item \textbf{Fichiers Client} : La limite de 15 fichiers non binaires est dépassée (environ 19 fichiers \texttt{.dart} et 2 fichiers \texttt{.arb}). Ce dépassement est justifié par le choix de la technologie \textbf{Flutter} qui requiert une organisation stricte en couches (\texttt{api}, \texttt{models}, \texttt{widgets}, \texttt{l10n}) et l'inclusion des fichiers de localisation (\texttt{l10n/\*.arb}) pour la fonctionnalité obligatoire de traduction.
+\end{itemize}
+
+% -------------------------------------------------------------------------
+% SECTION 3 : PRÉSENTATION DU SITE ET MANUEL D'UTILISATION
+% -------------------------------------------------------------------------
+\section*{2. Présentation du Site et Manuel d'Utilisation}
+
+\subsection*{2.1. Fonctionnalités de FEUR}
+FEUR permet aux utilisateurs authentifiés de partager des pensées courtes. Le site propose deux profils utilisateurs :
+\begin{itemize}
+    \item \textbf{Standard} : Création de compte, publication, parcours du fil, et fonctionnalité de "like" (augmentant le \texttt{likes\_count} du post).
+    \item \textbf{Administrateur} : Capacités supplémentaires pour gérer les utilisateurs (modification/suppression d'attributs via la colonne \texttt{is\_admin}) et la suppression des publications non conformes.
+\end{itemize}
+
+\subsection*{2.2. Modèle de Données et Requêtes}
+La page du fil d'actualité affiche un contenu généré par la base de données. L'accès à la base de données utilise deux types de requêtes :
+\begin{itemize}
+    \item \textbf{Lecture (\texttt{SELECT})} : Récupération du fil d'actualité (jointure \texttt{posts} et \texttt{users}).
+    \item \textbf{Modification (\texttt{INSERT/DELETE})} : Une requête \texttt{INSERT} est utilisée dans la table \texttt{user\_likes} pour enregistrer un nouveau "like". Une requête \texttt{DELETE} est employée par les administrateurs pour retirer des publications ou des utilisateurs.
+\end{itemize}
+
+
+% -------------------------------------------------------------------------
+% SECTION 4 : DÉTAILS TECHNIQUES ET CHOIX DE CONCEPTION
+% -------------------------------------------------------------------------
+\section*{3. Détails Techniques et Choix de Conception}
+
+\subsection*{3.1. Implémentation du Mode Jour/Nuit et de la Traduction}
+\begin{itemize}
+    \item \textbf{Mode Jour/Nuit} : Le changement est \textbf{dynamique} (sans rechargement de page), géré par le système de thèmes de Flutter, le thème sélectionné étant stocké dans un service (ex. : un Provider) et appliqué instantanément à l'intégralité de l'interface.
+    \item \textbf{Traduction} : La traduction Français/Anglais est gérée via les fichiers de localisation \texttt{app\_\*.arb} et le système d'internationalisation de Flutter, permettant le changement de langue par le bouton dédié.
+\end{itemize}
+
+\subsection*{3.2. Choix Technique : Sécurité et Gestion des Rôles}
+Nous avons implémenté un \textbf{middleware d'authentification} en Rust Axum (\texttt{auth/middleware.rs}). Ce middleware est responsable de l'interception des requêtes vers les routes protégées. Il vérifie la validité du jeton \textbf{JWT} et, crucialement, l'attribut \texttt{is\_admin} pour garantir que seuls les administrateurs peuvent accéder aux \texttt{user\_handlers.rs} de modification et suppression des comptes/posts.
+
+\clearpage % Force le passage à la page suivante
+
+% -------------------------------------------------------------------------
+% SECTION HORS COMPTE DE PAGES (LES CAPTURES)
+% -------------------------------------------------------------------------
+\section*{Annexes : Captures d'écran (Illustrations du Site)}
+
+\subsection*{4.1. Page du Fil d'Actualité}
+% Les deux images ci-dessous ne compteront pas dans le décompte des 2 pages
+\subsubsection*{Mode Français / Jour}
+\includegraphics[width=\textwidth]{img/accueil_fr_jour.png}
+\subsubsection*{Mode Anglais / Nuit}
+\includegraphics[width=\textwidth]{img/accueil_en_nuit.png}
+
+% Répétez pour toutes les pages et tous les modes requis.
+
+\end{document}

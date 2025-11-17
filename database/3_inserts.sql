@@ -1,59 +1,111 @@
 /**************************
 * USERS TEST DATA INSERTION
 ***************************/
-INSERT INTO users (username, email, password, is_admin) VALUES (
-	'FEUR',
-	'feur@free.fr',
-	'123',
-  TRUE
-);
-INSERT INTO users (username, email, password) VALUES (
-	'Milou',
-	'pate@manger.fr',
-	'patepate'
-);
-INSERT INTO users (username, email, password) VALUES (
-	'Babou',
-	'meme@miaow.fr',
-	'jaimepasmilou'
-);
-INSERT INTO users (username, email, password) VALUES (
-	'Minette',
-	'chipie@miaow.fr',
-	'jesuismims'
-);
-INSERT INTO users (username, email, password) VALUES (
-	'Sarah',
-	'saraaaah@gmail.com',
-	'parispanem'
-);
+INSERT INTO users (username, email, password, is_admin) VALUES
+('User1', 'user1@example.com', 'password1', FALSE),
+('User2', 'user2@example.com', 'password2', FALSE),
+('User3', 'user3@example.com', 'password3', FALSE),
+('User4', 'user4@example.com', 'password4', FALSE),
+('User5', 'user5@example.com', 'password5', FALSE),
+('User6', 'user6@example.com', 'password6', FALSE),
+('User7', 'user7@example.com', 'password7', FALSE),
+('User8', 'user8@example.com', 'password8', FALSE),
+('User9', 'user9@example.com', 'password9', FALSE),
+('User10', 'user10@example.com', 'password10', FALSE),
+('Admin1', 'admin1@example.com', 'adminpass1', TRUE),
+('Admin2', 'admin2@example.com', 'adminpass2', TRUE),
+('User11', 'user11@example.com', 'password11', FALSE),
+('User12', 'user12@example.com', 'password12', FALSE),
+('User13', 'user13@example.com', 'password13', FALSE),
+('User14', 'user14@example.com', 'password14', FALSE),
+('User15', 'user15@example.com', 'password15', FALSE),
+('User16', 'user16@example.com', 'password16', FALSE),
+('User17', 'user17@example.com', 'password17', FALSE),
+('User18', 'user18@example.com', 'password18', FALSE),
+('User19', 'user19@example.com', 'password19', FALSE),
+('User20', 'user20@example.com', 'password20', FALSE);
 
 /**************************
 * POSTS TEST DATA INSERTION
 ***************************/
-
-INSERT INTO posts (user_id, content, likes_count) VALUES (
-	1,
-	'Salut la team euuh je suis la et tout je suis feur et j''aime bien les chips en vrai et tout, vous en pensez quoi la team ?',
-	12
-);
-INSERT INTO posts (user_id, content, likes_count) VALUES (
-	2,
-	'Quelqu''un connais un plan pour avoir du paté pas cher les gars, la j''ai trop faim',
-	19
-);
-INSERT INTO posts (user_id, content, likes_count) VALUES (
-	3,
-	'Et hier j''était dans le bus et la ya ce gros tas de milou qui viens me parler de son paté de con putaint comment j''avais trop la haine',
-	18
-);
-INSERT INTO posts (user_id, content, likes_count) VALUES (
-	4,
-	'@sarah ouvre moi la porte stp sinon je te promet que je gueule devant ta porte toute la nuit',
-	14
-);
-INSERT INTO posts (user_id, content, likes_count) VALUES (
-	5,
-	'Je viens me passer à Paris Panem comment les flan vanille sont masterclass je me suis mit bien la',
-	51
-);
+INSERT INTO posts (user_id, content, likes_count) VALUES 
+(1, 'Content from User1', 5),
+(2, 'User2 sharing a thought', 10),
+(3, 'User3 is feeling philosophical today', 7),
+(4, 'Random thought from User4', 6),
+(5, 'User5 wants to know your opinion!', 15),
+(6, 'User6 is having a great day!', 20),
+(7, 'User7 shares a funny story', 8),
+(8, 'User8 is excited for the weekend', 12),
+(9, 'Deep thoughts from User9', 0),
+(10, 'User10 is learning something new', 1),
+(11, 'User11 has just finished a book', 14),
+(12, 'User12 is trying a new recipe', 13),
+(13, 'User13 shares travel plans', 9),
+(14, 'User14 asks for advice', 22),
+(15, 'User15 enjoys a rainy day', 3),
+(16, 'User16 is vibing with music', 11),
+(17, 'User17 shares a meme', 25),
+(18, 'User18 has a question for everyone', 5),
+(19, 'User19 is reflecting on life', 4),
+(20, 'User20 is excited about an upcoming event', 17),
+(1, 'User1 wonders about weekend plans', 10),
+(2, 'User2 discusses favorite movies', 8),
+(3, 'User3 talks about the latest tech trends', 5),
+(4, 'User4 asks about book recommendations', 12),
+(5, 'User5 shares workout tips', 15),
+(6, 'User6 reminisces about childhood', 20),
+(7, 'User7 thinks about future goals', 11),
+(8, 'User8 loves coffee', 9),
+(9, 'User9 shares random facts', 7),
+(10, 'User10 is trying to stay productive', 14),
+(11, 'User11 shares thoughts on sustainability', 3),
+(12, 'User12 is excited for the holidays', 18),
+(13, 'User13 is working on a project', 21),
+(14, 'User14 discusses current events', 6),
+(15, 'User15 loves exploring new places', 10),
+(16, 'User16 shares tech tips', 12),
+(17, 'User17 has a question about games', 8),
+(18, 'User18 shares a new hobby', 11),
+(19, 'User19 muses about the future of AI', 0),
+(20, 'User20 talks about favorite recipes', 19),
+(1, 'User1 explores the concept of happiness', 22),
+(2, 'User2 shares thoughts on mental health', 14),
+(3, 'User3 is curious about world cultures', 5),
+(4, 'User4 writes about favorite books', 18),
+(5, 'User5 discusses the impact of technology', 12),
+(6, 'User6 shares a travel experience', 22),
+(7, 'User7 reflects on friendship', 9),
+(8, 'User8 expresses love for pets', 15),
+(9, 'User9 shares a quirky dream', 8),
+(10, 'User10 is training for a marathon', 13),
+(11, 'User11 talks about art', 17),
+(12, 'User12 discusses sustainability initiatives', 11),
+(13, 'User13 shares a gratitude list', 24),
+(14, 'User14 inquires about favorite films', 10),
+(15, 'User15 expresses love for photography', 16),
+(16, 'User16 talks about music preferences', 5),
+(17, 'User17 shares a funny meme', 29),
+(18, 'User18 discusses mental wellness', 12),
+(19, 'User19 shares tips on productivity', 23),
+(20, 'User20 talks about holiday traditions', 14),
+(1, 'User1 shares a fun fact about history', 7),
+(2, 'User2 discusses favorite games', 9),
+(3, 'User3 reflects on casual conversations', 4),
+(4, 'User4 expresses excitement for the new year', 18),
+(5, 'User5 shares an inspiring quote', 20),
+(6, 'User6 writes about a recent event', 21),
+(7, 'User7 talks about family values', 8),
+(8, 'User8 discusses healthy living', 12),
+(9, 'User9 shares thoughts on winter', 10),
+(10, 'User10 expresses the joy of reading', 17),
+(11, 'User11 writes about upcoming movies', 16),
+(12, 'User12 discusses hobbies and interests', 11),
+(13, 'User13 shares a workout routine', 6),
+(14, 'User14 talks about community service', 14),
+(15, 'User15 reflects on personal growth', 23),
+(16, 'User16 shares a recent adventure', 12),
+(17, 'User17 talks about learning experiences', 19),
+(18, 'User18 asks about favorite travel destinations', 25),
+(19, 'User19 shares tips on socializing', 3),
+(20, 'User20 discusses the importance of kindness', 15);

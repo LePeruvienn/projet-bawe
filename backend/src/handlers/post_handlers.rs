@@ -1,6 +1,6 @@
-use axum::{extract::{Path, State, Form, Extension}, Json, http::StatusCode};
+use axum::{extract::{Path, State, Form, Extension, Query}, Json, http::StatusCode};
 use sqlx::PgPool;
-use crate::models::post::{PostWithUserData, FormPost};
+use crate::models::post::{PostWithUserData, FormPost, PaginationQuery};
 use crate::models::auth::AuthUser;
 
 
@@ -8,11 +8,15 @@ use crate::models::auth::AuthUser;
  * List all posts from the database
  * @auth {None} - no authorization needed
  */
-pub async fn list_all(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<Vec<PostWithUserData>>, StatusCode> {
+pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Query(pagination): Query<PaginationQuery>) -> Result<Json<Vec<PostWithUserData>>, StatusCode> {
 
     // The goal is if the user is connected, return his likes, otherwise set all likes to false wit
     // user -1.
     let user_id = if auth_user.is_connected { auth_user.user_id } else { -1 };
+
+    // Get values for pagination or else get default values
+    let limit = pagination.limit.unwrap_or(10); 
+    let offset = pagination.offset.unwrap_or(0);
 
     print!("post_handlers : list_all ...");
 
@@ -32,9 +36,14 @@ pub async fn list_all(Extension(auth_user): Extension<AuthUser>, State(pool): St
                 WHERE ul.user_id = $1 AND ul.post_id = p.id
             ) AS auth_is_liked
         FROM posts p
-        JOIN users u ON p.user_id = u.id;
+        JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+        LIMIT $2
+        OFFSET $3;
     ")
-    .bind(user_id);
+    .bind(user_id)
+    .bind(limit)
+    .bind(offset);
 
     let posts = query.fetch_all(&pool).await.map_err(|e| {
         eprintln!("Error fetching posts: {:?}", e);

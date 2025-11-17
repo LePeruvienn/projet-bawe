@@ -24,17 +24,17 @@ Future<Post> fetchPost(int id) async {
   }
 }
 
-Future<List<Post>> fetchPosts() async {
+Future<List<Post>> fetchPosts({int limit = 20, int offset = 0}) async {
 
   // Get user token
   final token = TokenHandler().token;
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/posts'),
+    Uri.parse('http://0.0.0.0:8080/posts?limit=$limit&offset=$offset'),
     headers: {
-      'Authorization': 'Bearer $token',  // Include token in the Authorization header
+      'Authorization': 'Bearer $token',
       'Content-Type': 'application/x-www-form-urlencoded',
-    }
+    },
   );
 
   if (response.statusCode == 200) {

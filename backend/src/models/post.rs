@@ -30,5 +30,12 @@ pub struct PostWithUserData {
 // middleware)
 #[derive(Deserialize)]
 pub struct FormPost {
-    pub content: String,
+    pub content: String
+}
+
+// This is for the list_posts methods, here is all the getter attribute you can give
+#[derive(Deserialize)]
+pub struct PaginationQuery {
+    pub offset: Option<i64>, // The number of posts to skip
+    pub limit: Option<i64>   // The maximum number of posts to return
 }
