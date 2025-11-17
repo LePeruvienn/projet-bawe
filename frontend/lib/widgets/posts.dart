@@ -522,7 +522,7 @@ class _PostsPageState extends State<PostsPage> {
               itemBuilder: (context, index) {
 
                 // Last item is the loading indicator
-                if (_isLoading && index == _posts.length) {
+                if (_isLoading && index == _totalItems - 1) {
                   return _hasMore ? const Center(child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: CircularProgressIndicator(),

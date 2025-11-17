@@ -47,3 +47,11 @@ docker exec -it postgres_db psql -U postgres -d appdb
 ```
 vimgrep /Colors/ frontend/lib/widgets/**/*.dart   
 ```
+
+---
+
+### Bugs Connus
+
+- Update le responsive après un like
+- Supprimer son propre compte
+- Changement de theme peut ne pas être pris en compte

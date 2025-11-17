@@ -169,44 +169,45 @@ pub async fn create_post(
  */
 pub async fn like_post(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
 
-    // If user is not connected return 401
+    // Return 401 if user not connected
     if !auth_user.is_connected {
         return StatusCode::UNAUTHORIZED;
     }
 
-    // Check if the post exists
-    let post_exists = sqlx::query("SELECT 1 FROM posts WHERE id = $1")
-        .bind(id)
-        .fetch_optional(&pool)
-        .await;
+    // Start transaction
+    let mut tx = match pool.begin().await {
+        Ok(t) => t,
+        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR,
+    };
 
-    // If post dont exist return 404 not found
-    if post_exists.is_err() || post_exists.unwrap().is_none() {
-        return StatusCode::NOT_FOUND;
-    }
-
-    // Check if the user already likes the post
-    let like_exists = sqlx::query("SELECT 1 FROM user_likes WHERE user_id = $1 AND post_id = $2")
+    // Insert like
+    let insert_result = sqlx::query("INSERT INTO user_likes (user_id, post_id) VALUES ($1, $2)")
         .bind(auth_user.user_id)
         .bind(id)
-        .fetch_optional(&pool)
+        .execute(&mut *tx)
         .await;
 
-    if like_exists.is_ok() && like_exists.unwrap().is_some() {
-        return StatusCode::CONFLICT; // Return 409 if user already liked the post
+    if insert_result.is_err() {
+        // Maybe it can be CONFLICT be i'm not sure if it's 100% accurate
+        return StatusCode::INTERNAL_SERVER_ERROR;
     }
 
-    // Attempt to insert a like
-    let result = sqlx::query("INSERT INTO user_likes (user_id, post_id) VALUES ($1, $2);")
-        .bind(auth_user.user_id)
+    // Update like count
+    let update_result = sqlx::query("UPDATE posts SET likes_count = likes_count + 1 WHERE id = $1")
         .bind(id)
-        .execute(&pool)
+        .execute(&mut *tx)
         .await;
 
-    match result {
-        Ok(_) => StatusCode::CREATED, // Return 201 if success
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // Return 500 if SQL error
+    if update_result.is_err() {
+        return StatusCode::INTERNAL_SERVER_ERROR;
     }
+
+    // Commit -> Apply both queries
+    if tx.commit().await.is_err() {
+        return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+
+    StatusCode::CREATED
 }
 
 /*
@@ -221,38 +222,37 @@ pub async fn unlike_post(Path(id): Path<i32>, Extension(auth_user): Extension<Au
         return StatusCode::UNAUTHORIZED;
     }
 
-    // Check if post exist
-    let post_exists = sqlx::query("SELECT 1 FROM posts WHERE id = $1")
-        .bind(id)
-        .fetch_optional(&pool)
-        .await;
+    // Start transaction
+    let mut tx = match pool.begin().await {
+        Ok(t) => t,
+        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR,
+    };
 
-    // If post dont exist return 404
-    if post_exists.is_err() || post_exists.unwrap().is_none() {
-        return StatusCode::NOT_FOUND;
-    }
-
-    // Check if user have liked the post
-    let like_exists = sqlx::query("SELECT 1 FROM user_likes WHERE user_id = $1 AND post_id = $2")
+    // Delete like
+    let delete_result = sqlx::query("DELETE FROM user_likes WHERE user_id = $1 AND post_id = $2")
         .bind(auth_user.user_id)
         .bind(id)
-        .fetch_optional(&pool)
+        .execute(&mut *tx)
         .await;
 
-    // If user hasnt like the post we return 404
-    if like_exists.is_err() || like_exists.unwrap().is_none() {
-        return StatusCode::NOT_FOUND;
+    if delete_result.is_err() {
+        return StatusCode::INTERNAL_SERVER_ERROR;
     }
 
-    // Unlike the post
-    let result = sqlx::query("DELETE FROM user_likes WHERE user_id = $1 AND post_id = $2")
-        .bind(auth_user.user_id)
+    // Update like count
+    let update_result = sqlx::query("UPDATE posts SET likes_count = likes_count - 1 WHERE id = $1")
         .bind(id)
-        .execute(&pool)
+        .execute(&mut *tx)
         .await;
 
-    match result {
-        Ok(_) => StatusCode::OK, // Return 200 if success
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR, // Return 500 if SQL error
+    if update_result.is_err() {
+        return StatusCode::INTERNAL_SERVER_ERROR;
     }
+
+    // Commit -> Apply both queries
+    if tx.commit().await.is_err() {
+        return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+
+    StatusCode::OK
 }
