@@ -95,7 +95,7 @@ void handleInfoUser(BuildContext context, User user) {
 * BASE USER PAGE
 */
 class UsersPage extends StatelessWidget {
-  
+
   // Global key to access the UserList state
   final GlobalKey<_UserListState> _userListKey = GlobalKey<_UserListState>();
 
@@ -275,7 +275,7 @@ class _UserListState extends State<UserList> {
           controller: _scrollController,
           itemCount: _users.length + (_isLoading ? 1 : 0),
           itemBuilder: (context, index) {
-            
+
             if (index == _users.length) {
               return _hasMore ? const Center(child: Padding(
                 padding: EdgeInsets.all(8.0),
