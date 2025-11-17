@@ -597,15 +597,12 @@ class _UserFormState extends State<UserForm> {
   }
 }
 
-// ... (UserInfoSheet, _InfoCard, _InfoRow, _InfoItem classes omitted for brevity)
-// The remaining classes are unchanged as they relate to displaying info, not list manipulation.
-
 /*
 * USER INFO SHEET
 * - Displays detailed info about a user in a bottom popup
 */
 class UserInfoSheet extends StatelessWidget {
-// ... (omitted for brevity)
+
   final User user;
 
   const UserInfoSheet({super.key, required this.user});
@@ -648,7 +645,7 @@ class UserInfoSheet extends StatelessWidget {
 * User to display users information in the popup
 */
 class _InfoCard extends StatelessWidget {
-// ... (omitted for brevity)
+
   static const double titleFontSize = 24;
   static const double itemFontSize = 14;
 
@@ -699,7 +696,7 @@ class _InfoCard extends StatelessWidget {
 * Ued to represent each row of the info card
 */
 class _InfoRow extends StatelessWidget {
-// ... (omitted for brevity)
+
   final _InfoItem item;
 
   const _InfoRow({required this.item});
@@ -743,7 +740,7 @@ class _InfoRow extends StatelessWidget {
 * Info model class
 */
 class _InfoItem {
-// ... (omitted for brevity)
+
   final IconData icon;
   final String label;
   final String value;
