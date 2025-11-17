@@ -60,15 +60,22 @@ pub async fn get_by_id(Path(id): Path<i32>, Extension(auth_user): Extension<Auth
  */
 pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> Result<Json<User>, StatusCode> {
 
-    let query = sqlx::query_as::<_, User>("INSERT INTO users (username, email, password, title, is_admin) VALUES ($1, $2, $3, $4, $5);")
-        .bind(&payload.username)
-        .bind(&payload.email)
-        .bind(&payload.password)
-        .bind(&payload.title)
-        .bind(&payload.is_admin);
+    let query = sqlx::query_as::<_, User>("
+        INSERT INTO users (username, email, password, title, is_admin)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, username, email, password, title, created_at, is_admin;
+    ")
+    .bind(&payload.username)
+    .bind(&payload.email)
+    .bind(&payload.password)
+    .bind(&payload.title)
+    .bind(&payload.is_admin);
 
     let user = query.fetch_one(&pool).await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // Return 500 if SQL request failed
+        .map_err(|e| {
+            eprintln!("Error creating user: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?; // Return 500 if SQL request failed
 
     // Return the created user
     Ok(Json(user))
