@@ -31,13 +31,13 @@ Future<User> fetchUser(int id) async {
   }
 }
 
-Future<List<User>> fetchUsers() async {
+Future<List<User>> fetchUsers({int limit = 20, int offset = 0}) async {
 
   // Get user token
   final token = TokenHandler().token;
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users'),
+    Uri.parse('http://0.0.0.0:8080/users?limit=$limit&offset=$offset'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -90,16 +90,13 @@ Future<bool> deleteUser(User user) async {
   }
 }
 
-Future<bool> createUser(String username, String email, String password, String? title, [bool? isAdmin]) async {
+Future<User?> createUser(String username, String email, String password, String? title, [bool? isAdmin]) async {
 
   // if isAdmin var is not set, set it to false
   if (isAdmin == null)
     isAdmin = false;
 
-  try {
-
-    final response = await http.post(
-
+  final response = await http.post(
     Uri.parse('http://0.0.0.0:8080/users/create'),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -111,21 +108,17 @@ Future<bool> createUser(String username, String email, String password, String? 
         'title': title ?? 'null',
         'is_admin': isAdmin ? 'true' : 'false',
       }
-    );
+  );
 
-    // Supposons que le backend renvoie 201 pour succès
-    final success = response.statusCode == 201;
+  print(">>>>>VVVV");
+  print(response.statusCode);
+  print(response.body);
 
-    if (!success)
-      print('Failed to create user: ${response.statusCode} - ${response.body}');
+  // If we did receive an OK (200) response, we return created user
+  if (response.statusCode == 200)
+    return await User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
 
-    return success;
-
-  } catch (error) {
-
-    print('Error occurred while creating user: $error');
-    return false;
-  }
+  return null;
 }
 
 

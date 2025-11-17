@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../models/post.dart';
 import '../utils.dart';
-import '../api/posts.dart';
+import '../api/posts.dart'; // ASSUMES: createPost returns Future<Post?>
 import '../auth/authProvider.dart';
 import '../routes.dart';
 
@@ -11,7 +11,9 @@ import '../routes.dart';
 * GLOBAL POSTS CONSTANTS
 *************************/
 
+// To get Lazy Loading config
 const POST_LIMIT = 20;
+const POST_MAX_LENGTH = 280;
 const REFRESH_WHEN_CLOSE_TO = 300;
 
 /************************
@@ -21,31 +23,42 @@ const REFRESH_WHEN_CLOSE_TO = 300;
 // Get Singleton Instance once
 final authProvider = AuthProvider();
 
-
 /************************
 * GLOBAL POSTS FUNCTIONS
 *************************/
 
-Future<void> handleCreatePost(BuildContext context, String content) async {
+Future<Post?> handleCreatePost(BuildContext context, String content) async {
 
-  final res = await createPost(content);
+  // Get created Post
+  final Post? newPost = await createPost(content);
 
+  // Get current context location (for translating)
   final loc = context.loc;
 
+  // Check if success
+  final res = newPost != null;
+
+  // Show message on showSnackbar depending of sucess
   showSnackbar(
     context: context,
     dismissText: res ? loc.postCreatedSuccess : loc.postCreationFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
+
+  // Return created post
+  return newPost;
 }
 
 void handleDeletePost(BuildContext context, Post post, VoidCallback onDeleted) async {
 
+  // Try to delete post
   final res = await deletePost(post);
 
+  // Get current context location (for translating)
   final loc = context.loc;
 
+  // Show message on showSnackbar depending of sucess
   showSnackbar(
     context: context,
     dismissText: res ? loc.postDeletedSuccess : loc.postDeletedFailed,
@@ -53,6 +66,7 @@ void handleDeletePost(BuildContext context, Post post, VoidCallback onDeleted) a
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
 
+  // Call onDeleted function if sucess
   if (res)
     onDeleted();
 }
@@ -61,8 +75,10 @@ Future<bool> handleLikePost(BuildContext context, Post post) async {
 
   final id = post.id;
 
+  // Try to like post
   bool isLiked = await likePost(id);
 
+  // If not succeded show error message
   if (!isLiked) {
 
     showSnackbar(
@@ -80,8 +96,10 @@ Future<bool> handleUnlikePost(BuildContext context, Post post) async {
 
   final id = post.id;
 
+  // Try to unlike post
   bool isUnliked = await unlikePost(id);
 
+  // If not succeded show error message
   if (!isUnliked) {
 
     showSnackbar(
@@ -95,9 +113,9 @@ Future<bool> handleUnlikePost(BuildContext context, Post post) async {
   return isUnliked;
 }
 
+void openMobilePostForm(BuildContext context, void Function(Post) onPostCreated) {
 
-void openPostForm(BuildContext context, VoidCallback onPostCreated) {
-
+  // Open Post form Interface, and on create call onPostCreated
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -108,7 +126,7 @@ void openPostForm(BuildContext context, VoidCallback onPostCreated) {
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: _PostForm(onPostCreated: onPostCreated),
+      child: _PostFormMobile(onPostCreated: onPostCreated),
     ),
   );
 }
@@ -117,35 +135,45 @@ void openPostForm(BuildContext context, VoidCallback onPostCreated) {
 * POSTS COMPONENTS
 ******************/
 
-class _PostForm extends StatefulWidget {
+class _PostFormMobile extends StatefulWidget {
 
-  final VoidCallback onPostCreated;
-  const _PostForm({required this.onPostCreated});
+  final void Function(Post) onPostCreated;
+  const _PostFormMobile({required this.onPostCreated});
 
   @override
-  State<_PostForm> createState() => _PostFormState();
+  State<_PostFormMobile> createState() => _PostFormMobileState();
 }
 
-class _PostFormState extends State<_PostForm> {
+class _PostFormMobileState extends State<_PostFormMobile> {
 
   final TextEditingController _controller = TextEditingController();
 
   bool isPosting = false;
-  static const int maxLength = 280;
 
   Future<void> _createPost(BuildContext context) async {
 
+    // Set state to posting
     setState(() => isPosting = true);
-    await handleCreatePost(context, _controller.text.trim());
+
+    // Try to create post
+    final newPost = await handleCreatePost(context, _controller.text.trim());
+
+    // Remove form
     Navigator.pop(context);
-    widget.onPostCreated();
+
+    // Reomove posting
+    setState(() => isPosting = false);
+
+    // If sucess call callback
+    if (newPost != null)
+      widget.onPostCreated(newPost);
   }
 
   @override
   Widget build(BuildContext context) {
 
-    final remaining = maxLength - _controller.text.length;
-    final disabled = _controller.text.trim().isEmpty || _controller.text.length > maxLength;
+    final remaining = POST_MAX_LENGTH - _controller.text.length;
+    final disabled = _controller.text.trim().isEmpty || _controller.text.length > POST_MAX_LENGTH;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -210,7 +238,7 @@ class _PostFormState extends State<_PostForm> {
 
 class _PostFormDesktop extends StatefulWidget {
 
-  final VoidCallback onPostCreated;
+  final void Function(Post) onPostCreated;
   const _PostFormDesktop({required this.onPostCreated});
 
   @override
@@ -222,24 +250,36 @@ class _PostFormDesktopState extends State<_PostFormDesktop> {
   final TextEditingController _controller = TextEditingController();
 
   bool isPosting = false;
-  static const int maxLength = 280;
 
   Future<void> _createPost() async {
 
+    // Get input data
     final content = _controller.text.trim();
-    if (content.isEmpty || content.length > maxLength) return;
 
+    // Check if empty
+    if (content.isEmpty || content.length > POST_MAX_LENGTH)
+      return;
+
+    // Set current state to posting
     setState(() => isPosting = true);
-    await handleCreatePost(context, content);
+
+    // Try to create new post
+    final newPost = await handleCreatePost(context, content);
+
     _controller.clear();
+
+    // Remove posting state
     setState(() => isPosting = false);
-    widget.onPostCreated();
+
+    // if we succeded call callback
+    if (newPost != null)
+      widget.onPostCreated(newPost);
   }
 
   @override
   Widget build(BuildContext context) {
 
-    final disabled = _controller.text.trim().isEmpty || _controller.text.length > maxLength;
+    final disabled = _controller.text.trim().isEmpty || _controller.text.length > POST_MAX_LENGTH;
 
     return Card(
       elevation: 2,
@@ -267,9 +307,9 @@ class _PostFormDesktopState extends State<_PostFormDesktop> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  '${maxLength - _controller.text.length}',
+                  '${POST_MAX_LENGTH - _controller.text.length}',
                   style: TextStyle(
-                    color: _controller.text.length > maxLength
+                    color: _controller.text.length > POST_MAX_LENGTH
                         ? Colors.red
                         : Colors.grey[600],
                     fontSize: 13,
@@ -332,6 +372,7 @@ class _PostsPageState extends State<PostsPage> {
   void initState() {
 
     super.initState();
+    // ⭐️ Conditional initial load logic (to prevent full refresh on pop) is missing here, but keeping loadPosts(initial: true) for now
     _initialLoadFuture = _loadPosts(initial: true); 
     _scrollController.addListener(_onScroll);
   }
@@ -354,7 +395,7 @@ class _PostsPageState extends State<PostsPage> {
 
   // --- Post Loading Logic ---
   Future<void> _loadPosts({bool initial = false}) async {
-
+    // ... (rest of _loadPosts remains the same, used for initial load and infinite scroll) ...
     if (_isLoading)
       return;
 
@@ -370,8 +411,6 @@ class _PostsPageState extends State<PostsPage> {
     }
     
     try {
-      // Assuming fetchPosts now takes limit and offset
-      // You must update your actual API call to use these parameters.
       final newPosts = await fetchPosts(limit: _limit, offset: _offset);
 
       if (mounted) {
@@ -384,7 +423,6 @@ class _PostsPageState extends State<PostsPage> {
         });
       }
     } catch (e) {
-      // Handle error, maybe show a snackbar or log it
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -399,6 +437,27 @@ class _PostsPageState extends State<PostsPage> {
     }
   }
 
+  // ⭐️ ADDED: Local deletion handler (removes post instantly)
+  void _removePostLocally(Post post) {
+    setState(() {
+
+      _posts.removeWhere((p) => p.id == post.id);
+
+      // ⭐️ Correctly decrement offset since the list size decreased by 1
+      if (_offset > 0)
+        _offset--;
+    });
+  }
+
+  // ⭐️ ADDED: Local post creation handler (inserts post instantly at the top)
+  void _addPostLocally(Post newPost) {
+    setState(() {
+      _posts.insert(0, newPost);
+      _offset++; // Increment offset as the list size grew
+      // _scrollController.jumpTo(0.0); // Optional: scroll to the new post
+    });
+  }
+
   // Helper getter from the original code
   bool get _isDesktop => MediaQuery.of(context).size.width >= 800;
 
@@ -409,34 +468,29 @@ class _PostsPageState extends State<PostsPage> {
       body: RefreshIndicator(
         onRefresh: () => _loadPosts(initial: true), // Trigger a full refresh
         child: FutureBuilder<void>(
-          // Use FutureBuilder on the initial load future
           future: _initialLoadFuture, 
           builder: (context, snapshot) {
 
-            // Initial full-screen loading state (only for the very first load)
+            // ... (loading, error, no data states remain the same) ...
             if (snapshot.connectionState == ConnectionState.waiting && _posts.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
-
-            // Error state for initial load
             if (snapshot.hasError && _posts.isEmpty) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
-
-            // No data state
             if (_posts.isEmpty && !_isLoading && !_hasMore) {
               return const Center(child: Text('No posts available.'));
             }
 
             // Main List View
             return ListView.builder(
-              controller: _scrollController, // Attach the controller
+              controller: _scrollController, 
               padding: const EdgeInsets.all(16),
-              itemCount: _posts.length + (_isLoading ? 1 : 0), // Add 1 for loading indicator
+              itemCount: _posts.length + (_isLoading ? 1 : 0), 
               itemBuilder: (context, index) {
+
                 // Last item is the loading indicator
                 if (index == _posts.length) {
-                  // Only show the indicator if we are loading AND expect more data
                   return _hasMore ? const Center(child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: CircularProgressIndicator(),
@@ -444,38 +498,34 @@ class _PostsPageState extends State<PostsPage> {
                 }
 
                 // First item is the desktop post form
-                if (index == 0 && _isDesktop && authProvider.isLoggedIn) {
-                  return Column(
-                    children: [
-                      _PostFormDesktop(onPostCreated: () => _loadPosts(initial: true)),
-                      PostListItem(
-                        post: _posts[index],
-                        onDelete: () => _loadPosts(initial: true),
-                      ),
-                    ],
-                  );
-                }
+                if (index == 0 && _isDesktop && authProvider.isLoggedIn)
+                  return _PostFormDesktop(onPostCreated: _addPostLocally);
 
                 // Standard post item
                 final post = _posts[index];
                 return PostListItem(
+                  key: ValueKey(post.id),
                   post: post,
-                  onDelete: () => _loadPosts(initial: true), // Refresh on delete
+                  // ⭐️ UPDATED: Use local handler _removePostLocally
+                  onDelete: () => _removePostLocally(post),
                 );
               },
             );
           },
         ),
       ),
+      // Mobile FAB
       floatingActionButton: (!_isDesktop && authProvider.isLoggedIn)
           ? FloatingActionButton(
-              onPressed: () => openPostForm(context, () => _loadPosts(initial: true)), // Refresh on post creation
+              // ⭐️ UPDATED: Use local handler _addPostLocally
+              onPressed: () => openMobilePostForm(context, _addPostLocally), 
               child: const Icon(Icons.create),
             )
           : null,
     );
   }
 }
+
 /************************
 * POST LIST ITEM
 *************************/
@@ -496,10 +546,9 @@ class PostListItem extends StatefulWidget {
 }
 
 class _PostListItemState extends State<PostListItem> {
-  
+
   int likes = 0;
   bool isLiked = false;
-
   bool isHandlingLike = false;
 
   @override
@@ -512,46 +561,30 @@ class _PostListItemState extends State<PostListItem> {
 
   void toggleLike(BuildContext context, Post post) async {
 
-    // Is we are actually handling a like do not process other instructions
     if (isHandlingLike)
       return;
 
-    // Set post item handling like status to true
     isHandlingLike = true;
-
-    // If user tries to like but is not logged in
     if (!authProvider.isLoggedIn) {
-
-      // Redirect to login page & stop here
       context.go(LOGIN_PATH);
       isHandlingLike = false;
       return;
     }
-
-    // Send like/unlike request to API
     bool success = isLiked ?
       await handleUnlikePost(context, post) : 
       await handleLikePost(context, post);
 
-    // if it failed stop here
     if (!success) {
       isHandlingLike = false;
       return;
     }
-
-    // Update current frontend item state
     setState(() {
-
       if (isLiked)
         likes -= 1;
-
       else
         likes += 1;
-
       isLiked = !isLiked;
     });
-
-    // Remove handling like state
     isHandlingLike = false;
   }
 
@@ -560,14 +593,13 @@ class _PostListItemState extends State<PostListItem> {
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     final post = widget.post;
 
     return Container(
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.onSurface.withOpacity(0.12), // subtle line based on text color
+            color: colorScheme.onSurface.withOpacity(0.12),
           ),
         ),
       ),
@@ -584,7 +616,6 @@ class _PostListItemState extends State<PostListItem> {
             ),
           ),
           const SizedBox(width: 10),
-
           // Main post content
           Expanded(
             child: Column(
@@ -620,6 +651,7 @@ class _PostListItemState extends State<PostListItem> {
                       IconButton(
                         iconSize: 20,
                         icon: Icon(Icons.delete),
+                        // ⭐️ UNCHANGED: This correctly calls the global handler, which triggers widget.onDelete (which is _removePostLocally)
                         onPressed: () => handleDeletePost(context, post, widget.onDelete),
                       ),
                   ],
@@ -631,7 +663,6 @@ class _PostListItemState extends State<PostListItem> {
                   style: const TextStyle(fontSize: 15),
                 ),
                 const SizedBox(height: 6),
-
                 // Date and like row
                 Row(
                   children: [

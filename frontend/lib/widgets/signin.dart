@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/user.dart';
 import '../api/users.dart';
 import '../routes.dart';
 import '../utils.dart';
@@ -11,9 +12,11 @@ import '../utils.dart';
 
 void handleCreateUser(BuildContext context, String username, String email, String password, String? title) async {
 
-  bool res = await createUser(username, email, password, title);
+  User? user = await createUser(username, email, password, title);
 
   final loc = context.loc;
+
+  final res = user != null;
 
   showSnackbar(
     context: context,
@@ -22,7 +25,8 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
 
-  if (res) context.go(LOGIN_PATH);
+  if (res)
+    context.go(LOGIN_PATH);
 }
 
 /***********************

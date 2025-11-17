@@ -30,8 +30,7 @@ Future<List<Post>> fetchPosts({int limit = 20, int offset = 0}) async {
   final token = TokenHandler().token;
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/posts?limit=$limit&offset=$offset'),
-    headers: {
+    Uri.parse('http://0.0.0.0:8080/posts?limit=$limit&offset=$offset'), headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -83,7 +82,7 @@ Future<bool> deletePost(Post post) async {
   }
 }
 
-Future<bool> createPost(String content) async {
+Future<Post?> createPost(String content) async {
 
   // Get user token
   final token = TokenHandler().token;
@@ -91,47 +90,27 @@ Future<bool> createPost(String content) async {
   // If there is no token return error
   if (token == null) {
     print('CreatePost > NoToken: User must be connected to create a post.');
-    return false;
+    return null;
   }
 
-  try {
+  final response = await http.post(
 
-    final response = await http.post(
-
-    Uri.parse('http://0.0.0.0:8080/posts/create'),
-      headers: {
-        'Authorization': 'Bearer $token',  // Include token in the Authorization header
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: {
-        'content': content
-      }
-    );
-
-    // Log status code
-    switch (response.statusCode) {
-
-      case 201: // Success
-        print('CreatePost > Created: Successfully create a post');
-
-      case 401: // Unauthorized
-        print('CreatePost > Unauthorized: Invalid token');
-
-      case 403: // Forbidden
-        print('CreatePost > Forbidden: You do not have access to this resource');
-
-      default: // Handle other status codes
-        print('CreatePost > Failed to fetch data: ${response.statusCode} - ${response.body}');
+  Uri.parse('http://0.0.0.0:8080/posts/create'),
+    headers: {
+      'Authorization': 'Bearer $token',  // Include token in the Authorization header
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: {
+      'content': content
     }
+  );
 
-    // Return treu if response was 201 - CREATED
-    return response.statusCode == 201;
+  // If we did receive an OK (200) response, we return created post
+  if (response.statusCode == 200)
+    return await Post.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
 
-  } catch (error) {
-
-    print('Error occurred while creating post: $error');
-    return false;
-  }
+  // Else we return null
+  return null;
 }
 
 

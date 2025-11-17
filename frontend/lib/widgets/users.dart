@@ -2,17 +2,33 @@ import 'package:flutter/material.dart';
 
 import '../models/user.dart';
 import '../utils.dart';
-import '../api/users.dart';
+import '../api/users.dart'; // ASSUMPTION: fetchUsers now supports limit and offset.
+
+/************************
+* GLOBALS USERS CONSTANTS
+*************************/
+
+const USER_LIMIT = 20;
+const REFRESH_WHEN_CLOSE_TO = 300;
 
 /************************
 * GLOBALS USERS FUNCTIONS
 *************************/
 
-void handleCreateUser(BuildContext context, String username, String email, String password, String? title) async {
+void updateWhere(List<User> users, User updatedUser) {
+
+  final index = users.indexWhere((u) => u.id == updatedUser.id);
+
+  if (index != -1)
+    users[index] = updatedUser;
+}
+
+Future<void> handleCreateUser(BuildContext context, String username, String email, String password, String? title, Function(User) onUserCreated) async {
 
   // Try to create user
-  bool res = await createUser(username, email, password, title);
+  final User? newUser = await createUser(username, email, password, title);
 
+  final bool res = newUser != null;
   final loc = context.loc;
 
   // Show message depending of sucess
@@ -22,6 +38,28 @@ void handleCreateUser(BuildContext context, String username, String email, Strin
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
+
+  // If successful call callback
+  if (res)
+    onUserCreated(newUser!);
+}
+
+Future<void> handleDeleteUser(BuildContext context, User user, Function(User) onUserRemoved) async {
+
+  bool res = await deleteUser(user);
+
+  final loc = context.loc;
+
+  showSnackbar(
+    context: context,
+    dismissText: res ? loc.deleteSuccess : loc.deleteFailed,
+    backgroundColor: res ? Colors.deepPurple : Colors.red,
+    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
+  );
+
+  // If successful call callback
+  if (res)
+    onUserRemoved(user);
 }
 
 Future<void> handleUpdateUser(BuildContext context, User user) async {
@@ -35,20 +73,6 @@ Future<void> handleUpdateUser(BuildContext context, User user) async {
   showSnackbar(
     context: context,
     dismissText: res ? loc.updateSuccess : loc.updateFailed,
-    backgroundColor: res ? Colors.deepPurple : Colors.red,
-    icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
-  );
-}
-
-void handleDeleteUser(BuildContext context, User user) async {
-
-  bool res = await deleteUser(user);
-
-  final loc = context.loc;
-
-  showSnackbar(
-    context: context,
-    dismissText: res ? loc.deleteSuccess : loc.deleteFailed,
     backgroundColor: res ? Colors.deepPurple : Colors.red,
     icon: Icon(res ? Icons.done : Icons.close, color: Colors.white),
   );
@@ -69,28 +93,19 @@ void handleInfoUser(BuildContext context, User user) {
 
 /*
 * BASE USER PAGE
-* - This is the container of the user list page
 */
 class UsersPage extends StatelessWidget {
+  
+  // Global key to access the UserList state
+  final GlobalKey<_UserListState> _userListKey = GlobalKey<_UserListState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  print('Refresh Pressed'); // Example action
-                },
-              ),
-            ],
-          ),
           Expanded(
-            child: UserList(), // Your UserList widget goes here
+            child: UserList(key: _userListKey),
           ),
         ],
       ),
@@ -103,7 +118,10 @@ class UsersPage extends StatelessWidget {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: UserForm(title: context.loc.createUser),
+              child: UserForm(
+                title: context.loc.createUser,
+                onUserCreated: _userListKey.currentState?._addUserLocally,
+              ),
             ),
           );
         },
@@ -115,7 +133,6 @@ class UsersPage extends StatelessWidget {
 
 /*
 * USER LIST WIDGET
-* - This widget contains the list of all the Users
 */
 class UserList extends StatefulWidget {
 
@@ -130,42 +147,150 @@ class UserList extends StatefulWidget {
 */
 class _UserListState extends State<UserList> {
 
-  late Future<List<User>> futureUsers;
+  // Lazy Loading State
+  final ScrollController _scrollController = ScrollController();
+
+  final int _limit = USER_LIMIT;
+  int _offset = 0;
+
+  bool _isLoading = false;
+  bool _hasMore = true;
+
+  List<User> _users = [];
+  
+  // Future that represents the initial/refresh load
+  Future<void>? _initialLoadFuture; 
 
   @override
   void initState() {
     super.initState();
-    futureUsers = fetchUsers();
+    _initialLoadFuture = _loadUsers(initial: true); 
+    _scrollController.addListener(_onScroll);
   }
 
-  // Used to refrech the users after delete / update
-  Future<void> _refreshUsers() async {
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _addUserLocally(User user) {
+
     setState(() {
-      futureUsers = fetchUsers();
+      _users.insert(0, user);
+      _offset++;
     });
+  }
+
+  void _removeUserLocally(User user) {
+
+    setState(() {
+      _users.removeWhere((u) => u.id == user.id);
+      _offset--;
+    });
+  }
+
+  void _updateUserLocally(User updatedUser) {
+
+    setState(() {
+      updateWhere(_users, updatedUser);
+    });
+  }
+  void _onScroll() {
+
+    final pos = _scrollController.position.pixels;
+    final threshold = _scrollController.position.maxScrollExtent - REFRESH_WHEN_CLOSE_TO;
+
+    if (pos >= threshold && !_isLoading && _hasMore)
+      _loadUsers();
+  }
+
+  // The core loading logic for pagination and refresh
+  Future<void> _loadUsers({bool initial = false}) async {
+
+    if (_isLoading)
+      return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    if (initial) {
+      _users.clear();
+      _offset = 0;
+      _hasMore = true;
+    }
+
+    try {
+
+      final newUsers = await fetchUsers(limit: _limit, offset: _offset);
+
+      if (mounted) {
+
+        setState(() {
+          _users.addAll(newUsers);
+          _offset += newUsers.length;
+          _hasMore = newUsers.length == _limit; 
+          _isLoading = false;
+        });
+      }
+
+    } catch (e) {
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        showSnackbar(
+          context: context, 
+          dismissText: 'Error loading users',
+          backgroundColor: Colors.red,
+          icon: const Icon(Icons.close, color: Colors.white),
+        );
+      }
+    }
   }
 
   @override Widget build(BuildContext context) {
 
-    return FutureBuilder<List<User>>(
-      future: futureUsers,
+    return FutureBuilder<void>(
+
+      future: _initialLoadFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
 
-          return Center(child: CircularProgressIndicator());
+        // Loading Widget ...
+        if (snapshot.connectionState == ConnectionState.waiting && _users.isEmpty)
+          return const Center(child: CircularProgressIndicator());
 
-        } else if (snapshot.hasError) {
-
+        // Error Widget
+        if (snapshot.hasError && _users.isEmpty)
           return Center(child: Text('Error: ${snapshot.error}'));
 
-        } else {
+        // No posts Widget
+        if (_users.isEmpty && !_isLoading && !_hasMore)
+          return const Center(child: Text('No users available.'));
 
-          return ListView(
-            children: snapshot.data!.map((user) {
-              return UserListItem(user: user);
-            }).toList(),
-          );
-        }
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: _users.length + (_isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            
+            if (index == _users.length) {
+              return _hasMore ? const Center(child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              )) : const SizedBox.shrink(); 
+            }
+
+            final user = _users[index];
+            return UserListItem(
+              user: user,
+              onUserRemoved: _removeUserLocally,
+              onUserUpdated: _updateUserLocally,
+            );
+          },
+        );
       },
     );
   }
@@ -173,13 +298,19 @@ class _UserListState extends State<UserList> {
 
 /*
 * USER LIST ITEM WIDGET
-* - This is the widget for 1 unique user in users list
 */
 class UserListItem extends StatefulWidget {
 
   final User user;
 
-  UserListItem({ required this.user }) : super(key: ObjectKey(user));
+  final Function(User) onUserRemoved;
+  final Function(User) onUserUpdated;
+
+  UserListItem({
+    required this.user,
+    required this.onUserRemoved,
+    required this.onUserUpdated,
+  }) : super(key: ObjectKey(user));
 
   @override
   State<UserListItem> createState() => _UserListItemState();
@@ -191,6 +322,32 @@ class UserListItem extends StatefulWidget {
 class _UserListItemState extends State<UserListItem> {
 
   bool _isHovered = false;
+
+  void _deleteUser() async {
+
+    await handleDeleteUser(context, widget.user, widget.onUserRemoved); 
+  }
+
+  // Wrapper to show the edit form with refresh callback
+  void _showEditForm() {
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        // Pass the refresh callback to the form
+        child: UserForm(
+          title: context.loc.editUser, 
+          user: widget.user,
+          onUserUpdated: widget.onUserUpdated,
+          callback: () => {}
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,22 +372,11 @@ class _UserListItemState extends State<UserListItem> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom,
-                        ),
-                        child: UserForm(title: context.loc.editUser, user: widget.user),
-                      ),
-                    );
-                  },
+                  onPressed: _showEditForm,
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () => handleDeleteUser(context, widget.user),
+                  onPressed: _deleteUser,
                 ),
               ],
             ),
@@ -244,24 +390,23 @@ class _UserListItemState extends State<UserListItem> {
 
 /*
 * USER FORM
-* - This widget displays the form to create a new user
 */
 class UserForm extends StatefulWidget {
 
-  // Title displayed at the top of the popup
   final String title;
-
-  // User linked to the form (can be null if we are creating an user)
   final User? user;
 
-  // Callback (optional)
   final VoidCallback? callback;
+  final Function(User)? onUserCreated;
+  final Function(User)? onUserUpdated;
 
   const UserForm({
     super.key,
     required this.title,
     this.user = null,
-    this.callback = null
+    this.callback = null,
+    this.onUserCreated = null,
+    this.onUserUpdated = null,
   });
 
   @override
@@ -282,7 +427,6 @@ class _UserFormState extends State<UserForm> {
 
   bool _isSubmitting = false;
   
-  // UI vars
   bool _obscurePassword = true;
 
   @override
@@ -305,14 +449,11 @@ class _UserFormState extends State<UserForm> {
 
   void _submitForm() async {
 
-    // If form not valid return
     if (!_formKey.currentState!.validate())
       return;
 
-    // Update state
     setState(() => _isSubmitting = true);
 
-    // Getting inputs values
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -321,7 +462,9 @@ class _UserFormState extends State<UserForm> {
     // Create user
     if (widget.user == null) {
 
-      handleCreateUser (context, username, email, password, title);
+      handleCreateUser (context, username, email, password, title, (User newUser) {
+        widget.onUserCreated?.call(newUser);
+      });
 
     // Update User
     } else {
@@ -336,22 +479,20 @@ class _UserFormState extends State<UserForm> {
       );
 
       await handleUpdateUser(context, user);
+
+      widget.onUserUpdated?.call(user);
     }
 
-    // Clear inputs fields
     _usernameController.clear();
     _emailController.clear();
     _passwordController.clear();
     _titleController.clear();
 
-    // Close form if in a dialog
     Navigator.of(context).pop();
 
-    // Call callback
     if (widget.callback != null)
       widget.callback?.call();
 
-    // Update state
     setState(() => _isSubmitting = false);
   }
 
@@ -385,7 +526,7 @@ class _UserFormState extends State<UserForm> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12), // espace entre les champs
+                const SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(
                     controller: _usernameController,
@@ -456,13 +597,15 @@ class _UserFormState extends State<UserForm> {
   }
 }
 
+// ... (UserInfoSheet, _InfoCard, _InfoRow, _InfoItem classes omitted for brevity)
+// The remaining classes are unchanged as they relate to displaying info, not list manipulation.
 
 /*
 * USER INFO SHEET
 * - Displays detailed info about a user in a bottom popup
 */
 class UserInfoSheet extends StatelessWidget {
-
+// ... (omitted for brevity)
   final User user;
 
   const UserInfoSheet({super.key, required this.user});
@@ -505,7 +648,7 @@ class UserInfoSheet extends StatelessWidget {
 * User to display users information in the popup
 */
 class _InfoCard extends StatelessWidget {
-
+// ... (omitted for brevity)
   static const double titleFontSize = 24;
   static const double itemFontSize = 14;
 
@@ -556,6 +699,7 @@ class _InfoCard extends StatelessWidget {
 * Ued to represent each row of the info card
 */
 class _InfoRow extends StatelessWidget {
+// ... (omitted for brevity)
   final _InfoItem item;
 
   const _InfoRow({required this.item});
@@ -599,7 +743,7 @@ class _InfoRow extends StatelessWidget {
 * Info model class
 */
 class _InfoItem {
-
+// ... (omitted for brevity)
   final IconData icon;
   final String label;
   final String value;
