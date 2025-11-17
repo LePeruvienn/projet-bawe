@@ -4,7 +4,7 @@ use sqlx::PgPool;
 use crate::auth::middleware::get_auth_user;
 
 use crate::handlers::user_handlers::{
-    list_all,
+    list,
     get_by_id,
     create_user,
     delete_user,
@@ -28,7 +28,7 @@ fn public_routes() -> Router<PgPool> {
 fn protected_routes() -> Router<PgPool> {
 
     Router::new()
-        .route("/", get(list_all))
+        .route("/", get(list))
         .route("/{id}", get(get_by_id))
         .route("/me", get(get_connected))
         .route("/delete/{id}", delete(delete_user))

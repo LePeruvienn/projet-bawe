@@ -1,7 +1,8 @@
 use axum::{extract::{Path, State, Form, Extension, Query}, Json, http::StatusCode};
 use sqlx::PgPool;
-use crate::models::post::{PostWithUserData, FormPost, PaginationQuery};
+use crate::models::post::{PostWithUserData, FormPost};
 use crate::models::auth::AuthUser;
+use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery};
 
 
 /*
@@ -15,8 +16,8 @@ pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<
     let user_id = if auth_user.is_connected { auth_user.user_id } else { -1 };
 
     // Get values for pagination or else get default values
-    let limit = pagination.limit.unwrap_or(10); 
-    let offset = pagination.offset.unwrap_or(0);
+    let limit = pagination.limit.unwrap_or(DEFAULT_LIMIT); 
+    let offset = pagination.offset.unwrap_or(DEFAULT_OFFSET);
 
     print!("post_handlers : list_all ...");
 
@@ -108,39 +109,57 @@ pub async fn delete_post(Path(id): Path<i32>, Extension(auth_user): Extension<Au
 }
 
 /*
- * Create a post
+ * Create a post and returns it with the user linked data
  * @auth {Conneceted} - only for conneceted users
  * @param {FormPost} - form input data
  */
-pub async fn create_post(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormPost>) -> StatusCode {
+pub async fn create_post(
+    Extension(auth_user): Extension<AuthUser>,
+    State(pool): State<PgPool>,
+    Form(payload): Form<FormPost>,
+) -> Result<Json<PostWithUserData>, StatusCode> {
 
-    println!("CREATE_POST: Trying to get connected user ...");
-
-    // If user is not connected we return 500
+    // If the user is not connected, return 401
     if !auth_user.is_connected {
-        return StatusCode::UNAUTHORIZED;
+        return Err(StatusCode::UNAUTHORIZED);
     }
 
-    // Get query data
-    let username = auth_user.username;
+    // Get user & form data
     let user_id = auth_user.user_id;
     let content = payload.content;
 
-    println!("CREATE POST: User is connected with @{username}");
+    let query = sqlx::query_as::<_, PostWithUserData>("
+        WITH new_post AS (
+            INSERT INTO posts (user_id, content) 
+            VALUES ($1, $2) 
+            RETURNING id, user_id, content, created_at, likes_count
+        )
+        SELECT 
+            np.id, 
+            np.content, 
+            np.created_at, 
+            np.likes_count, 
+            u.id as user_id, 
+            u.username as user_username, 
+            u.title as user_title, 
+            u.created_at as user_created_at,
+            EXISTS (
+                SELECT 1 
+                FROM user_likes ul 
+                WHERE ul.user_id = $3 AND ul.post_id = np.id
+            ) AS auth_is_liked 
+        FROM new_post np 
+        JOIN users u ON np.user_id = u.id;
+    ")
+    .bind(user_id)
+    .bind(content)
+    .bind(user_id);
 
-    let query = sqlx::query("INSERT INTO posts (user_id, content) VALUES ($1, $2);")
-        .bind(user_id)
-        .bind(content);
+    let post = query.fetch_one(&pool).await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let result = query.execute(&pool).await;
-
-    println!("CREATE POST: Executed SQL query");
-
-    match result {
-
-        Ok(_) => StatusCode::CREATED, // Return 201 if success
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR // Return 500 if SQL error
-    }
+    // Return the created post
+    Ok(Json(post))
 }
 
 /*

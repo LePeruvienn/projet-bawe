@@ -1,20 +1,31 @@
-use axum::{extract::{Path, Extension, State, Form}, Json, http::StatusCode};
+use axum::{extract::{Path, Extension, State, Form, Query}, Json, http::StatusCode};
 use sqlx::PgPool;
 use crate::models::user::{User, FormUser};
 use crate::models::auth::AuthUser;
+use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery};
 
 /*
  * List all users data from database
  * @auth {Admin} - only for admin users
  */
-pub async fn list_all(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<Vec<User>>, StatusCode> {
+pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Query(pagination): Query<PaginationQuery>) -> Result<Json<Vec<User>>, StatusCode> {
 
     // If user is not admin we return 401
     if !auth_user.is_admin {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    let query = sqlx::query_as::<_, User>("SELECT id, username, email, password, title, created_at, is_admin FROM users");
+    let limit = pagination.limit.unwrap_or(DEFAULT_LIMIT); 
+    let offset = pagination.offset.unwrap_or(DEFAULT_OFFSET);
+
+    let query = sqlx::query_as::<_, User>("
+        SELECT id, username, email, password, title, created_at, is_admin FROM users
+        ORDER BY created_at DESC
+        LIMIT $1
+        OFFSET $2;
+    ")
+    .bind(limit)
+    .bind(offset);
 
     let users = query.fetch_all(&pool).await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // Return 500 if SQL request failed
@@ -43,26 +54,24 @@ pub async fn get_by_id(Path(id): Path<i32>, Extension(auth_user): Extension<Auth
 }
 
 /*
- * List a specific user data from database
+ * Create an new user in the database and returns it
  * @auth {None} - no authorization needed
  * @param {FormUser} - form input data
  */
-pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> StatusCode {
+pub async fn create_user(State(pool): State<PgPool>, Form(payload): Form<FormUser>) -> Result<Json<User>, StatusCode> {
 
-    let query = sqlx::query("INSERT INTO users (username, email, password, title, is_admin) VALUES ($1, $2, $3, $4, $5);")
+    let query = sqlx::query_as::<_, User>("INSERT INTO users (username, email, password, title, is_admin) VALUES ($1, $2, $3, $4, $5);")
         .bind(&payload.username)
         .bind(&payload.email)
         .bind(&payload.password)
         .bind(&payload.title)
         .bind(&payload.is_admin);
 
-    let result = query.execute(&pool).await;
+    let user = query.fetch_one(&pool).await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // Return 500 if SQL request failed
 
-    match result {
-
-        Ok(_) => StatusCode::CREATED, // Return 201 if user created successfully
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR // Return 500 if SQL request failed
-    }
+    // Return the created user
+    Ok(Json(user))
 }
 
 /*
