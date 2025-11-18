@@ -55,6 +55,8 @@ async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::
 #[tokio::main]
 async fn main() {
 
+    println!("Starting FEUR API...");
+
     // Ensure env variable are accessible
     dotenv().ok();
 

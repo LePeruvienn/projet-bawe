@@ -19,8 +19,7 @@ pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<
     let limit = pagination.limit.unwrap_or(DEFAULT_LIMIT); 
     let offset = pagination.offset.unwrap_or(DEFAULT_OFFSET);
 
-    print!("post_handlers : list_all ...");
-
+    // Create query
     let query = sqlx::query_as::<_, PostWithUserData>("
         SELECT 
             p.id,

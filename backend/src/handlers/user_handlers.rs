@@ -211,8 +211,6 @@ pub async fn update_user(Path(id): Path<i32>, Extension(auth_user): Extension<Au
  */
 pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<User>, StatusCode> {
 
-    println!("Trying to get connected user ...");
-
     // If user is not connected we return 401
     if !auth_user.is_connected {
         return Err(StatusCode::UNAUTHORIZED);
@@ -220,8 +218,6 @@ pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool
 
     // Get connected user id
     let id = auth_user.user_id;
-
-    println!("User is connected with id: {id}");
 
     let query = sqlx::query_as::<_, User>("SELECT id, username, email, title, created_at, is_admin FROM users WHERE id = $1")
         .bind(id);

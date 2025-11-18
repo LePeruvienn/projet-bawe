@@ -12,8 +12,6 @@ use crate::auth::token_handler::create_jwt;
  */
 pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>) -> Result<Json<TokenResponse>, StatusCode> {
 
-    println!("Loggin in ...");
-
     let username = payload.username;
     let password = payload.password;
 
@@ -35,8 +33,6 @@ pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>
 
             // Check if hashed pasword is good
             if Argon2::default().verify_password(password.as_bytes(), &parsed_hash).is_ok() {
-
-                println!("Passwords matchs ! Creating Token with userd_id: {db_id}");
 
                 let token = create_jwt(db_id);
 
