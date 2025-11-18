@@ -43,7 +43,7 @@ function applyTheme() {
 
 		if (__ADAPTIVE_THEME_DATA__) {
 
-			parsedData = JSON.parse(adaptiveThemData);
+			parsedData = JSON.parse(__ADAPTIVE_THEME_DATA__);
 
 			if (parsedData.length !== undefined)
 				parsedData = JSON.parse(parsedData);
