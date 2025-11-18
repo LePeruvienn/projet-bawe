@@ -1,0 +1,91 @@
+:root {
+	--bg-color: #f0f2f5;
+	--primary-color: #007bff;
+	--secondary-color: #007bff;
+}
+
+.flutter-loader {
+	display: none !important;
+}
+
+html, body { 
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: var(--bg-color); 
+	transition: background-color 0.3s; /* Smooth transition */
+}
+
+flutter-view {
+	background-color: var(--bg-color) !important;
+}
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	font-family: sans-serif;
+	overflow: hidden; 
+}
+
+#loading-splash-screen {
+	text-align: center;
+	padding: 30px;
+	color: var(--secondary-color);
+	transition: all 0.3s;
+}
+
+/* FEUR Header */
+#loading-splash-screen h1 {
+	font-size: 3em;
+	font-weight: bold;
+	color: var(--primary-color); 
+	margin-bottom: 10px;
+	letter-spacing: 2px;
+}
+
+#loading-splash-screen p {
+	font-size: 1.1em;
+	color: var(--secondary-color);
+	margin-bottom: 25px;
+}
+
+.progress-bar-container {
+	width: 100%;
+	background-color: var(--secondary-color);
+	border-radius: 5px;
+	height: 8px;
+	overflow: hidden;
+	margin-bottom: 20px;
+}
+
+.progress-bar {
+	height: 100%;
+	width: 0%; 
+	background-color: var(--primary-color);
+	animation: progress-animation 1.5s infinite linear;
+	border-radius: 5px;
+}
+
+@keyframes progress-animation {
+	0% {
+	width: 0%;
+	left: -100%;
+	}
+	50% {
+	width: 100%;
+	left: 0%;
+	}
+	100% {
+	width: 0%;
+	left: 100%;
+	}
+}
+
+#loading-message {
+	font-family: monospace;
+	font-size: 0.85em;
+	color: var(--secondary-color);
+	margin-top: 20px;
+}

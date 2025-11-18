@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+
 import 'l10n/app_localizations.dart';
+import 'widgets/navigation.dart';
 import 'routes.dart';
 
 /*
@@ -137,6 +139,53 @@ class ErrorText extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/*
+ * Widget used to display errors messages !
+ */
+class LoadingPage extends StatelessWidget {
+
+  const LoadingPage ({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: FeurAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'FEUR.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'This is the best app',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            CircularProgressIndicator(),
+          ],
+        ),
       ),
     );
   }
