@@ -20,3 +20,6 @@ bundle/
 vendor/pkg/
 pyenv
 Vagrantfile
+*.aux
+*.log
+*.out
