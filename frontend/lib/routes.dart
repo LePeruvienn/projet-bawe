@@ -8,11 +8,13 @@ import 'widgets/login.dart';
 import 'widgets/signin.dart';
 import 'widgets/navigation.dart';
 import 'auth/authProvider.dart';
+import 'utils.dart';
 
 /************************
 * GLOBAL ROUTES CONSTANTS
 *************************/
 
+const ROOT_PATH    = '/';
 const HOME_PATH    = '/home';
 const LOGIN_PATH   = '/login';
 const SIGNIN_PATH  = '/signin';
@@ -46,18 +48,30 @@ final GoRouter router = GoRouter(
       routes: appRoutes
     ),
   ],
+  // If path is not found we fallback to this page
+  errorBuilder: (BuildContext context, GoRouterState state) {
+    return Scaffold(
+      appBar: FeurAppBar(),
+      body: Center(child: ErrorText(
+        header: 'Are lost bro?',
+        message: 'Path not found: ${state.uri.path}',
+        haveButton: true
+      ))
+    );
+  },
   redirect: (BuildContext context, GoRouterState state) {
 
     // Get the current location the user is trying to go
     final String location = state.matchedLocation;
 
     // Protected routes
+    final bool isGoingToRoot = location == ROOT_PATH;
     final bool isGoingToAuthPage = location == LOGIN_PATH || location == SIGNIN_PATH;
     final bool isGoingToAccountPage = location == ACCOUNT_PATH;
     final bool isGoingToAdminPage = location == ADMIN_PATH;
 
     // If user logged in and tries to login / signin 
-    if (authProvider.isLoggedIn && isGoingToAuthPage)
+    if (isGoingToRoot || (authProvider.isLoggedIn && isGoingToAuthPage))
       return HOME_PATH;
 
     // If user is not logged in and tries to go to admin or account page

@@ -481,6 +481,9 @@ class _PostsPageState extends State<PostsPage> {
   @override
   Widget build(BuildContext context) {
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     // Check for responsive
     final _isDesktop = MediaQuery.of(context).size.width >= 800;
 
@@ -497,16 +500,21 @@ class _PostsPageState extends State<PostsPage> {
 
             // Handling errors and loading
             if (snapshot.connectionState == ConnectionState.waiting && _posts.isEmpty && !_showDesktopForm)
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
             if (!_isLoading && snapshot.hasError && _posts.isEmpty)
-                return Center(child: Text('Error: ${snapshot.error}'));
+                return Center(child: ErrorText(message: 'Error: ${snapshot.error}'));
 
             // If there is no more post to shown
             if (!_isLoading && _posts.isEmpty && !_hasMore) {
 
               // If we have nothing to show, we can just return a loading, otherwise we add this item at the end of the list
               if (!_showDesktopForm)
-                return const Center(child: Text('No posts available.'));
+                return Center(child: ErrorText(
+                  header: 'Nothing there ...',
+                  message: 'Be the first one to create a post !',
+                  color: colorScheme.primary
+                ));
+
               else
                 _totalItems++;
             }
@@ -540,14 +548,13 @@ class _PostsPageState extends State<PostsPage> {
                       const SizedBox.shrink(); 
 
                   // If we are NOT loading add and have no post to shown
-                  } else if (_posts.isEmpty && !_hasMore){
+                  } else if (_posts.isEmpty && !_hasMore) {
 
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('No posts available.')
-                        )
-                      );
+                    return Center(child: ErrorText(
+                      header: 'Nothing there ...',
+                      message: 'Be the first one to create a post !',
+                      color: colorScheme.primary
+                    ));
                   }
                 }
 

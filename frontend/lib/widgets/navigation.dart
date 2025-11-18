@@ -123,6 +123,27 @@ String getDestinationLabel(BuildContext context, DestinationData destination) {
 }
 
 /******************
+* NAVIGATION MODELS
+*******************/
+
+/*
+ * Used to store destination data
+ */
+class DestinationData {
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String path;
+
+  const DestinationData({
+    required this.icon,
+    required this.selectedIcon,
+    required this.path
+  });
+}
+
+
+/******************
 * NAVIGATION LAYOUT
 *******************/
 

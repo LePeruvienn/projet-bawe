@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
+import 'routes.dart';
 
 /*
  * Function used to display message on a SnackBar easly
@@ -65,21 +67,74 @@ String formatTimeAgo(DateTime date) {
 }
 
 /*
- * Used to store destination data
+ * Widget used to display errors messages !
  */
-class DestinationData {
+class ErrorText extends StatelessWidget {
 
-  final IconData icon;
-  final IconData selectedIcon;
-  final String path;
+  final String header;
+  final String message;
+  final Color color;
+  final bool haveButton;
 
-  const DestinationData({
-    required this.icon,
-    required this.selectedIcon,
-    required this.path
+  ErrorText ({
+    super.key,
+    this.header = 'Oops!',
+    this.message = 'The page you requested could not be found.',
+    this.color = Colors.redAccent,
+    this.haveButton = false
   });
-}
 
+  @override
+  Widget build(BuildContext context) {
+
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            header,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade700,
+              height: 1.5,
+            ),
+          ),
+          // Only if button is active
+          if (haveButton)
+            const SizedBox(height: 32),
+          if (haveButton)
+            ElevatedButton.icon(
+              onPressed: () => context.go(HOME_PATH),
+              icon: const Icon(Icons.home),
+              label: const Text('Home'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
 
 /*
  * Make the use of locationsation text easier !
