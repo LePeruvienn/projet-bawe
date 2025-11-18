@@ -23,107 +23,110 @@ Le projet se compose de :
 
 ---
 
-# 🚀 **Lancer le projet**
+# 🚀 Guide d'Installation et de Lancement
 
-## 1. Prérequis
+Ce projet full-stack est composé d'un **backend** développé en **Rust** et d'un **frontend** développé en **Flutter** (pour le Web).
 
-Assurez-vous d’avoir installé :
+## 📋 Prérequis
 
-### 🦀 Rust
+Assurez-vous que les outils et services suivants sont installés sur votre système :
 
-```
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
+  * **Rust et Cargo**
+  * **Flutter SDK** (configuré pour le développement Web, ex: `flutter doctor -v` doit être propre)
+  * **PostgreSQL Server** (version 10 ou supérieure recommandée)
+  * **Client PostgreSQL** (`psql`)
 
-### 🐘 PostgreSQL
+## 1\. 🐘 Configuration de la Base de Données PostgreSQL
 
-```
-sudo pacman -S postgresql
-```
+Le backend nécessite une instance PostgreSQL démarrée et configurée.
 
-### 🎨 Flutter Web
+### A. Démarrage du Service
 
-```
-sudo pacman -S flutter
-flutter config --enable-web
-```
+Assurez-vous que le service PostgreSQL est lancé. Sur la plupart des distributions Linux utilisant Systemd :
 
----
-
-## 2. Création de la base de données
-
-Démarrer PostgreSQL :
-
-```
+```bash
 sudo systemctl start postgresql
+sudo systemctl enable postgresql # Pour un démarrage automatique
 ```
 
-Initialiser la base (si première installation) :
+### B. Création de l'Utilisateur et de la Base de Données
 
-```
-sudo -iu postgres initdb -D /var/lib/postgres/data
-sudo systemctl restart postgresql
-```
+Les configurations par défaut sont :
 
-Créer l’utilisateur et la base :
+  * **Utilisateur:** `appdb`
+  * **Mot de passe:** `appdb`
+  * **Base de Données:** `appdb`
 
-```
-sudo -iu postgres psql
-CREATE USER feur WITH PASSWORD 'feur';
-CREATE DATABASE feur OWNER feur;
-\q
-```
+Exécutez les commandes suivantes en tant qu'utilisateur `postgres` (généralement via `sudo`) pour créer les ressources nécessaires :
 
-Importer la structure :
+1.  **Créer l'utilisateur:**
+    ```bash
+    sudo -u postgres psql -c "CREATE USER appdb WITH PASSWORD 'appdb';"
+    ```
+2.  **Créer la base de données et l'attribuer à l'utilisateur:**
+    ```bash
+    sudo -u postgres psql -c "CREATE DATABASE appdb OWNER appdb;"
+    ```
+3.  **Attribuer les droits nécessaires** (pour s'assurer que l'utilisateur `appdb` peut gérer le schéma `public`) :
+    ```bash
+    sudo -u postgres psql -d appdb -c "GRANT ALL PRIVILEGES ON SCHEMA public TO appdb;"
+    ```
 
-```
-TODO: CHANGE
-psql -U feur -d feur -f database.sql
-```
+### C. Importation de la Structure
 
----
+Importez le schéma de la base de données à partir des fichiers SQL.
 
-## 3. Lancer le backend (Rust)
-
-```
-cd backend/
-cargo run
-```
-
-Le serveur démarre sur :
-➡️ [http://localhost:3000](http://localhost:3000)
-
----
-
-## 4. Lancer le frontend (Flutter Web)
-
-```
-cd frontend/
-flutter pub get
-flutter run -d chrome
+```bash
+cd database/
+for sqlfile in *.sql; do
+    echo "➡️ Import de $sqlfile ..."
+    # Le mot de passe sera demandé ou doit être configuré via la variable PGPASSWORD
+    psql -U appdb -d appdb -h localhost -f "$sqlfile"
+done
+cd ..
 ```
 
-Le site s’ouvre automatiquement dans votre navigateur.
+-----
 
----
+## 2\. ⚙️ Lancement du Backend (Rust)
 
-# 📘 **Résumé rapide**
+Le backend écoute sur `localhost` et se connecte à la base de données `appdb`.
 
-| Composant            | Commande (sans Docker)  | Port           |
-| -------------------- | ----------------------- | -------------- |
-| Backend Rust         | `cargo run`             | 3000           |
-| Frontend Flutter Web | `flutter run -d chrome` | 8080 (ou auto) |
-| PostgreSQL           | `psql -U feur -d feur`  | 5432           |
+1.  **Naviguez vers le répertoire du backend :**
+    ```bash
+    cd backend
+    ```
+2.  **Lancez l'application en mode release** (pour de meilleures performances) :
+    ```bash
+    cargo run --release
+    ```
+    Le serveur devrait démarrer et afficher l'adresse où il écoute (ex: `http://127.0.0.1:8080`).
 
----
+-----
 
-# 🧪 **Tests rapides**
+## 3\. 🌐 Lancement du Frontend (Flutter Web)
 
-* Liker un post
-* Changer de langue
-* Changer le thème
-* Créer et supprimer un compte
-* Vérifier la persistance des données dans PostgreSQL
+Le frontend se connecte au backend pour afficher l'interface utilisateur.
+
+1.  **Naviguez vers le répertoire du frontend :**
+    ```bash
+    cd frontend
+    ```
+2.  **Nettoyez et lancez le projet en mode release sur Chrome :**
+    ```bash
+    flutter clean
+    flutter run -d chrome --release
+    ```
+    Flutter lancera un navigateur Chrome pointant vers l'application Web. Le frontend interagit avec le backend Rust.
+
+-----
+
+## 🛑 Arrêt du Projet
+
+Pour arrêter l'application, vous devez arrêter les deux processus manuellement :
+
+1.  **Backend Rust :** Revenez au terminal où `cargo run` est actif et appuyez sur **`Ctrl+C`**.
+2.  **Frontend Flutter :** Revenez au terminal où `flutter run` est actif et appuyez sur **`q`** ou **`Ctrl+C`**.
 
 ---
 
