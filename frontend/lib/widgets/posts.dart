@@ -366,6 +366,7 @@ class _PostsPageState extends State<PostsPage> {
 
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _hasError = false;
 
   List<Post> _posts = [];
 
@@ -407,6 +408,7 @@ class _PostsPageState extends State<PostsPage> {
     // Update State to loading
     setState(() {
       _isLoading = true;
+      _hasError = false;
     });
 
     if (initial) {
@@ -422,10 +424,6 @@ class _PostsPageState extends State<PostsPage> {
       // Do the API call
       final newPosts = await fetchPosts(limit: _limit, offset: _offset);
 
-      // Use `mounted` to ensure that we still on this page !!!
-      if (!mounted)
-        return;
-
       setState(() {
         // Add new posts to posts list
         _posts.addAll(newPosts);
@@ -440,22 +438,23 @@ class _PostsPageState extends State<PostsPage> {
     // IF WE CATCH A ERROR WHILE LOADING POSTS :
     } catch (e) {
 
-      // Use `mounted` to ensure that we still on this page !!!
-      if (mounted)
-        return;
-
       // Update loading state to false
       setState(() {
         _isLoading = false;
+        _hasError = true;
       });
 
-      // Show error to snackbar
-      showSnackbar(
-        context: context, 
-        dismissText: 'context.loc.postsLoadFailed',
-        backgroundColor: Colors.red,
-        icon: const Icon(Icons.close, color: Colors.white),
-      );
+      // Show error to snackbar if it's not the inital fetch
+      if (!initial)
+        showSnackbar(
+          context: context, 
+          dismissText: 'context.loc.postsLoadFailed',
+          backgroundColor: Colors.red,
+          icon: const Icon(Icons.close, color: Colors.white),
+        );
+
+      // Throw error
+      throw(e);
     }
   }
 
@@ -501,8 +500,9 @@ class _PostsPageState extends State<PostsPage> {
             // Handling errors and loading
             if (snapshot.connectionState == ConnectionState.waiting && _posts.isEmpty && !_showDesktopForm)
                 return Center(child: CircularProgressIndicator());
-            if (!_isLoading && snapshot.hasError && _posts.isEmpty)
-                return Center(child: ErrorText(message: 'Error: ${snapshot.error}'));
+
+            if (!_isLoading && (_hasError || snapshot.hasError) && _posts.isEmpty)
+                return Center(child: ErrorText(header: "Failed to load posts", message: 'Error: ${snapshot.error}'));
 
             // If there is no more post to shown
             if (!_isLoading && _posts.isEmpty && !_hasMore) {

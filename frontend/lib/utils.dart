@@ -13,8 +13,14 @@ void showSnackbar({
   required Color backgroundColor,
   required Icon icon
 }) {
+
+  final messenger = ScaffoldMessenger.of(context);
   
-  ScaffoldMessenger.of(context).showSnackBar(
+  // Clear old message if exist
+  messenger.clearSnackBars(); 
+
+  // Show new message 
+  messenger.showSnackBar(
     SnackBar(
       content: Row(
         children: [

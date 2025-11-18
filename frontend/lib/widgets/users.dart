@@ -266,11 +266,11 @@ class _UserListState extends State<UserList> {
 
         // Error Widget
         if (snapshot.hasError && _users.isEmpty)
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: ErrorText(header: 'Failed to load users', message: 'Error: ${snapshot.error}'));
 
         // No posts Widget
         if (_users.isEmpty && !_isLoading && !_hasMore)
-          return const Center(child: Text('No users available.'));
+          return Center(child: ErrorText(header: 'Failed to load users', message: 'No users available.'));
 
         return ListView.builder(
           controller: _scrollController,
