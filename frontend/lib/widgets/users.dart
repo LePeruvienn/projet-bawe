@@ -245,7 +245,7 @@ class _UserListState extends State<UserList> {
         });
         showSnackbar(
           context: context, 
-          dismissText: 'Error loading users',
+          dismissText: context.loc.errorLoadingUsers,
           backgroundColor: Colors.red,
           icon: const Icon(Icons.close, color: Colors.white),
         );
@@ -266,11 +266,11 @@ class _UserListState extends State<UserList> {
 
         // Error Widget
         if (snapshot.hasError && _users.isEmpty)
-          return Center(child: ErrorText(header: 'Failed to load users', message: 'Error: ${snapshot.error}'));
+          return Center(child: ErrorText(header: context.loc.failedToLoadUsers, message: context.loc.error(snapshot.error.toString())));
 
         // No posts Widget
         if (_users.isEmpty && !_isLoading && !_hasMore)
-          return Center(child: ErrorText(header: 'Failed to load users', message: 'No users available.'));
+          return Center(child: ErrorText(header: context.loc.failedToLoadUsers, message: context.loc.noUsersAvaible));
 
         return ListView.builder(
           controller: _scrollController,
@@ -387,17 +387,14 @@ class _UserListItemState extends State<UserListItem> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.info_outline),
-                  tooltip: 'View Details',
                   onPressed: () => handleInfoUser(context, widget.user),
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit User',
                   onPressed: _showEditForm,
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  tooltip: 'Delete User',
                   onPressed: _deleteUser,
                 ),
               ],
@@ -606,7 +603,7 @@ class _UserFormState extends State<UserForm> {
               const SizedBox(height: 20),
             if (AuthProvider().isAdmin)
               CheckboxListTile(
-                title: Text('Is Admin'),
+                title: Text(context.loc.isAdmin),
                 value: _isAdmin,
                 onChanged: (bool? newValue) {
                   setState(() {
@@ -672,7 +669,7 @@ class UserInfoSheet extends StatelessWidget {
                 value: user.createdAt.toLocal().toString().split('.')[0],
               ),
               if (user.isAdmin)
-                _InfoItem(icon: Icons.lock, label: 'Admin', value: user.title ?? 'Yes'),
+                _InfoItem(icon: Icons.lock, label: context.loc.admin, value: user.title ?? context.loc.yes),
             ],
           ),
         ],

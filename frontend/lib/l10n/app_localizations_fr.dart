@@ -178,4 +178,61 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get repeatPasswordRequired => 'Veuillez répéter votre mot de passe';
+
+  @override
+  String get justNow => 'à l\'instant';
+
+  @override
+  String get oops => 'Oups !';
+
+  @override
+  String get pageNotFound =>
+      'La page que vous avez demandée n\'a pas pu être trouvée.';
+
+  @override
+  String get areYouLost => 'Es-tu perdu, mon gars ?';
+
+  @override
+  String pathNotFound(Object error) {
+    return 'Chemin non trouvé : $error';
+  }
+
+  @override
+  String get errorLoadingUsers => 'Erreur lors du chargement des utilisateurs';
+
+  @override
+  String get failedToLoadUsers => 'Échec du chargement des utilisateurs';
+
+  @override
+  String get noUsersAvaible => 'Aucun utilisateur disponible.';
+
+  @override
+  String error(Object error) {
+    return 'Erreur : $error';
+  }
+
+  @override
+  String get isAdmin => 'Est administrateur';
+
+  @override
+  String get yes => 'Oui';
+
+  @override
+  String get no => 'Non';
+
+  @override
+  String get nothingToSeeThere => 'Rien à voir par ici...';
+
+  @override
+  String get beThe1stOneToCreatePost =>
+      'Sois le premier à créer une publication !';
+
+  @override
+  String get failedToLoadPosts => 'Échec du chargement des publications';
+
+  @override
+  String get noUserDataAvaible => 'Aucune donnée utilisateur disponible';
+
+  @override
+  String get areYouAGhost => 'Es-tu un fantôme ?';
 }

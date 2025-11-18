@@ -502,7 +502,7 @@ class _PostsPageState extends State<PostsPage> {
                 return Center(child: CircularProgressIndicator());
 
             if (!_isLoading && (_hasError || snapshot.hasError) && _posts.isEmpty)
-                return Center(child: ErrorText(header: "Failed to load posts", message: 'Error: ${snapshot.error}'));
+                return Center(child: ErrorText(header: context.loc.failedToLoadPosts, message: context.loc.error(snapshot.error.toString())));
 
             // If there is no more post to shown
             if (!_isLoading && _posts.isEmpty && !_hasMore) {
@@ -510,8 +510,8 @@ class _PostsPageState extends State<PostsPage> {
               // If we have nothing to show, we can just return a loading, otherwise we add this item at the end of the list
               if (!_showDesktopForm)
                 return Center(child: ErrorText(
-                  header: 'Nothing there ...',
-                  message: 'Be the first one to create a post !',
+                  header: context.loc.nothingToSeeThere,
+                  message: context.loc.beThe1stOneToCreatePost,
                   color: colorScheme.primary
                 ));
 
@@ -551,8 +551,8 @@ class _PostsPageState extends State<PostsPage> {
                   } else if (_posts.isEmpty && !_hasMore) {
 
                     return Center(child: ErrorText(
-                      header: 'Nothing there ...',
-                      message: 'Be the first one to create a post !',
+                      header: context.loc.nothingToSeeThere,
+                      message: context.loc.beThe1stOneToCreatePost,
                       color: colorScheme.primary
                     ));
                   }
@@ -748,7 +748,7 @@ class _PostListItemState extends State<PostListItem> {
                     Text('$likes', style: TextStyle(color: Colors.grey[700])),
                     const Spacer(),
                     Text(
-                      formatTimeAgo(post.createdAt),
+                      formatTimeAgo(context, post.createdAt),
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],

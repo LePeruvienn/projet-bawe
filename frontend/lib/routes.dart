@@ -53,8 +53,8 @@ final GoRouter router = GoRouter(
     return Scaffold(
       appBar: FeurAppBar(),
       body: Center(child: ErrorText(
-        header: 'Are lost bro?',
-        message: 'Path not found: ${state.uri.path}',
+        header: context.loc.areYouLost,
+        message: context.loc.pathNotFound(state.uri.path),
         haveButton: true
       ))
     );

@@ -56,6 +56,9 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Center(
       child: SizedBox(
         width: 800, 
@@ -74,11 +77,16 @@ class _AccountPageState extends State<AccountPage> {
 
                     // When error, show error message at center
                     else if (snapshot.hasError)
-                      return Center(child: Text('Error: ${snapshot.error}'));
+                      return Center(child: Text(context.loc.error(snapshot.error.toString())));
 
                     // If we have no data return no data error
                     else if (!snapshot.hasData)
-                      return const Center(child: Text('No user data available'));
+                      //TODO: ERROR WIDGET
+                      return Center(child: ErrorText(
+                        header: context.loc.areYouAGhost, 
+                        message: context.loc.noUserDataAvaible,
+                        color: colorScheme.primary
+                      ));
 
                     // Ge fetched user
                     final user = snapshot.data!;
@@ -152,7 +160,7 @@ class AccountDetails extends StatelessWidget {
               value: user.createdAt.toLocal().toString().split('.')[0],
             ),
             if (user.isAdmin)
-              _InfoItem(icon: Icons.lock, label: 'Admin', value: user.title ?? 'Yes'),
+              _InfoItem(icon: Icons.lock, label: context.loc.admin, value: user.title ?? context.loc.yes),
           ],
           onUserUpdate: onUserUpdate
         ),

@@ -176,4 +176,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get repeatPasswordRequired => 'Please repeat your password';
+
+  @override
+  String get justNow => 'just now';
+
+  @override
+  String get oops => 'Oops!';
+
+  @override
+  String get pageNotFound => 'The page you requested could not be found.';
+
+  @override
+  String get areYouLost => 'Are lost bro?';
+
+  @override
+  String pathNotFound(Object error) {
+    return 'Path not found: $error';
+  }
+
+  @override
+  String get errorLoadingUsers => 'Error loading users';
+
+  @override
+  String get failedToLoadUsers => 'Failed to load users';
+
+  @override
+  String get noUsersAvaible => 'No users available.';
+
+  @override
+  String error(Object error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get isAdmin => 'Is Admin';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get nothingToSeeThere => 'Nothing there ...';
+
+  @override
+  String get beThe1stOneToCreatePost => 'Be the first one to create a post !';
+
+  @override
+  String get failedToLoadPosts => 'Failed to load posts';
+
+  @override
+  String get noUserDataAvaible => 'No user data available';
+
+  @override
+  String get areYouAGhost => 'Are you a gosht ?';
 }

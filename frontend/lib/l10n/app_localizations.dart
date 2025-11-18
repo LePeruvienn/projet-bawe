@@ -433,6 +433,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please repeat your password'**
   String get repeatPasswordRequired;
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get justNow;
+
+  /// No description provided for @oops.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops!'**
+  String get oops;
+
+  /// No description provided for @pageNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The page you requested could not be found.'**
+  String get pageNotFound;
+
+  /// No description provided for @areYouLost.
+  ///
+  /// In en, this message translates to:
+  /// **'Are lost bro?'**
+  String get areYouLost;
+
+  /// No description provided for @pathNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Path not found: {error}'**
+  String pathNotFound(Object error);
+
+  /// No description provided for @errorLoadingUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading users'**
+  String get errorLoadingUsers;
+
+  /// No description provided for @failedToLoadUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load users'**
+  String get failedToLoadUsers;
+
+  /// No description provided for @noUsersAvaible.
+  ///
+  /// In en, this message translates to:
+  /// **'No users available.'**
+  String get noUsersAvaible;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String error(Object error);
+
+  /// No description provided for @isAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Is Admin'**
+  String get isAdmin;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @nothingToSeeThere.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing there ...'**
+  String get nothingToSeeThere;
+
+  /// No description provided for @beThe1stOneToCreatePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first one to create a post !'**
+  String get beThe1stOneToCreatePost;
+
+  /// No description provided for @failedToLoadPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load posts'**
+  String get failedToLoadPosts;
+
+  /// No description provided for @noUserDataAvaible.
+  ///
+  /// In en, this message translates to:
+  /// **'No user data available'**
+  String get noUserDataAvaible;
+
+  /// No description provided for @areYouAGhost.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you a gosht ?'**
+  String get areYouAGhost;
 }
 
 class _AppLocalizationsDelegate

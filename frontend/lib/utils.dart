@@ -52,7 +52,7 @@ void showSnackbar({
 /*
  * Function used to get a text from how many time the date was
  */
-String formatTimeAgo(DateTime date) {
+String formatTimeAgo(BuildContext context, DateTime date) {
 
   // Force compare dates as they are UTCs (even if we force it before i want to be sure)
   final nowUtc = DateTime.now().toUtc();
@@ -62,7 +62,7 @@ String formatTimeAgo(DateTime date) {
   final diff = nowUtc.difference(dateUtc);
 
   // Show message depending of time diff
-  if (diff.inSeconds < 60) return 'just now';
+  if (diff.inSeconds < 60) return context.loc.justNow;
   if (diff.inMinutes < 60) return '${diff.inMinutes}m';
   if (diff.inHours < 24) return '${diff.inHours}h';
   if (diff.inDays < 7) return '${diff.inDays}d';
@@ -79,15 +79,15 @@ String formatTimeAgo(DateTime date) {
  */
 class ErrorText extends StatelessWidget {
 
-  final String header;
-  final String message;
+  final String? header;
+  final String? message;
   final Color color;
   final bool haveButton;
 
   ErrorText ({
     super.key,
-    this.header = 'Oops!',
-    this.message = 'The page you requested could not be found.',
+    this.header,
+    this.message,
     this.color = Colors.redAccent,
     this.haveButton = false
   });
@@ -103,7 +103,7 @@ class ErrorText extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            header,
+            header ?? context.loc.oops,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 32,
@@ -113,7 +113,7 @@ class ErrorText extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            message,
+            message ?? context.loc.pageNotFound,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -128,7 +128,7 @@ class ErrorText extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () => context.go(HOME_PATH),
               icon: const Icon(Icons.home),
-              label: const Text('Home'),
+              label: Text(context.loc.home),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 backgroundColor: colorScheme.primary,
@@ -139,53 +139,6 @@ class ErrorText extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-/*
- * Widget used to display errors messages !
- */
-class LoadingPage extends StatelessWidget {
-
-  const LoadingPage ({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      appBar: FeurAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'FEUR.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'This is the best app',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey.shade700,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 20),
-            CircularProgressIndicator(),
-          ],
-        ),
       ),
     );
   }

@@ -68,5 +68,23 @@
   "usernameRequired": "Nom d'utilisateur requis",
   "emailRequired": "Email requis",
   "passwordRequired": "Veuillez entrer votre mot de passe",
-  "repeatPasswordRequired": "Veuillez répéter votre mot de passe"
+  "repeatPasswordRequired": "Veuillez répéter votre mot de passe",
+
+  "justNow": "à l'instant",
+  "oops": "Oups !",
+  "pageNotFound": "La page que vous avez demandée n'a pas pu être trouvée.",
+  "areYouLost": "Es-tu perdu, mon gars ?",
+  "pathNotFound": "Chemin non trouvé : {error}",
+  "errorLoadingUsers": "Erreur lors du chargement des utilisateurs",
+  "failedToLoadUsers": "Échec du chargement des utilisateurs",
+  "noUsersAvaible": "Aucun utilisateur disponible.",
+  "error": "Erreur : {error}",
+  "isAdmin": "Est administrateur",
+  "yes": "Oui",
+  "no": "Non",
+  "nothingToSeeThere": "Rien à voir par ici...",
+  "beThe1stOneToCreatePost": "Sois le premier à créer une publication !",
+  "failedToLoadPosts": "Échec du chargement des publications",
+  "noUserDataAvaible": "Aucune donnée utilisateur disponible",
+  "areYouAGhost": "Es-tu un fantôme ?"
 }

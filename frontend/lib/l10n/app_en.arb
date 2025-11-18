@@ -69,5 +69,28 @@
   "usernameRequired": "Username required",
   "emailRequired": "Email required",
   "passwordRequired": "Please enter your password",
-  "repeatPasswordRequired": "Please repeat your password"
+  "repeatPasswordRequired": "Please repeat your password",
+
+  "justNow": "just now",
+  "oops": "Oops!",
+  "pageNotFound": "The page you requested could not be found.",
+
+  "areYouLost": "Are lost bro?",
+  "pathNotFound": "Path not found: {error}",
+
+  "errorLoadingUsers": "Error loading users",
+  "failedToLoadUsers": "Failed to load users",
+  "noUsersAvaible": "No users available.",
+  "error": "Error: {error}",
+  "isAdmin": "Is Admin",
+  "yes": "Yes",
+  "no": "No",
+
+
+  "nothingToSeeThere": "Nothing there ...",
+  "beThe1stOneToCreatePost": "Be the first one to create a post !",
+  "failedToLoadPosts": "Failed to load posts",
+
+  "noUserDataAvaible": "No user data available",
+  "areYouAGhost": "Are you a gosht ?"
 }
