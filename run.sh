@@ -96,7 +96,7 @@ cd ..
 echo "🌐 Lancement du frontend Flutter Web..."
 cd frontend
 flutter clean
-flutter run -d chrome --release &
+flutter run -d chrome --release --web-port 8000 --web-hostname 0.0.0.0 &
 FRONTEND_PID=$!
 cd ..
 

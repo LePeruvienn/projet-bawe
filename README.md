@@ -21,6 +21,14 @@ Le projet se compose de :
 └── README.md
 ```
 
+**Ports des différents services** :
+
+- `5432` : Base de données (PostgreSQL)
+- `8080` : API Web (Rust)
+- `8000` : Client Web (Flutter)
+
+Pour acceder au site internet : [](http://0.0.0.0:8000/)
+
 ---
 
 # 🚀 Guide d'Installation et de Lancement
@@ -188,7 +196,7 @@ cd frontend
 
 ```bash
 flutter clean
-flutter run -d chrome --release
+flutter run -d chrome --release --web-port 8000 --web-hostname 0.0.0.0
 ```
 
 Flutter lancera un navigateur Chrome pointant vers l'application Web. Le frontend interagit avec le backend Rust.
