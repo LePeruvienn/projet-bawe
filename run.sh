@@ -16,7 +16,7 @@ PG_DATA_DIR="/var/lib/postgres/data"
 # Vérification des commandes
 # ----------------------------
 for cmd in cargo flutter psql systemctl initdb; do
-    command -v $cmd >/dev/null 2>&1 || { echo "❌ $cmd n'est pas installé"; exit 1; }
+	command -v $cmd >/dev/null 2>&1 || { echo "❌ $cmd n'est pas installé"; exit 1; }
 done
 
 echo "---------------------------------------------"
@@ -28,19 +28,19 @@ echo "---------------------------------------------"
 # ----------------------------
 
 if ! sudo test -d "$PG_DATA_DIR"; then
-	cho "📂 Initialisation de PostgreSQL..."
-    sudo -iu postgres initdb --locale=C.UTF-8 --encoding=UTF8 -D "$PG_DATA_DIR"
+	echo "📂 Initialisation de PostgreSQL..."
+	sudo -iu postgres initdb --locale=C.UTF-8 --encoding=UTF8 -D "$PG_DATA_DIR"
 else
-    echo "✅ PostgreSQL déjà initialisé."
+	echo "✅ PostgreSQL déjà initialisé."
 fi
 
 # ----------------------------
 # Démarrage du service PostgreSQL
 # ----------------------------
 if ! systemctl is-active --quiet postgresql; then
-    echo "🐘 Démarrage du service PostgreSQL..."
-    sudo systemctl start postgresql
-    sleep 3
+	echo "🐘 Démarrage du service PostgreSQL..."
+	sudo systemctl start postgresql
+	sleep 3
 fi
 
 # ----------------------------
@@ -48,10 +48,10 @@ fi
 # ----------------------------
 USER_EXISTS=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'")
 if [ "$USER_EXISTS" != "1" ]; then
-    echo "➕ Création de l'utilisateur PostgreSQL '$DB_USER'..."
-    sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
+	echo "➕ Création de l'utilisateur PostgreSQL '$DB_USER'..."
+	sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
 else
-    echo "✅ Utilisateur '$DB_USER' existe déjà."
+	echo "✅ Utilisateur '$DB_USER' existe déjà."
 fi
 
 # ----------------------------
@@ -59,10 +59,10 @@ fi
 # ----------------------------
 DB_EXISTS=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'")
 if [ "$DB_EXISTS" != "1" ]; then
-    echo "➕ Création de la base de données '$DB_NAME'..."
-    sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
+	echo "➕ Création de la base de données '$DB_NAME'..."
+	sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
 else
-    echo "✅ Base '$DB_NAME' existe déjà."
+	echo "✅ Base '$DB_NAME' existe déjà."
 fi
 
 # Donner tous les droits à appdb sur le schéma public
@@ -76,10 +76,11 @@ sudo -u postgres psql -d $DB_NAME -c "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN S
 # Import de la structure
 # ----------------------------
 echo "📂 Import de la structure de la base..."
-for sqlfile in database/*.sql; do
-    echo "➡️ Import de $sqlfile ..."
-    sudo -u postgres psql -U $DB_USER -d $DB_NAME -f "$sqlfile"
+for sqlfile in database/*.sql ; do
+	echo "➡️ Import de $sqlfile ..."
+	psql -U $DB_USER -d $DB_NAME -h $DB_HOST -p $DB_PORT -f "$sqlfile"
 done
+
 # ----------------------------
 # Lancement backend Rust
 # ----------------------------
@@ -103,9 +104,9 @@ cd ..
 # Gestion Ctrl+C pour arrêter proprement
 # ----------------------------
 function cleanup {
-    echo "🛑 Arrêt des serveurs..."
-    kill $BACKEND_PID $FRONTEND_PID || true
-    exit 0
+	echo "🛑 Arrêt des serveurs..."
+	kill $BACKEND_PID $FRONTEND_PID || true
+	exit 0
 }
 trap cleanup SIGINT
 
