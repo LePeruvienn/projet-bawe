@@ -156,6 +156,7 @@ class _UserListState extends State<UserList> {
 
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _hasError = false;
 
   List<User> _users = [];
   
@@ -215,6 +216,7 @@ class _UserListState extends State<UserList> {
 
     setState(() {
       _isLoading = true;
+      _hasError = false;
     });
 
     if (initial) {
@@ -242,14 +244,12 @@ class _UserListState extends State<UserList> {
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _hasError = true;
         });
-        showSnackbar(
-          context: context, 
-          dismissText: context.loc.errorLoadingUsers,
-          backgroundColor: Colors.red,
-          icon: const Icon(Icons.close, color: Colors.white),
-        );
       }
+
+      // Throw error
+      throw(e);
     }
   }
 
@@ -265,11 +265,11 @@ class _UserListState extends State<UserList> {
           return const Center(child: CircularProgressIndicator());
 
         // Error Widget
-        if (snapshot.hasError && _users.isEmpty)
+        if (!_isLoading && (_hasError || snapshot.hasError) && _users.isEmpty)
           return Center(child: ErrorText(header: context.loc.failedToLoadUsers, message: context.loc.error(snapshot.error.toString())));
 
         // No posts Widget
-        if (_users.isEmpty && !_isLoading && !_hasMore)
+        if (!_isLoading && _users.isEmpty && !_hasMore)
           return Center(child: ErrorText(header: context.loc.failedToLoadUsers, message: context.loc.noUsersAvaible));
 
         return ListView.builder(

@@ -77,11 +77,14 @@ class _AccountPageState extends State<AccountPage> {
 
                     // When error, show error message at center
                     else if (snapshot.hasError)
-                      return Center(child: Text(context.loc.error(snapshot.error.toString())));
+                      return Center(child: ErrorText(
+                        header: context.loc.areYouAGhost, 
+                        message: context.loc.error(snapshot.error.toString()),
+                        color: colorScheme.primary
+                      ));
 
                     // If we have no data return no data error
                     else if (!snapshot.hasData)
-                      //TODO: ERROR WIDGET
                       return Center(child: ErrorText(
                         header: context.loc.areYouAGhost, 
                         message: context.loc.noUserDataAvaible,
