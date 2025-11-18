@@ -29,11 +29,15 @@ class Post {
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
+    // Small trick to force date to be considered in UTC timezone
+    final createdAtString = json['created_at'] as String;
+    final utcDate = DateTime.parse('${createdAtString}Z');
+
     return Post(
       id: json['id'] as int,
       user: user,
       content: json['content'] as String,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: utcDate,
       likesCount: json['likes_count'] as int,
       authIsLiked: json['auth_is_liked'] as bool,
     );

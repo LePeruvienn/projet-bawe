@@ -53,7 +53,6 @@ vimgrep /Colors/ frontend/lib/widgets/**/*.dart
 ### Bugs Connus
 
 - Update le responsive après un like
-- Supprimer son propre compte
 - Changement de theme peut ne pas être pris en compte
-- Le Claims est pas bon en fait il faut mettre que l'id et l'username + admin on le me
+- Supprimer son propre compte
 - Le temps afficher à coté des posts est pas bon nom plus

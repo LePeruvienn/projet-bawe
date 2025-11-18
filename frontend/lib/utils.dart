@@ -39,30 +39,29 @@ void showSnackbar({
   );
 }
 
-/* TODO: FIX TIME ZONE ISSUE
- * 
+/*
  * Function used to get a text from how many time the date was
  */
 String formatTimeAgo(DateTime date) {
 
-  final now = DateTime.now();
-  final utcDate = date.toUtc();
-  final diff = now.difference(utcDate);
+  // Force compare dates as they are UTCs (even if we force it before i want to be sure)
+  final nowUtc = DateTime.now().toUtc();
+  final dateUtc = date.toUtc();
 
-  print("DATE >>>>");
-  print(date);
-  print(utcDate);
-  print("DIFF >>>>");
-  print(now);
-  print(diff);
-  print(">>>>");
+  // Compute diff
+  final diff = nowUtc.difference(dateUtc);
 
+  // Show message depending of time diff
   if (diff.inSeconds < 60) return 'just now';
   if (diff.inMinutes < 60) return '${diff.inMinutes}m';
   if (diff.inHours < 24) return '${diff.inHours}h';
   if (diff.inDays < 7) return '${diff.inDays}d';
 
-  return '${date.year}-${date.month}-${date.day}';
+  // ensure that we show value as local
+  final localDate = date.toLocal();
+
+  // Return date in string if diff is too big
+  return '${localDate.year}-${localDate.month}-${localDate.day}';
 }
 
 /*

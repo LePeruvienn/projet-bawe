@@ -1,3 +1,7 @@
+
+-- Force UTC timezone ! Important to not have weird time diff bugs
+SET TIME ZONE 'UTC';
+
 CREATE TABLE users (
 	id SERIAL PRIMARY KEY,
 	username VARCHAR (50) NOT NULL UNIQUE,
