@@ -1,95 +1,123 @@
-\documentclass[11pt, a4paper]{article}
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french, provide=*]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{hyperref}
 
-% --- PAQUETS ESSENTIELS ---
-\usepackage[utf8]{inputenc} % Encodage
-\usepackage[T1]{fontenc}    % Encodage de la police
-\usepackage[french]{babel}  % Support de la langue française
-\usepackage{hyperref}       % Liens cliquables
-\usepackage{graphicx}       % Pour insérer les images (captures d'écran)
-\usepackage{enumitem}       % Pour personnaliser les listes
-\usepackage{parskip}        % Pour sauter des lignes entre les paragraphes au lieu de les indenter
+\geometry{margin=1cm}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
 
-% --- GESTION DES MARGES (Ajustez si nécessaire pour tenir sur 2 pages) ---
-\usepackage[margin=2.5cm]{geometry} % Marge standard : 2.5cm
-
-% --- TITRE ET INFORMATIONS ---
-\title{\textbf{Rapport de Projet : FEUR (Bases du Web)}}
-\author{Votre Nom et Prénom \\ ENSIIE FISA FC 2025-2026}
-\date{Novembre 2025} % Mettez la date de rendu
+\title{\textbf{Rapport du Projet BAWE}}
+\author{Arthur PINEL - ENSIIE FISA}
+\date{}
 
 \begin{document}
+\pagestyle{empty}
 
 \maketitle
-\thispagestyle{empty} % Supprime le numéro de page sur la page de titre (si vous en faites une)
 
-% -------------------------------------------------------------------------
-% SECTION 2 : TECHNOLOGIES ET ARCHITECTURE (CONTENU ÉVALUÉ)
-% -------------------------------------------------------------------------
-\section*{1. Technologies Utilisées et Architecture}
+\section*{1. Introduction}
 
-\subsection*{1.1. Architecture Technique}
-Le projet FEUR, inspiré de Twitter, est implémenté avec une architecture client-serveur moderne :
+Dans le cadre du module \textit{Bases du Web}, j'ai développé un mini réseau social nommé \textbf{FEUR}. Le but était de créer un site complet comprenant une partie client, une partie serveur, une base de données, un système de traduction, un thème jour/nuit et des requêtes SQL variées.
+
+J'ai souhaité profiter de ce projet pour explorer et mettre en œuvre des technologies que je n'avais jamais utilisées auparavant, c'est alors ma première fois avec chacun d'entre eux.
+
+\section*{2. Technologies utilisées}
+
+\textbf{Backend :} Rust avec le framework Axum.
+Ce choix me permettait d'utiliser un langage moderne, sécurisé et performant, tout en explorant une technologie que je voulais apprendre.
+
+\textbf{Frontend :} Flutter Web.
+J'ai choisi Flutter pour bénéficier d'une interface moderne ainsi que de sa capacité à se compiler sur diverses plateformes. C'est aussi une technologie que je voulais explorer.
+
+\textbf{Base de données :} PostgreSQL avec trois tables :
 \begin{itemize}
-    \item \textbf{Client (Frontend)} : \textbf{Flutter} (Dart), choisi pour sa flexibilité multiplateforme (Web/Mobile).
-    \item \textbf{Serveur (Backend)} : \textbf{Rust Axum}, utilisé pour sa performance et sa gestion des traitements asynchrones.
-    \item \textbf{Base de Données} : \textbf{PostgreSQL}, une base de données relationnelle robuste.
+    \item \texttt{users} : contient les informations des utilisateurs.
+    \item \texttt{posts} : représente les messages publiées.
+    \item \texttt{user\_likes} : contient les likes éffectué par les utilisateurs.
 \end{itemize}
 
-\subsection*{1.2. Conformité aux Contraintes et Justification du Dépassement}
-Les contraintes du sujet ont été respectées sur la partie serveur (10 fichiers) et la base de données (3 tables).
+\section*{3. Fonctionnement général du site}
+
+Le site propose les pages et fonctionnalités suivantes :
+
 \begin{itemize}
-    \item \textbf{Base de données} : \textbf{3 tables} SQL (\texttt{users}, \texttt{posts}, \texttt{user\_likes}).
-    \item \textbf{Fichiers Client} : La limite de 15 fichiers non binaires est dépassée (environ 19 fichiers \texttt{.dart} et 2 fichiers \texttt{.arb}). Ce dépassement est justifié par le choix de la technologie \textbf{Flutter} qui requiert une organisation stricte en couches (\texttt{api}, \texttt{models}, \texttt{widgets}, \texttt{l10n}) et l'inclusion des fichiers de localisation (\texttt{l10n/\*.arb}) pour la fonctionnalité obligatoire de traduction.
+    \item \textbf{Accueil :} créer et consulter les publications.
+    \item \textbf{Connexion et inscription :} création de compte, login.
+    \item \textbf{Profil :} informations de l'utilisateur et suppression du compte.
+    \item \textbf{Back Office :} permet aux adminstrateur de gérer les comptes.
 \end{itemize}
 
-% -------------------------------------------------------------------------
-% SECTION 3 : PRÉSENTATION DU SITE ET MANUEL D'UTILISATION
-% -------------------------------------------------------------------------
-\section*{2. Présentation du Site et Manuel d'Utilisation}
+L'utilisateur peut :
 
-\subsection*{2.1. Fonctionnalités de FEUR}
-FEUR permet aux utilisateurs authentifiés de partager des pensées courtes. Le site propose deux profils utilisateurs :
 \begin{itemize}
-    \item \textbf{Standard} : Création de compte, publication, parcours du fil, et fonctionnalité de "like" (augmentant le \texttt{likes\_count} du post).
-    \item \textbf{Administrateur} : Capacités supplémentaires pour gérer les utilisateurs (modification/suppression d'attributs via la colonne \texttt{is\_admin}) et la suppression des publications non conformes.
+    \item s'inscrire, se connecter et se déconnecter,
+    \item consulter, créer et aimer des publications,
+    \item changer de langue (FR/EN) et de thème (clair/sombre),
+    \item consulter et modifier ses données.
 \end{itemize}
 
-\subsection*{2.2. Modèle de Données et Requêtes}
-La page du fil d'actualité affiche un contenu généré par la base de données. L'accès à la base de données utilise deux types de requêtes :
+Si l'utilisateur est administrateur, il peut en plus :
+
 \begin{itemize}
-    \item \textbf{Lecture (\texttt{SELECT})} : Récupération du fil d'actualité (jointure \texttt{posts} et \texttt{users}).
-    \item \textbf{Modification (\texttt{INSERT/DELETE})} : Une requête \texttt{INSERT} est utilisée dans la table \texttt{user\_likes} pour enregistrer un nouveau "like". Une requête \texttt{DELETE} est employée par les administrateurs pour retirer des publications ou des utilisateurs.
+    \item consulter, modifié et supprimer les utilisateurs,
+    \item supprimer des publications.
 \end{itemize}
 
+\section*{4. Détails techniques du code}
 
-% -------------------------------------------------------------------------
-% SECTION 4 : DÉTAILS TECHNIQUES ET CHOIX DE CONCEPTION
-% -------------------------------------------------------------------------
-\section*{3. Détails Techniques et Choix de Conception}
+\textbf{Authentification et sécurité :}\\
+Le backend utilise un système d'authentification basé sur des jetons \texttt{JWT}. Lors de la connexion, le serveur génère un jeton signé contenant l'identifiant de l'utilisateur.  
+Ce jeton est ensuite envoyé au client et stocké en toute sécurité dans le \texttt{localStorage}.  
+À chaque requête nécessitant une authentification, le frontend ajoute automatiquement un header \texttt{Authorization: Bearer <token>}.
 
-\subsection*{3.1. Implémentation du Mode Jour/Nuit et de la Traduction}
+Côté serveur, un middleware Axum intercepte les requêtes, vérifie la validité du JWT, extrait l'identifiant utilisateur et le transmet handler sous forme d'une structure \texttt{AuthUser}. Cela permet d'avoir des routes protégées.
+
+\textbf{Lazy Loading :}\\
+Pour optimiser les performances du frontend, un système de \textit{lazy loading} a été mis en place :  
+la page d'accueil ne charge qu'un nombre limité de posts et charge les suivants au fur et à mesure que l'utilisateur fait défiler la page.  
+Cela réduit les temps de chargement initiaux et rend l'application fluide même avec de nombreuses données.
+
+\section*{5. Bugs mineures}
+
 \begin{itemize}
-    \item \textbf{Mode Jour/Nuit} : Le changement est \textbf{dynamique} (sans rechargement de page), géré par le système de thèmes de Flutter, le thème sélectionné étant stocké dans un service (ex. : un Provider) et appliqué instantanément à l'intégralité de l'interface.
-    \item \textbf{Traduction} : La traduction Français/Anglais est gérée via les fichiers de localisation \texttt{app\_\*.arb} et le système d'internationalisation de Flutter, permettant le changement de langue par le bouton dédié.
+    \item Le like peut disparaître lors d'un changement de résolution (mobile $\rightarrow$ desktop).
+    \item Le thème jour/nuit peut parfois ne pas s’appliquer immédiatement.
+    \item Il est possible de supprimer son propre compte (fonctionnalité volontaire mais perfectible).
 \end{itemize}
 
-\subsection*{3.2. Choix Technique : Sécurité et Gestion des Rôles}
-Nous avons implémenté un \textbf{middleware d'authentification} en Rust Axum (\texttt{auth/middleware.rs}). Ce middleware est responsable de l'interception des requêtes vers les routes protégées. Il vérifie la validité du jeton \textbf{JWT} et, crucialement, l'attribut \texttt{is\_admin} pour garantir que seuls les administrateurs peuvent accéder aux \texttt{user\_handlers.rs} de modification et suppression des comptes/posts.
+\section*{\textbf{6. Justification des Contraintes Techniques}}
 
-\clearpage % Force le passage à la page suivante
+Conformément à la possibilité de justification fournie dans le rapport, le choix technologique impose un léger dépassement du nombre maximal de fichiers sources non-binaires :
 
-% -------------------------------------------------------------------------
-% SECTION HORS COMPTE DE PAGES (LES CAPTURES)
-% -------------------------------------------------------------------------
-\section*{Annexes : Captures d'écran (Illustrations du Site)}
+\begin{itemize}
+    \item \textbf{Backend (Rust) :} Nous comptons \textbf{12 fichiers} (au lieu de 10) dans le répertoire \textbf{\texttt{/src}}. Ce dépassement est dû à l'architecture de \textbf{Rust} qui exige l'utilisation de fichiers \textbf{\texttt{mod.rs}} pour la structuration des modules.
+    \item \textbf{Frontend (Flutter) :} Nous comptons \textbf{16 fichiers} (au lieu de 15) dans le répertoire \textbf{\texttt{/lib}}. Ce dépassement est lié à la génération automatique de fichiers sources par \textbf{Flutter} pour la gestion centralisée des traductions.
+\end{itemize}
 
-\subsection*{4.1. Page du Fil d'Actualité}
-% Les deux images ci-dessous ne compteront pas dans le décompte des 2 pages
-\subsubsection*{Mode Français / Jour}
-\includegraphics[width=\textwidth]{img/accueil_fr_jour.png}
-\subsubsection*{Mode Anglais / Nuit}
-\includegraphics[width=\textwidth]{img/accueil_en_nuit.png}
+Ce surplus est principalement lié à la gestion de l'\textbf{authentification} dans l'architecture des frameworks choisis.
 
-% Répétez pour toutes les pages et tous les modes requis.
+Enfin, des fichiers HTML, JavaScript et CSS sont présents dans le répertoire \textbf{\texttt{/web}}, ces derniers sont entièrement \textbf{optionnels} et ne servent qu'à créer une interface de chargement personnalisée, sans être nécessaires au fonctionnement de l'application.
+
+\section*{7. Conclusion}
+
+Ce projet m'a permis de développer une application web complète, \textbf{FEUR}, en utilisant une stack moderne : \textbf{Rust (Axum)}, \textbf{Flutter Web} et \textbf{PostgreSQL}.
+
+J'ai trouvé particulièrement intéressant et formateur de travailler avec \textbf{Rust} et \textbf{Flutter}, deux technologies aux philosophies complètement opposées (sécurité/bas niveau contre développement rapide/multiplateforme). Ce challenge a été très enrichissant et je suis content d'avoir atteint les objectifs fixés pour le projet.
+
+L'ensemble du code a été assurée via \textbf{Git}, vous pouvez consulter le dépot via le lien ci-dessous :
+
+\begin{center}
+\url{[https://github.com/LePeruvienn/projet-bawe]}
+\end{center}
+
+\vfill
+\begin{center}
+\textit{Merci d'avoir lu !}
+\end{center}
 
 \end{document}
