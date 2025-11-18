@@ -1,14 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import 'l10n/app_localizations.dart';
 
 import 'auth/tokenHandler.dart';
 import 'auth/authProvider.dart';
 import 'routes.dart';
+
+const LOCALE_STORAGE_KEY = 'feur_saved_local';
 
 const DEFAULT_TEXT_SCALE = 1.0;
 const TABLET_TEXT_SCALE = 1.1;
@@ -27,10 +30,14 @@ void main() async {
   // Get saved theme mode
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
 
+  // Get saved local code
+  final prefs = await SharedPreferences.getInstance();
+  final savedLocalCode = prefs.getString(LOCALE_STORAGE_KEY);
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => authProvider,
-      child: MyApp(savedThemeMode: savedThemeMode),
+      child: MyApp(savedThemeMode: savedThemeMode, savedLocalCode: savedLocalCode),
     ),
   );
 }
@@ -38,8 +45,9 @@ void main() async {
 class MyApp extends StatefulWidget {
 
   final AdaptiveThemeMode? savedThemeMode;
+  final String? savedLocalCode;
 
-  const MyApp({super.key, this.savedThemeMode});
+  const MyApp({super.key, this.savedThemeMode, this.savedLocalCode});
 
   static _MyAppState of(BuildContext context) {
 
@@ -55,10 +63,30 @@ class _MyAppState extends State<MyApp> {
 
   Locale _locale = const Locale('en');
 
-  void setLocale(Locale locale) {
+  @override
+  void initState() {
+
+    super.initState();
+
+    final localCode = widget.savedLocalCode;
+
+    if (localCode != null) {
+
+      setState(() {
+        _locale = Locale(localCode);
+      });
+    }
+
+  }
+
+  void setLocale(String localCode) async {
+
     setState(() {
-      _locale = locale;
+      _locale = Locale(localCode);
     });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(LOCALE_STORAGE_KEY, localCode);
   }
 
   @override

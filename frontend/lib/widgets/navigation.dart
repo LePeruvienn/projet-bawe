@@ -179,25 +179,25 @@ class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        // 🌍 Language button
-        PopupMenuButton<Locale>(
+        // Language button
+        PopupMenuButton<String>(
           icon: const Icon(Icons.language),
-          onSelected: (Locale locale) {
-            MyApp.of(context).setLocale(locale);
+          onSelected: (String localCode) {
+            MyApp.of(context).setLocale(localCode);
           },
           itemBuilder: (context) => const [
             PopupMenuItem(
-              value: Locale('en'),
+              value: 'en',
               child: Text('English'),
             ),
             PopupMenuItem(
-              value: Locale('fr'),
+              value: 'fr',
               child: Text('Français'),
             ),
           ],
         ),
 
-        // 🌙 Light/Dark theme button
+        // light/dark theme button
         IconButton(
           icon: Icon(
             AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
