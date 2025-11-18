@@ -491,15 +491,24 @@ class _PostsPageState extends State<PostsPage> {
           future: _initialLoadFuture, 
           builder: (context, snapshot) {
 
-            // ... (loading, error, no data states remain the same) ...
-            if (snapshot.connectionState == ConnectionState.waiting && _posts.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError && _posts.isEmpty) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            if (_posts.isEmpty && !_isLoading && !_hasMore) {
-              return const Center(child: Text('No posts available.'));
+            // vvv explained after
+            final bool _showDesktopForm = _isDesktop && authProvider.isLoggedIn;
+            int _totalItems = _posts.length + (_isLoading ? 1 : 0) + (_showDesktopForm ? 1 : 0);
+
+            // Handling errors and loading
+            if (snapshot.connectionState == ConnectionState.waiting && _posts.isEmpty && !_showDesktopForm)
+                return const Center(child: CircularProgressIndicator());
+            if (!_isLoading && snapshot.hasError && _posts.isEmpty)
+                return Center(child: Text('Error: ${snapshot.error}'));
+
+            // If there is no more post to shown
+            if (!_isLoading && _posts.isEmpty && !_hasMore) {
+
+              // If we have nothing to show, we can just return a loading, otherwise we add this item at the end of the list
+              if (!_showDesktopForm)
+                return const Center(child: Text('No posts available.'));
+              else
+                _totalItems++;
             }
 
             // Ok this is weird but let me expalin,
@@ -509,10 +518,9 @@ class _PostsPageState extends State<PostsPage> {
             //
             // We also need so to dynamicly change the post indexs depending if we have added the DesktopForm at the top
             //
-            // So we must to compute this dynamicly it's weid and can make some pretty bad bugs
-
-            final bool _showDesktopForm = _isDesktop && authProvider.isLoggedIn;
-            final int _totalItems = _posts.length + (_isLoading ? 1 : 0) + (_showDesktopForm ? 1 : 0);
+            // So we must to compute this dynamicly it's weid and can make some pretty bad bugs 
+            // - _showDesktopForm
+            // - _totalItems
 
             // Main List View
             return ListView.builder(
@@ -521,12 +529,26 @@ class _PostsPageState extends State<PostsPage> {
               itemCount: _totalItems, 
               itemBuilder: (context, index) {
 
-                // Last item is the loading indicator
-                if (_isLoading && index == _totalItems - 1) {
-                  return _hasMore ? const Center(child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
-                  )) : const SizedBox.shrink(); 
+                // Last item is the loading indicator or the message
+                if (index ==_totalItems - 1) {
+
+                  // If we are loading add loading circle
+                  if (_isLoading) {
+
+                    return _hasMore ?
+                      const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator())) : 
+                      const SizedBox.shrink(); 
+
+                  // If we are NOT loading add and have no post to shown
+                  } else if (_posts.isEmpty && !_hasMore){
+
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('No posts available.')
+                        )
+                      );
+                  }
                 }
 
                 // First item is the desktop post form

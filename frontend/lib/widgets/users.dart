@@ -322,8 +322,6 @@ class UserListItem extends StatefulWidget {
 */
 class _UserListItemState extends State<UserListItem> {
 
-  bool _isHovered = false;
-
   void _deleteUser() async {
 
     await handleDeleteUser(context, widget.user, widget.onUserRemoved); 
@@ -352,36 +350,59 @@ class _UserListItemState extends State<UserListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
-        color: _isHovered ? Colors.black.withOpacity(0.1) : Colors.transparent,
-        child: ListTile(
-          leading: CircleAvatar(
-            child: Text(widget.user.username[0]),
-          ),
-          title: Text(widget.user.username),
-          trailing: Opacity(
-            opacity: _isHovered ? 1.0 : 0,
-            child: Row(
+        // Bigger padding/size for the card
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Row(
+          children: [
+            // Bigger Avatar
+            CircleAvatar(
+              radius: 25,
+              child: Text(widget.user.username[0], style: const TextStyle(fontSize: 24)),
+            ),
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '@${widget.user.username}',
+                    style: const TextStyle(fontSize: 16)
+                  ),
+                ],
+              ),
+            ),
+
+            // Actions (Clear, visible icons for desktop)
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.info),
+                  icon: const Icon(Icons.info_outline),
+                  tooltip: 'View Details',
                   onPressed: () => handleInfoUser(context, widget.user),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit),
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Edit User',
                   onPressed: _showEditForm,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  tooltip: 'Delete User',
                   onPressed: _deleteUser,
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );

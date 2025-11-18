@@ -55,4 +55,3 @@ vimgrep /Colors/ frontend/lib/widgets/**/*.dart
 - Update le responsive après un like
 - Changement de theme peut ne pas être pris en compte
 - Supprimer son propre compte
-- Le temps afficher à coté des posts est pas bon nom plus
