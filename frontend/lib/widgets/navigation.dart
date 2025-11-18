@@ -182,8 +182,8 @@ class FeurAppBar extends StatelessWidget implements PreferredSizeWidget {
         // Language button
         PopupMenuButton<String>(
           icon: const Icon(Icons.language),
-          onSelected: (String localCode) {
-            MyApp.of(context).setLocale(localCode);
+          onSelected: (String localeCode) {
+            MyApp.of(context).setLocale(localeCode);
           },
           itemBuilder: (context) => const [
             PopupMenuItem(

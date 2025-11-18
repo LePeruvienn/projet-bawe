@@ -11,7 +11,7 @@ import 'auth/tokenHandler.dart';
 import 'auth/authProvider.dart';
 import 'routes.dart';
 
-const LOCALE_STORAGE_KEY = 'feur_saved_local';
+const LOCALE_STORAGE_KEY = 'feur_saved_locale';
 
 const DEFAULT_TEXT_SCALE = 1.0;
 const TABLET_TEXT_SCALE = 1.1;
@@ -68,25 +68,25 @@ class _MyAppState extends State<MyApp> {
 
     super.initState();
 
-    final localCode = widget.savedLocalCode;
+    final localeCode = widget.savedLocalCode;
 
-    if (localCode != null) {
+    if (localeCode != null) {
 
       setState(() {
-        _locale = Locale(localCode);
+        _locale = Locale(localeCode);
       });
     }
 
   }
 
-  void setLocale(String localCode) async {
+  void setLocale(String localeCode) async {
 
     setState(() {
-      _locale = Locale(localCode);
+      _locale = Locale(localeCode);
     });
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(LOCALE_STORAGE_KEY, localCode);
+    await prefs.setString(LOCALE_STORAGE_KEY, localeCode);
   }
 
   @override
