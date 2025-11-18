@@ -151,7 +151,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get areYouReady => 'Are you ready to create a new FEUR?';
 
   @override
-  String get madeWithLove => 'Made with';
+  String get madeWithLove => 'Made with <3';
 
   @override
   String get footer => 'Arthur Pinel 2025';

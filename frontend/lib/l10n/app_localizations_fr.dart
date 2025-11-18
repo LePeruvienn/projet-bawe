@@ -153,7 +153,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get areYouReady => 'Êtes-vous prêt à créer un nouveau FEUR ?';
 
   @override
-  String get madeWithLove => 'Fait avec';
+  String get madeWithLove => 'Fait avec <3';
 
   @override
   String get footer => 'Arthur Pinel 2025';

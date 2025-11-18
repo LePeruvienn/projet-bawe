@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @madeWithLove.
   ///
   /// In en, this message translates to:
-  /// **'Made with'**
+  /// **'Made with <3'**
   String get madeWithLove;
 
   /// No description provided for @footer.
