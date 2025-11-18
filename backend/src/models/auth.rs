@@ -4,16 +4,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone)]
 pub struct AuthUser {
     pub user_id: i32,
-    pub username: String,
-    pub is_admin: bool,
     pub is_connected: bool
 }
 
 // This is the claims structure used to store data in the JWT key
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
-    pub username: String,
-    pub is_admin: bool,
     pub sub: i32,   // user id
     pub exp: usize  // expiration timestamp
 }

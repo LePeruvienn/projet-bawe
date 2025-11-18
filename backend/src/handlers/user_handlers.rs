@@ -5,7 +5,7 @@ use sqlx::PgPool;
 
 use crate::models::user::{User, FormCreateUser, FormUpdateUser};
 use crate::models::auth::AuthUser;
-use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery};
+use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery, auth_handlers::get_is_admin};
 
 /*
  * List all users data from database
@@ -13,8 +13,10 @@ use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery};
  */
 pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Query(pagination): Query<PaginationQuery>) -> Result<Json<Vec<User>>, StatusCode> {
 
+    let is_admin = get_is_admin(&pool, &auth_user).await;
+
     // If user is not admin we return 401
-    if !auth_user.is_admin {
+    if !is_admin {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
@@ -43,8 +45,10 @@ pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<
  */
 pub async fn get_by_id(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> Result<Json<User>, StatusCode> {
 
+    let is_admin = get_is_admin(&pool, &auth_user).await;
+
     // If user is not admin we return 401
-    if !auth_user.is_admin {
+    if !is_admin {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
@@ -64,7 +68,7 @@ pub async fn get_by_id(Path(id): Path<i32>, Extension(auth_user): Extension<Auth
 pub async fn create_user( Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormCreateUser>) -> Result<Json<User>, StatusCode> {
 
     // If some is trying to create an admin user but is not admin return 401
-    if payload.is_admin && !auth_user.is_admin{
+    if payload.is_admin && !get_is_admin(&pool, &auth_user).await {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
@@ -108,8 +112,10 @@ pub async fn create_user( Extension(auth_user): Extension<AuthUser>, State(pool)
  */
 pub async fn delete_user(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
 
+    let is_admin = get_is_admin(&pool, &auth_user).await;
+
     // If user is not admin we return 401
-    if !auth_user.is_admin {
+    if !is_admin {
         return StatusCode::UNAUTHORIZED;
     }
 
@@ -133,7 +139,9 @@ pub async fn delete_user(Path(id): Path<i32>, Extension(auth_user): Extension<Au
  */
 pub async fn update_user(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormUpdateUser>) -> StatusCode {
 
-    let is_authorized = (auth_user.is_connected && auth_user.user_id == id) || auth_user.is_admin;
+    let is_admin = get_is_admin(&pool, &auth_user).await;
+
+    let is_authorized = (auth_user.is_connected && auth_user.user_id == id) || is_admin;
 
     // If user is not admin or is not connect on his account return 401
     if !is_authorized {
@@ -141,7 +149,7 @@ pub async fn update_user(Path(id): Path<i32>, Extension(auth_user): Extension<Au
     }
 
     // If some is trying to set an user to admin but is not an admin return 401
-    if payload.is_admin && !auth_user.is_admin{
+    if payload.is_admin && !is_admin {
         return StatusCode::UNAUTHORIZED;
     }
 
@@ -210,13 +218,13 @@ pub async fn get_connected(Extension(auth_user): Extension<AuthUser>, State(pool
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    // Get connected user username
-    let username = auth_user.username;
+    // Get connected user id
+    let id = auth_user.user_id;
 
-    println!("User is connected with {username}");
+    println!("User is connected with id: {id}");
 
-    let query = sqlx::query_as::<_, User>("SELECT id, username, email, title, created_at, is_admin FROM users WHERE username = $1")
-        .bind(username);
+    let query = sqlx::query_as::<_, User>("SELECT id, username, email, title, created_at, is_admin FROM users WHERE id = $1")
+        .bind(id);
 
     let user = query.fetch_one(&pool).await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?; // returns 500 if SQL error

@@ -2,7 +2,7 @@ use axum::{extract::{Path, State, Form, Extension, Query}, Json, http::StatusCod
 use sqlx::PgPool;
 use crate::models::post::{PostWithUserData, FormPost};
 use crate::models::auth::AuthUser;
-use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery};
+use crate::handlers::{DEFAULT_LIMIT, DEFAULT_OFFSET, PaginationQuery, auth_handlers::get_is_admin};
 
 
 /*
@@ -91,8 +91,10 @@ pub async fn get_by_id(Path(id): Path<i32>, State(pool): State<PgPool>) -> Resul
  */
 pub async fn delete_post(Path(id): Path<i32>, Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>) -> StatusCode {
 
+    let is_admin = get_is_admin(&pool, &auth_user).await;
+
     // If user is not admin return 401
-    if !auth_user.is_admin {
+    if !is_admin {
         return StatusCode::UNAUTHORIZED;
     }
 
@@ -113,11 +115,7 @@ pub async fn delete_post(Path(id): Path<i32>, Extension(auth_user): Extension<Au
  * @auth {Conneceted} - only for conneceted users
  * @param {FormPost} - form input data
  */
-pub async fn create_post(
-    Extension(auth_user): Extension<AuthUser>,
-    State(pool): State<PgPool>,
-    Form(payload): Form<FormPost>,
-) -> Result<Json<PostWithUserData>, StatusCode> {
+pub async fn create_post(Extension(auth_user): Extension<AuthUser>, State(pool): State<PgPool>, Form(payload): Form<FormPost>) -> Result<Json<PostWithUserData>, StatusCode> {
 
     // If the user is not connected, return 401
     if !auth_user.is_connected {

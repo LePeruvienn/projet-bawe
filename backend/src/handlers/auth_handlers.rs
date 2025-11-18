@@ -3,7 +3,7 @@ use axum::{Json, extract::State};
 use axum::http::StatusCode;
 use argon2::{Argon2, PasswordVerifier, password_hash::PasswordHash};
 
-use crate::models::auth::{LoginRequest, TokenResponse};
+use crate::models::auth::{AuthUser, LoginRequest, TokenResponse};
 use crate::auth::token_handler::create_jwt;
 
 /*
@@ -12,22 +12,22 @@ use crate::auth::token_handler::create_jwt;
  */
 pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>) -> Result<Json<TokenResponse>, StatusCode> {
 
-    println!("Loggin ...");
+    println!("Loggin in ...");
 
     let username = payload.username;
     let password = payload.password;
 
-    let query = sqlx::query("SELECT id, username, password, is_admin FROM users WHERE username = $1").bind(username);
+    let query = sqlx::query("SELECT id, password FROM users WHERE username = $1").bind(username);
 
-    match query.fetch_one(&pool).await {
+    let result = query.fetch_one(&pool).await;
+
+    match result {
 
         Ok(row) => {
 
             // Get DB datas
             let db_id: i32 = row.get("id");
-            let db_username: String = row.get("username");
             let db_password: String = row.get("password");
-            let db_is_admin: bool = row.get("is_admin");
 
             // Verify if the hash is correct
             let parsed_hash = PasswordHash::new(&db_password)
@@ -36,9 +36,9 @@ pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>
             // Check if hashed pasword is good
             if Argon2::default().verify_password(password.as_bytes(), &parsed_hash).is_ok() {
 
-                println!("Passwords matchs ! Creating Token with {db_username}");
+                println!("Passwords matchs ! Creating Token with userd_id: {db_id}");
 
-                let token = create_jwt(db_id, db_username, db_is_admin);
+                let token = create_jwt(db_id);
 
                 return Ok(Json(TokenResponse { token }));
             }
@@ -59,4 +59,42 @@ pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>
 
     // If we reach here, the password verification failed or user not found
     Err(StatusCode::UNAUTHORIZED)
+}
+
+/*
+ * This function is used to ensure that user is admin in the DB
+ * - This is not an hanlder, but an helper function
+ */
+pub async fn get_is_admin(pool: &PgPool, auth_user: &AuthUser) -> bool {
+
+    // If user is not connected we can simply return false
+    if !auth_user.is_connected {
+        return false;
+    }
+
+    // Get user connected id
+    let id = auth_user.user_id;
+
+    // Get is_admin row in datbase for this user
+    let query = sqlx::query("SELECT is_admin FROM users WHERE id = $1")
+        .bind(id);
+
+    // Execute query
+    let result = query.fetch_one(pool).await;
+
+    match result {
+
+        // If we successfully fetch_one, we can return the is_admin row
+        Ok(row) => {
+
+            let is_admin: bool = row.get("is_admin");
+            return is_admin;
+        }
+
+        // If there was an error in the fetch, print an error and return false
+        Err(e) => {
+            eprintln!("Error while check is_admin: {e}");
+            return false;
+        }
+    }
 }
