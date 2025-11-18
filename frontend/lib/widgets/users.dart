@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../auth/authProvider.dart';
 import '../models/user.dart';
+import '../api/users.dart';
 import '../utils.dart';
-import '../api/users.dart'; // ASSUMPTION: fetchUsers now supports limit and offset.
 
 /************************
 * GLOBALS USERS CONSTANTS
@@ -23,10 +24,10 @@ void updateWhere(List<User> users, User updatedUser) {
     users[index] = updatedUser;
 }
 
-Future<void> handleCreateUser(BuildContext context, String username, String email, String password, String? title, Function(User) onUserCreated) async {
+Future<void> handleCreateUser(BuildContext context, String username, String email, String password, String? title, bool isAdmin, Function(User) onUserCreated) async {
 
   // Try to create user
-  final User? newUser = await createUser(username, email, password, title);
+  final User? newUser = await createUser(username, email, password, title, isAdmin);
 
   final bool res = newUser != null;
   final loc = context.loc;
@@ -424,6 +425,7 @@ class _UserFormState extends State<UserForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+  bool _isAdmin = false;
 
   bool _isSubmitting = false;
   
@@ -440,6 +442,7 @@ class _UserFormState extends State<UserForm> {
 
       _usernameController.text = user!.username;
       _emailController.text = user!.email;
+      _isAdmin = user.isAdmin;
 
       if (user?.title != null)
         _titleController.text = user!.title!;
@@ -457,11 +460,12 @@ class _UserFormState extends State<UserForm> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final title = _titleController.text.trim();
+    final isAdmin = _isAdmin;
 
     // Create user
     if (widget.user == null) {
 
-      handleCreateUser (context, username, email, password, title, (User newUser) {
+      handleCreateUser (context, username, email, password, title, isAdmin, (User newUser) {
         widget.onUserCreated?.call(newUser);
       });
 
@@ -473,6 +477,7 @@ class _UserFormState extends State<UserForm> {
         username: username,
         email: email,
         title: title,
+        isAdmin: isAdmin,
         createdAt: widget.user!.createdAt,
       );
 
@@ -575,6 +580,21 @@ class _UserFormState extends State<UserForm> {
               validator: (value) =>
                   ((value == null || value.isEmpty) && widget.user == null) ? context.loc.passwordRequired : null,
             ),
+            // Only show this form is user is admin
+            if (AuthProvider().isAdmin)
+              const SizedBox(height: 20),
+            if (AuthProvider().isAdmin)
+              CheckboxListTile(
+                title: Text('Is Admin'),
+                value: _isAdmin,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    _isAdmin = newValue ?? false;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading, // Checkbox on the left
+                contentPadding: EdgeInsets.zero,
+              ),
             const SizedBox(height: 20),
             _isSubmitting
                 ? const CircularProgressIndicator()

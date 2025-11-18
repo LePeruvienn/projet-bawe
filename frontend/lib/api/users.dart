@@ -110,10 +110,6 @@ Future<User?> createUser(String username, String email, String password, String?
       }
   );
 
-  print(">>>>>VVVV");
-  print(response.statusCode);
-  print(response.body);
-
   // If we did receive an OK (200) response, we return created user
   if (response.statusCode == 200)
     return await User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
