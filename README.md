@@ -13,7 +13,10 @@ Le projet se compose de :
 
 # 📘 Le rapport : `rapport/rapport.pdf`.
 
-Le rapport se trouve dans Le rapport se trouve à cette endroit
+Le rapport se trouve dans le repertoire `rapport/rapport.pdf`, on y trouve aussi :
+
+- Le fichier `.text` qui as permit de le générer
+- Les ressources nessaire à la création du documents (images)
 
 ---
 
