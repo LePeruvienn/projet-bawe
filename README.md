@@ -11,6 +11,12 @@ Le projet se compose de :
 
 ---
 
+# 📘 Le rapport : `rapport/rapport.pdf`.
+
+Le rapport se trouve dans Le rapport se trouve à cette endroit
+
+---
+
 # 📦 **Structure du projet**
 
 ```
@@ -18,6 +24,7 @@ Le projet se compose de :
 ├── backend/        (Serveur Rust + Axum)
 ├── frontend/       (Flutter Web)
 ├── database/       (Création et insertion des tables)
+├── rapport/        (La ou se trouve le rapport.pdf)
 └── README.md
 ```
 
