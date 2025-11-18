@@ -7,7 +7,6 @@ pub struct User {
     pub id: i32,
     pub username: String,
     pub email: String,
-    pub password: String,
     pub title: Option<String>,
     pub created_at: Option<NaiveDateTime>,
     pub is_admin: bool
@@ -15,10 +14,19 @@ pub struct User {
 
 // JSON client must send to create an user
 #[derive(Deserialize)]
-pub struct FormUser {
+pub struct FormCreateUser {
     pub username: String,
     pub email: String,
     pub password: String,
+    pub title: Option<String>,
+    pub is_admin: bool
+}
+
+#[derive(Deserialize)]
+pub struct FormUpdateUser {
+    pub username: String,
+    pub email: String,
+    pub password: Option<String>,
     pub title: Option<String>,
     pub is_admin: bool
 }

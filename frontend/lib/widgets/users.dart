@@ -62,10 +62,10 @@ Future<void> handleDeleteUser(BuildContext context, User user, Function(User) on
     onUserRemoved(user);
 }
 
-Future<void> handleUpdateUser(BuildContext context, User user) async {
+Future<void> handleUpdateUser(BuildContext context, User user, String? password) async {
 
   // Try update user
-  bool res = await updateUser(user);
+  bool res = await updateUser(user, password);
 
   final loc = context.loc;
 
@@ -440,7 +440,6 @@ class _UserFormState extends State<UserForm> {
 
       _usernameController.text = user!.username;
       _emailController.text = user!.email;
-      _passwordController.text = user!.password;
 
       if (user?.title != null)
         _titleController.text = user!.title!;
@@ -473,12 +472,11 @@ class _UserFormState extends State<UserForm> {
         id: widget.user!.id,
         username: username,
         email: email,
-        password: password,
         title: title,
         createdAt: widget.user!.createdAt,
       );
 
-      await handleUpdateUser(context, user);
+      await handleUpdateUser(context, user, password);
 
       widget.onUserUpdated?.call(user);
     }
@@ -575,7 +573,7 @@ class _UserFormState extends State<UserForm> {
                 ),
               ),
               validator: (value) =>
-                  (value == null || value.isEmpty) ? context.loc.passwordRequired : null,
+                  ((value == null || value.isEmpty) && widget.user == null) ? context.loc.passwordRequired : null,
             ),
             const SizedBox(height: 20),
             _isSubmitting
@@ -626,13 +624,14 @@ class UserInfoSheet extends StatelessWidget {
               _InfoItem(icon: Icons.badge, label: context.loc.id, value: user.id.toString()),
               _InfoItem(icon: Icons.person, label: context.loc.username, value: user.username),
               _InfoItem(icon: Icons.email, label: context.loc.email, value: user.email),
-              _InfoItem(icon: Icons.lock, label: context.loc.password, value: user.password),
               _InfoItem(icon: Icons.title, label: context.loc.title, value: user.title ?? '—'),
               _InfoItem(
                 icon: Icons.calendar_today,
                 label: context.loc.createdAt,
                 value: user.createdAt.toLocal().toString().split('.')[0],
               ),
+              if (user.isAdmin)
+                _InfoItem(icon: Icons.lock, label: 'Admin', value: user.title ?? 'Yes'),
             ],
           ),
         ],

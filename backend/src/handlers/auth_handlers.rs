@@ -1,6 +1,7 @@
 use sqlx::{PgPool, Row};
 use axum::{Json, extract::State};
 use axum::http::StatusCode;
+use argon2::{Argon2, PasswordVerifier, password_hash::PasswordHash};
 
 use crate::models::auth::{LoginRequest, TokenResponse};
 use crate::auth::token_handler::create_jwt;
@@ -28,8 +29,12 @@ pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginRequest>
             let db_password: String = row.get("password");
             let db_is_admin: bool = row.get("is_admin");
 
-            // If password matches, create token and return it
-            if password == db_password {
+            // Verify if the hash is correct
+            let parsed_hash = PasswordHash::new(&db_password)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+            // Check if hashed pasword is good
+            if Argon2::default().verify_password(password.as_bytes(), &parsed_hash).is_ok() {
 
                 println!("Passwords matchs ! Creating Token with {db_username}");
 

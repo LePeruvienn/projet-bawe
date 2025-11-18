@@ -122,7 +122,7 @@ Future<User?> createUser(String username, String email, String password, String?
 }
 
 
-Future<bool> updateUser(User user) async {
+Future<bool> updateUser(User user, String? password) async {
 
   final id = user.id;
 
@@ -131,19 +131,25 @@ Future<bool> updateUser(User user) async {
 
   try {
 
+    final Map<String, String> body = {
+      'username': user.username,
+      'email': user.email,
+      'title': user.title ?? 'null',
+      'is_admin': user.isAdmin ? 'true' : 'false',
+    };
+
+    // Include password only if it's provided
+    if (password != null && password.isNotEmpty) {
+      body['password'] = password;
+    }
+
     final response = await http.put(
       Uri.parse('http://0.0.0.0:8080/users/update/$id'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: {
-        'username': user.username,
-        'email': user.email,
-        'password': user.password,
-        'title': user.title ?? 'null',
-        'is_admin': user.isAdmin ? 'true' : 'false'
-      }
+      body: body
     );
 
     // Check for 202 : OK

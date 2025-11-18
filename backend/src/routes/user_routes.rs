@@ -17,8 +17,8 @@ use crate::handlers::user_handlers::{
  */
 fn public_routes() -> Router<PgPool> {
 
+    // There is no public routes (but there was !)
     Router::new()
-        .route("/create", post(create_user))
 }
 
 /*
@@ -31,6 +31,7 @@ fn protected_routes() -> Router<PgPool> {
         .route("/", get(list))
         .route("/{id}", get(get_by_id))
         .route("/me", get(get_connected))
+        .route("/create", post(create_user))
         .route("/delete/{id}", delete(delete_user))
         .route("/update/{id}", put(update_user))
         .route_layer(middleware::from_fn(get_auth_user))

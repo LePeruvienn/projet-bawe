@@ -145,13 +145,14 @@ class AccountDetails extends StatelessWidget {
             _InfoItem(icon: Icons.badge, label: context.loc.id, value: user.id.toString()),
             _InfoItem(icon: Icons.person, label: context.loc.username, value: user.username),
             _InfoItem(icon: Icons.email, label: context.loc.email, value: user.email),
-            _InfoItem(icon: Icons.lock, label: context.loc.password, value: user.password),
             _InfoItem(icon: Icons.title, label: context.loc.title, value: user.title ?? '—'),
             _InfoItem(
               icon: Icons.calendar_today,
               label: context.loc.createdAt,
               value: user.createdAt.toLocal().toString().split('.')[0],
             ),
+            if (user.isAdmin)
+              _InfoItem(icon: Icons.lock, label: 'Admin', value: user.title ?? 'Yes'),
           ],
           onUserUpdate: onUserUpdate
         ),

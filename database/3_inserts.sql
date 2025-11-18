@@ -2,6 +2,7 @@
 * USERS TEST DATA INSERTION
 ***************************/
 INSERT INTO users (username, email, password, is_admin) VALUES
+('admin', 'admin@secure.com', '$argon2id$v=19$m=19456,t=2,p=1$jbj6R/pN/iKJi/Hi8VqJYg$WYmcgwNDmfwcxGcqTO4IGOArJhuYtAv/pwdH2GOMROc', TRUE),
 ('User1', 'user1@example.com', 'password1', FALSE),
 ('User2', 'user2@example.com', 'password2', FALSE),
 ('User3', 'user3@example.com', 'password3', FALSE),

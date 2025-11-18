@@ -39,13 +39,23 @@ void showSnackbar({
   );
 }
 
-/*
+/* TODO: FIX TIME ZONE ISSUE
+ * 
  * Function used to get a text from how many time the date was
  */
 String formatTimeAgo(DateTime date) {
 
   final now = DateTime.now();
-  final diff = now.difference(date);
+  final utcDate = date.toUtc();
+  final diff = now.difference(utcDate);
+
+  print("DATE >>>>");
+  print(date);
+  print(utcDate);
+  print("DIFF >>>>");
+  print(now);
+  print(diff);
+  print(">>>>");
 
   if (diff.inSeconds < 60) return 'just now';
   if (diff.inMinutes < 60) return '${diff.inMinutes}m';
