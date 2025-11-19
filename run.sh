@@ -17,9 +17,24 @@ FRONTEND_PORT="8000"
 
 EXIT_CODE=0
 
+WAIT_TIME=3
+MAX_RETRIES=10
+
+BACKEND_PID=-1
+FRONTEND_PID=-1
+
 function cleanup {
+
 	echo "🛑 Arrêt des serveurs..."
-	kill $BACKEND_PID $FRONTEND_PID || true
+
+	# On tue les processus si ils existes
+	if [ "$BACKEND_PID" != "-1" ]; then
+		kill $BACKEND_PID
+	fi
+	if [ "$FRONTEND_PID" != "-1" ]; then
+		kill $FRONTEND_PID
+	fi
+
 	exit $EXIT_CODE
 }
 
@@ -38,7 +53,7 @@ trap handle_error ERR
 # Vérification des commandes
 # ----------------------------
 for cmd in cargo flutter psql systemctl initdb curl; do
-	command -v $cmd >/dev/null 2>&1 || { echo "❌ $cmd n'est pas installé"; exit 1; }
+	command -v $cmd > /dev/null 2>&1 || { echo "❌ $cmd n'est pas installé"; exit 1; }
 done
 
 # ----------------------------
@@ -109,6 +124,29 @@ sudo -u postgres psql -d $DB_NAME -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHE
 sudo -u postgres psql -d $DB_NAME -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $DB_USER;"
 sudo -u postgres psql -d $DB_NAME -c "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO $DB_USER;"
 
+# On vérifie que PostgreSQL est prêt
+retry=0
+echo "⏳ Vérification de PostgreSQL..."
+until pg_isready -U $DB_USER -d $DB_NAME -h $DB_HOST; do
+	retry=$((retry + 1))
+
+	if [ "$retry" -ge "$MAX_RETRIES" ]; then
+		echo "❌ PostgreSQL n'as pas répondu après $MAX_RETRIES tentative."
+		EXIT_CODE=1
+		exit $EXIT_CODE
+	fi
+
+	echo "   Toujours pas prêt ... ($retry/$MAX_RETRIES)"
+	sleep $WAIT_TIME
+done
+echo "✅ PostgreSQL est prêt!"
+
+
+echo "📂 Import de la structure de la base..."
+until pg_isready -U $DB_USER -d $DB_NAME -h $DB_HOST; do
+    sleep 1
+done
+
 # ----------------------------
 # Import de la structure
 # ----------------------------
@@ -129,28 +167,26 @@ cargo build --release
 
 # Run API
 echo "🚀 Lancement du backend Rust..."
-cargo run --release &
+cargo run --release > /dev/null &
 BACKEND_PID=$!
 cd ..
 
-# Verify that backend is running 
-wait_time=3
-max_retries=10
+# On vérifie que le backend écoute bien sur son port
 retry=0
-echo "⏳ Waiting for backend on port $BACKEND_PORT..."
+echo "En attente du backend sur le port $BACKEND_PORT..."
 until curl -sf "http://localhost:$BACKEND_PORT/" > /dev/null; do
 	retry=$((retry + 1))
 
-	if [ "$retry" -ge "$max_retries" ]; then
-		echo "❌ Backend did not respond after $max_retries attempts."
+	if [ "$retry" -ge "$MAX_RETRIES" ]; then
+		echo "❌ Le backend n'as pas répondu après $MAX_RETRIES tentative."
 		EXIT_CODE=1
 		exit $EXIT_CODE
 	fi
 
-	echo "   Still waiting... ($retry/$max_retries)"
-	sleep $wait_time
+	echo "   Toujours en attente... ($retry/$MAX_RETRIES)"
+	sleep $WAIT_TIME
 done
-echo "✅ Backend is ready!"
+echo "✅ Backend est prêt!"
 
 
 # ----------------------------
