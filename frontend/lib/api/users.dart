@@ -12,7 +12,7 @@ Future<User> fetchUser(int id) async {
   final token = TokenHandler().token;
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/$id'),
+    Uri.parse('http://127.0.0.1:8080/users/$id'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,7 +37,7 @@ Future<List<User>> fetchUsers({int limit = 20, int offset = 0}) async {
   final token = TokenHandler().token;
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users?limit=$limit&offset=$offset'),
+    Uri.parse('http://127.0.0.1:8080/users?limit=$limit&offset=$offset'),
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -66,7 +66,7 @@ Future<bool> deleteUser(User user) async {
   try {
 
     final response = await http.delete(
-      Uri.parse('http://0.0.0.0:8080/users/delete/$id'),
+      Uri.parse('http://127.0.0.1:8080/users/delete/$id'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -97,7 +97,7 @@ Future<User?> createUser(String username, String email, String password, String?
     isAdmin = false;
 
   final response = await http.post(
-    Uri.parse('http://0.0.0.0:8080/users/create'),
+    Uri.parse('http://127.0.0.1:8080/users/create'),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -140,7 +140,7 @@ Future<bool> updateUser(User user, String? password) async {
     }
 
     final response = await http.put(
-      Uri.parse('http://0.0.0.0:8080/users/update/$id'),
+      Uri.parse('http://127.0.0.1:8080/users/update/$id'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -181,7 +181,7 @@ Future<User> fetchConnectedUser() async {
 
   // Try getting connected user data
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/users/me'),
+    Uri.parse('http://127.0.0.1:8080/users/me'),
     headers: {
       'Authorization': 'Bearer $token',  // Include token in the Authorization header
       'Content-Type': 'application/json',

@@ -10,7 +10,7 @@ Future<bool> login(String username, String password) async {
 
   try {
 
-    final response = await http.post(Uri.parse('http://0.0.0.0:8080/auth/login'),
+    final response = await http.post(Uri.parse('http://127.0.0.1:8080/auth/login'),
       headers: {
         'Content-Type': 'application/json',
       },

@@ -143,7 +143,7 @@ echo "✅ Backend is ready!"
 echo "🌐 Lancement du frontend Flutter Web..."
 cd frontend
 flutter clean
-flutter run -d chrome --release --web-port 8000 --web-hostname 0.0.0.0 &
+flutter run -d chrome --release --web-port 8000 --web-hostname 127.0.0.1 &
 FRONTEND_PID=$!
 cd ..
 

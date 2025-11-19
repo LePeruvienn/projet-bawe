@@ -9,7 +9,7 @@ import '../auth/tokenHandler.dart';
 Future<Post> fetchPost(int id) async {
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/posts/$id'),
+    Uri.parse('http://127.0.0.1:8080/posts/$id'),
   );
 
   if (response.statusCode == 200) {
@@ -30,7 +30,7 @@ Future<List<Post>> fetchPosts({int limit = 20, int offset = 0}) async {
   final token = TokenHandler().token;
 
   final response = await http.get(
-    Uri.parse('http://0.0.0.0:8080/posts?limit=$limit&offset=$offset'), headers: {
+    Uri.parse('http://127.0.0.1:8080/posts?limit=$limit&offset=$offset'), headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -58,7 +58,7 @@ Future<bool> deletePost(Post post) async {
   try {
 
     final response = await http.delete(
-      Uri.parse('http://0.0.0.0:8080/posts/delete/$id'),
+      Uri.parse('http://127.0.0.1:8080/posts/delete/$id'),
       headers: {
         'Authorization': 'Bearer $token',  // Include token in the Authorization header
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -95,7 +95,7 @@ Future<Post?> createPost(String content) async {
 
   final response = await http.post(
 
-  Uri.parse('http://0.0.0.0:8080/posts/create'),
+  Uri.parse('http://127.0.0.1:8080/posts/create'),
     headers: {
       'Authorization': 'Bearer $token',  // Include token in the Authorization header
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -129,7 +129,7 @@ Future<bool> likePost(int id) async {
 
     final response = await http.get(
 
-    Uri.parse('http://0.0.0.0:8080/posts/like/$id'),
+    Uri.parse('http://127.0.0.1:8080/posts/like/$id'),
       headers: {
         'Authorization': 'Bearer $token',  // Include token in the Authorization header
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -179,7 +179,7 @@ Future<bool> unlikePost(int id) async {
 
     final response = await http.get(
 
-    Uri.parse('http://0.0.0.0:8080/posts/unlike/$id'),
+    Uri.parse('http://127.0.0.1:8080/posts/unlike/$id'),
       headers: {
         'Authorization': 'Bearer $token',  // Include token in the Authorization header
         'Content-Type': 'application/x-www-form-urlencoded',

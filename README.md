@@ -37,7 +37,7 @@ Le rapport se trouve dans le repertoire `rapport/rapport.pdf`, on y trouve aussi
 - `8080` : API Web (Rust)
 - `8000` : Client Web (Flutter)
 
-Pour acceder au site internet : [http://0.0.0.0:8000/](http://0.0.0.0:8000/)
+Pour acceder au site internet : [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 - **NB**: Le compte administrateur par défaut est `admin` avec comme mot de passe `admin`.
 
@@ -212,7 +212,7 @@ cd frontend
 
 ```bash
 flutter clean
-flutter run -d chrome --release --web-port 8000 --web-hostname 0.0.0.0
+flutter run -d chrome --release --web-port 8000 --web-hostname 127.0.0.1
 ```
 
 Flutter lancera un navigateur Chrome pointant vers l'application Web. Le frontend interagit avec le backend Rust.
@@ -220,7 +220,7 @@ Flutter lancera un navigateur Chrome pointant vers l'application Web. Le fronten
 **⚠️ Cepandant le site est tout autant accessible sur firefox, il suffit simplement d'ouvrir dans le navigateur le lien** :
 
 ```
-http://0.0.0.0:8000/
+http://127.0.0.1:8000/
 ```
 
 -----
