@@ -17,6 +17,23 @@ FRONTEND_PORT="8000"
 
 EXIT_CODE=0
 
+function cleanup {
+	echo "🛑 Arrêt des serveurs..."
+	kill $BACKEND_PID $FRONTEND_PID || true
+	exit $EXIT_CODE
+}
+
+function handle_error {
+	echo "❌ ERREUR LORS DE L'EXECUTION DU PROGRAMME"
+	cleanup
+	exit 1
+}
+
+# Added trop be sure to kill process when exiting or Ctr+C
+trap cleanup SIGINT
+trap cleanup SIGTSTP
+trap handle_error ERR
+
 # ----------------------------
 # Vérification des commandes
 # ----------------------------
@@ -143,21 +160,12 @@ echo "✅ Backend is ready!"
 echo "🌐 Lancement du frontend Flutter Web..."
 cd frontend
 flutter clean
-flutter run -d chrome --release --web-port 8000 --web-hostname 127.0.0.1 &
+flutter run -d chrome --release --web-port 8000 --web-hostname 127.0.0.1
 FRONTEND_PID=$!
 cd ..
 
 # ----------------------------
-# Gestion Ctrl+C pour arrêter proprement
+# CLEAN DE FIN DE PROGRAMME
 # ----------------------------
-function cleanup {
-	echo "🛑 Arrêt des serveurs..."
-	kill $BACKEND_PID $FRONTEND_PID || true
-	exit $EXIT_CODE
-}
 
-# Added trop be sure to kill process when exiting or Ctr+C
-trap cleanup SIGINT
-trap cleanup EXIT
-
-wait
+cleanup
