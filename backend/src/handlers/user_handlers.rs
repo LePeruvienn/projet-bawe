@@ -25,7 +25,7 @@ pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<
 
     let query = sqlx::query_as::<_, User>("
         SELECT id, username, email, title, created_at, is_admin FROM users
-        ORDER BY created_at DESC
+        ORDER BY created_at DESC, id DESC
         LIMIT $1
         OFFSET $2;
     ")
