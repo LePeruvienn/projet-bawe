@@ -21,23 +21,21 @@ pub async fn list(Extension(auth_user): Extension<AuthUser>, State(pool): State<
 
     // Create query
     let query = sqlx::query_as::<_, PostWithUserData>("
-        SELECT 
+        SELECT
             p.id,
             p.content,
             p.created_at,
             p.likes_count,
-            u.id as user_id,
-            u.username as user_username,
-            u.title as user_title,
-            u.created_at as user_created_at,
-            EXISTS (
-                SELECT 1
-                FROM user_likes ul 
-                WHERE ul.user_id = $1 AND ul.post_id = p.id
-            ) AS auth_is_liked
+            u.id AS user_id,
+            u.username AS user_username,
+            u.title AS user_title,
+            u.created_at AS user_created_at,
+            -- Check if a match was found in the LEFT JOIN
+            CASE WHEN ul.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS auth_is_liked
         FROM posts p
         JOIN users u ON p.user_id = u.id
-        ORDER BY p.created_at DESC
+        LEFT JOIN user_likes ul ON ul.post_id = p.id AND ul.user_id = $1
+        ORDER BY p.created_at DESC, p.id DESC
         LIMIT $2
         OFFSET $3;
     ")
