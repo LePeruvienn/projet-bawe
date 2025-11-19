@@ -37,7 +37,9 @@ Le rapport se trouve dans le repertoire `rapport/rapport.pdf`, on y trouve aussi
 - `8080` : API Web (Rust)
 - `8000` : Client Web (Flutter)
 
-Pour acceder au site internet : [](http://0.0.0.0:8000/)
+Pour acceder au site internet : [http://0.0.0.0:8000/](http://0.0.0.0:8000/)
+
+- **NB**: Le compte administrateur par défaut est `admin` avec comme mot de passe `admin`.
 
 ---
 
@@ -109,14 +111,14 @@ flutter doctor
 
 ## 💻 Script de lancement
 
-Vous pouvez lancer le projet à l'aide du script `run.sh` ou `run-docker.sh` (mais necessites les dépendances de docker).
+**Vous pouvez lancer le projet à l'aide du script `run.sh`** ou `run-docker.sh` (mais necessites les dépendances de docker).
 
 ```bash
 ./run.sh # Pour un lancement SANS docker
 ./run-docker.sh # Pour un lancement AVEC docker
 ```
 
-Si vous ne préferez pas je vous laisse suivre les instruction ci dessous.
+*Si vous ne préferez pas je vous laisse suivre les instruction ci dessous.*
 
 ## 1\. 🐘 Configuration de la Base de Données PostgreSQL
 
@@ -243,3 +245,5 @@ Quelques bugs mineurs persisites
 * Il est possible de supprimer son propre compte (*cela ne créer pas vraiment de bug mais c'est bizzare*).
 
 ----
+
+*Merci d'avoir lu !*
