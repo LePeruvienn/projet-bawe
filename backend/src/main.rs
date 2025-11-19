@@ -6,6 +6,7 @@ use std::env;
 use std::time::Duration;
 use tokio::time::sleep;
 use tower_http::cors::{CorsLayer, Any};
+use axum::routing::get;
 
 pub mod handlers;
 pub mod models;
@@ -15,6 +16,8 @@ pub mod auth;
 use crate::routes::user_routes;
 use crate::routes::post_routes;
 use crate::routes:: auth_routes;
+
+use crate::handlers::ping;
 
 /*
  * Try to connect to the database with multiplie tries
@@ -48,6 +51,8 @@ async fn wait_for_db(database_url: &str, retries: u8, delay_secs: u64) -> sqlx::
     }
 }
 
+
+
 /********************
  *      MAIN        *
  ********************/
@@ -74,7 +79,8 @@ async fn main() {
 
     // Create http router with all paths and routes
     let app = Router::new()
-        .nest("/users", user_routes::routes())
+        .route("/", get(ping)) // Ping route (used to check if backend is up)
+        .nest("/users", user_routes::routes()) // API routes
         .nest("/posts", post_routes::routes())
         .nest("/auth", auth_routes::routes())
         .with_state(pool.clone())

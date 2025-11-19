@@ -9,15 +9,35 @@ DB_USER="appdb"
 DB_PASSWORD="appdb"
 DB_NAME="appdb"
 DB_HOST="localhost"
-DB_PORT="5432"
 PG_DATA_DIR="/var/lib/postgres/data"
+
+DB_PORT="5432"
+BACKEND_PORT="8080"
+FRONTEND_PORT="8000"
+
+EXIT_CODE=0
 
 # ----------------------------
 # Vérification des commandes
 # ----------------------------
-for cmd in cargo flutter psql systemctl initdb; do
+for cmd in cargo flutter psql systemctl initdb curl; do
 	command -v $cmd >/dev/null 2>&1 || { echo "❌ $cmd n'est pas installé"; exit 1; }
 done
+
+# ----------------------------
+# Vérification des ports
+# ----------------------------
+
+if ss -tuln | grep -E ":($BACKEND_PORT|$FRONTEND_PORT) " > /dev/null; then
+	echo "❌ Some ports are already in use : $BACKEND_PORT, $FRONTEND_PORT"
+	echo "   Please set these port free before running the script."
+	echo "   -> cant run project exiting ..."
+	EXIT_CODE=1
+	exit $EXIT_CODE
+else
+	echo "✅ All ports are free"
+fi
+
 
 echo "---------------------------------------------"
 echo "🔄 Vérification du service PostgreSQL..."
@@ -84,15 +104,42 @@ done
 # ----------------------------
 # Lancement backend Rust
 # ----------------------------
-echo "🚀 Lancement du backend Rust..."
+
+# Build backend
+echo "🔧 Building backend Rust..."
 cd backend
+cargo build --release
+
+# Run API
+echo "🚀 Lancement du backend Rust..."
 cargo run --release &
 BACKEND_PID=$!
 cd ..
 
+# Verify that backend is running 
+wait_time=3
+max_retries=10
+retry=0
+echo "⏳ Waiting for backend on port $BACKEND_PORT..."
+until curl -sf "http://localhost:$BACKEND_PORT/" > /dev/null; do
+	retry=$((retry + 1))
+
+	if [ "$retry" -ge "$max_retries" ]; then
+		echo "❌ Backend did not respond after $max_retries attempts."
+		EXIT_CODE=1
+		exit $EXIT_CODE
+	fi
+
+	echo "   Still waiting... ($retry/$max_retries)"
+	sleep $wait_time
+done
+echo "✅ Backend is ready!"
+
+
 # ----------------------------
 # Lancement frontend Flutter Web
 # ----------------------------
+
 echo "🌐 Lancement du frontend Flutter Web..."
 cd frontend
 flutter clean
@@ -106,8 +153,11 @@ cd ..
 function cleanup {
 	echo "🛑 Arrêt des serveurs..."
 	kill $BACKEND_PID $FRONTEND_PID || true
-	exit 0
+	exit $EXIT_CODE
 }
+
+# Added trop be sure to kill process when exiting or Ctr+C
 trap cleanup SIGINT
+trap cleanup EXIT
 
 wait

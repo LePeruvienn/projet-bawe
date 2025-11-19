@@ -1,3 +1,4 @@
+use axum::http::StatusCode;
 use serde::Deserialize;
 
 // Expose rust files
@@ -18,3 +19,11 @@ pub struct PaginationQuery {
     pub limit: Option<i64>,   // The maximum number of posts to return
     // pub since_created_at: Option<String>
 }
+
+// This is only used to make the backend return 200 when trying to acess it
+// - This will help me check if the backend is UP when running my script
+pub async fn ping() -> StatusCode {
+
+    StatusCode::OK
+}
+

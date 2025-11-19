@@ -15,7 +15,7 @@ Le projet se compose de :
 
 Le rapport se trouve dans le repertoire `rapport/rapport.pdf`, on y trouve aussi :
 
-- Le fichier `.text` qui as permit de le générer
+- Le fichier `.tex` qui as permit de le générer
 - Les ressources nessaire à la création du documents (images)
 
 ---
@@ -146,18 +146,22 @@ Les configurations par défaut sont :
 
 Exécutez les commandes suivantes en tant qu'utilisateur `postgres` (généralement via `sudo`) pour créer les ressources nécessaires :
 
-1.  **Créer l'utilisateur:**
-    ```bash
-    sudo -u postgres psql -c "CREATE USER appdb WITH PASSWORD 'appdb';"
-    ```
-2.  **Créer la base de données et l'attribuer à l'utilisateur:**
-    ```bash
-    sudo -u postgres psql -c "CREATE DATABASE appdb OWNER appdb;"
-    ```
-3.  **Attribuer les droits nécessaires** (pour s'assurer que l'utilisateur `appdb` peut gérer le schéma `public`) :
-    ```bash
-    sudo -u postgres psql -d appdb -c "GRANT ALL PRIVILEGES ON SCHEMA public TO appdb;"
-    ```
+1. **Créer l'utilisateur:**
+
+```bash
+sudo -u postgres psql -c "CREATE USER appdb WITH PASSWORD 'appdb';"
+```
+2. **Créer la base de données et l'attribuer à l'utilisateur:**
+
+```bash
+sudo -u postgres psql -c "CREATE DATABASE appdb OWNER appdb;"
+```
+
+3. **Attribuer les droits nécessaires** (pour s'assurer que l'utilisateur `appdb` peut gérer le schéma `public`) :
+
+```bash
+sudo -u postgres psql -d appdb -c "GRANT ALL PRIVILEGES ON SCHEMA public TO appdb;"
+```
 
 ### C. Importation de la Structure
 
@@ -211,6 +215,12 @@ flutter run -d chrome --release --web-port 8000 --web-hostname 0.0.0.0
 
 Flutter lancera un navigateur Chrome pointant vers l'application Web. Le frontend interagit avec le backend Rust.
 
+**⚠️ Cepandant le site est tout autant accessible sur firefox, il suffit simplement d'ouvrir dans le navigateur le lien** :
+
+```
+http://0.0.0.0:8000/
+```
+
 -----
 
 ## 🛑 Arrêt du Projet
@@ -220,21 +230,16 @@ Pour arrêter l'application, vous devez arrêter les deux processus manuellement
 1. **Backend Rust :** Revenez au terminal où `cargo run` est actif et appuyez sur **`Ctrl+C`**.
 2. **Frontend Flutter :** Revenez au terminal où `flutter run` est actif et appuyez sur **`q`** ou **`Ctrl+C`**.
 
----
+PostgreSQL sera toujours acitif tant que vous n'arretez pas son serivice via `systemctl stop postgres`.
+
+----
 
 # 🐞 **Bugs connus**
 
-* Le like peut disparaître après un changement de résolution.
-* Le thème peut parfois ne pas s’appliquer immédiatement.
-* Il est possible de supprimer son propre compte.
+Quelques bugs mineurs persisites
 
----
+* Le like peut disparaître après un changement de résolution (*le responsive fait bugger l'affichage des likes*).
+* Le thème peut parfois ne pas s’appliquer immédiatement (*marche généralement 1 fois sur 2 pour le mode clair*).
+* Il est possible de supprimer son propre compte (*cela ne créer pas vraiment de bug mais c'est bizzare*).
 
-# ✔️ **Projet conforme**
-
-TODO: 
-Ce projet respecte l’intégralité des consignes du sujet BAWE.
-
----
-
-*Arthur PINEL - ENSIIE FISA 2025*
+----
